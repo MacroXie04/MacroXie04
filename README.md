@@ -4,7 +4,7 @@
 ![Python](https://github.com/macroxie/macroxie/blob/main/icons/python.svg)
 ![JavaScript](https://github.com/macroxie/macroxiey/blob/main/icons/javascript.svg)
 ![csswizardry](https://github.com/macroxie/macroxie/blob/main/icons/csswizardry.svg)
-![mysql](https://github.com/macroxie/macroxie/blob/main/icons/mysql.svg)
+![mysql](https://simpleicons.org/icons/mysql.svg)
 
 
 

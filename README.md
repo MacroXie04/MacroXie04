@@ -1,11 +1,8 @@
 # Hi there 👋
 
 ## Programming language
-<img src="https://simpleicons.org/icons/python.svg" width="50" height="50">
-<img src="https://simpleicons.org/icons/javascript.svg" width="50" height="50">
-<img src="https://simpleicons.org/icons/django.svg" width="50" height="50">
-<img src="" width="50" height="50">
-<img src="https://simpleicons.org/icons/mysql.svg" width="50" height="50">
+
+<img src="https://simpleicons.org/icons/python.svg" width="50" height="50" style="margin-right: 20px;"><img src="https://simpleicons.org/icons/javascript.svg" width="50" height="50" style="margin-right: 20px;"><img src="https://simpleicons.org/icons/django.svg" width="50" height="50" style="margin-right: 20px;">
 
 
 

@@ -1,11 +1,13 @@
-### Hi there 👋
+# Hi there 👋
 
-<p>
-  🎶Now playing ...🎶 <em>(powered by <a href="https://github.com/MrStanDu33/spotify-informer">spotify-explorer</a>)</em><br/>
-  <a href="http://spotify-informer.daniels-roth-stan.fr/">
-    <img height="75" src="http://spotify-informer.daniels-roth-stan.fr/api"/>
-  </a>
-</p>
+## Programming language
+![Python](https://github.com/macroxie/macroxie/blob/main/icons/python.svg)
+![JavaScript](https://github.com/macroxie/macroxiey/blob/main/icons/javascript.svg)
+![csswizardry](https://github.com/macroxie/macroxie/blob/main/icons/csswizardry.svg)
+![mysql](https://github.com/macroxie/macroxie/blob/main/icons/mysql.svg)
+
+
+
 
 **MacroXie/MacroXie** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 

@@ -36,7 +36,7 @@ https://simpleicons.org/icons/git.svg
 anaconda
 https://simpleicons.org/icons/anaconda.svg
 
-
+<img id="example-view" src="https://spotify-github-profile.vercel.app/api/view.svg?uid=31ftptstvfi7q2sd5wsjnl3ff6yi&amp;cover_image=true&amp;theme=novatorem&amp;show_offline=true&amp;background_color=ffffff&amp;interchange=false&amp;bar_color=53b14f&amp;bar_color_cover=false">
 
 
 ![Hongzhe's GitHub stats](https://github-readme-stats-macroxie.vercel.app/api?username=macroxie&show_icons=true&theme=transparent)

@@ -1,12 +1,22 @@
 # Hi there 👋
 
-<h2> 🚀 &nbsp;Some Tools I Have Used and Learned</h2>
+<h2>😍😍😍&nbsp;Programming Language</h2>
 <p align="left">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="vscode" width="45" height="45"/>
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bash/bash-original.svg" alt="bash" width="45" height="45"/>
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="php" width="45" height="45"/>
+<img src="https://cdn-icons-png.flaticon.com/128/5968/5968282.png" alt="Java" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+<img src="https://cdn-icons-png.flaticon.com/128/5968/5968350.png" alt="Python" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+<img src="https://cdn1.iconfinder.com/data/icons/akar-vol-1/24/django-fill-128.png" alt="Django" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+<img src="https://cdn4.iconfinder.com/data/icons/logos-brands-5/24/mysql-128.png" alt="MySQL" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+<img src="https://simpleicons.org/icons/flask.svg" alt="Flask" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
 </p>
 
+<h2>  😎😎😎&nbsp;Programming Tools</h2>
+<p align="left">
+<img src="https://cdn4.iconfinder.com/data/icons/logos-brands-5/24/vim-128.png" alt="Vim" width="45" height="45"/>
+
+</p>
+
+Flask
+https://simpleicons.org/icons/flask.svg
 java
 https://cdn-icons-png.flaticon.com/128/5968/5968282.png
 python

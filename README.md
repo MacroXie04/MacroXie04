@@ -1,10 +1,11 @@
 # Hi there 👋
 
 ## Programming language
-![Python](https://github.com/macroxie/macroxie/blob/main/icons/python.svg)
-![JavaScript](https://github.com/macroxie/macroxiey/blob/main/icons/javascript.svg)
-![csswizardry](https://github.com/macroxie/macroxie/blob/main/icons/csswizardry.svg)
-![mysql](https://simpleicons.org/icons/mysql.svg)
+<img src="https://simpleicons.org/icons/python.svg" width="50" height="50">
+<img src="https://simpleicons.org/icons/javascript.svg" width="50" height="50">
+<img src="https://simpleicons.org/icons/django.svg" width="50" height="50">
+<img src="" width="50" height="50">
+<img src="https://simpleicons.org/icons/mysql.svg" width="50" height="50">
 
 
 

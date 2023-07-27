@@ -16,6 +16,11 @@
 
 </p>
 
+
+<img id="example-view" src="https://spotify-github-profile.vercel.app/api/view.svg?uid=31ftptstvfi7q2sd5wsjnl3ff6yi&amp;cover_image=true&amp;theme=natemoo-re&amp;show_offline=false&amp;background_color=121212&amp;interchange=true&amp;bar_color=53b14f&amp;bar_color_cover=false">
+
+
+
 Flask
 https://simpleicons.org/icons/flask.svg
 java

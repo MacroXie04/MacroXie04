@@ -20,9 +20,4 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 
-<details>
-  <summary>:zap: GitHub Stats</summary>
-
-  <img align="left" alt="Hongzhe's GitHub Stats" src="github-readme-stats-jade-tau-57.vercel.app/api?username=Hongzhe&show_icons=true&hide_border=false&title_color=ff652f&icon_color=FFE400&bg_color=09131B&text_color=ffffff&border_color=0c1a25" />
-
-</details>
+![Anurag's GitHub stats](https://github-readme-stats-jade-tau-57.vercel.app/api?username=anuraghazra&show_icons=true&theme=transparent)

@@ -17,9 +17,20 @@
 
 <h2>😎 &nbsp;Programming Tools</h2>
 <p align="left">
-<img src="" alt="Vim" width="45" height="45"/>
-
+<img src="https://github.com/MacroXie/MacroXie/blob/main/static/vim.png?raw=true" alt="Java" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+&nbsp;
+<img src="" alt="Python" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+&nbsp;
+<img src="https://cdn1.iconfinder.com/data/icons/akar-vol-1/24/django-fill-128.png" alt="Django" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+&nbsp;
+<img src="https://cdn4.iconfinder.com/data/icons/logos-brands-5/24/mysql-128.png" alt="MySQL" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+&nbsp;
+<img src="https://simpleicons.org/icons/flask.svg" alt="Flask" width="45" height="45" style="margin-right: 10px; margin-left: 10px;"/>
+&nbsp;
 </p>
+
+
+
 
 
 <img id="example-view" src="https://spotify-github-profile.vercel.app/api/view.svg?uid=31ftptstvfi7q2sd5wsjnl3ff6yi&amp;cover_image=true&amp;theme=natemoo-re&amp;show_offline=false&amp;background_color=121212&amp;interchange=true&amp;bar_color=53b14f&amp;bar_color_cover=false">

@@ -3,7 +3,7 @@
 
 <p>Hi, I'm Macro! I'm a vibrant and optimistic software developer with a deep passion for Python. I wholeheartedly believe in the transformative power of technology and am committed to making the world a better place through code. Beyond my technical pursuits, I genuinely love interacting with people. I cherish every opportunity to exchange knowledge, perspectives, and stories. To me, the best moments of learning and growth often happen during these human-to-human interactions. Whether you're keen to dive deep into tech, looking for a collaboration, or just fancy a chat, I'm always here and eager to connect!</p>
 
-<h2>😍 &nbsp;Programming Language</h2>
+<h2>😍 &nbsp;Technologies & Tools</h2>
 <p align="left">
 <img src="https://cdn-icons-png.flaticon.com/128/5968/5968282.png" alt="Java" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -27,7 +27,7 @@
     <li>📧 Email: <a href="mailto:xiehongzhe04@gmail.com">xiehongzhe04@gmail.com</a></li>
 </ul>
 
-<h2>😎 &nbsp;Programming Tools</h2>
+<h2>😎 &nbsp;Integrated Development Environment</h2>
 <p align="left">
 <img src="https://github.com/MacroXie/MacroXie/blob/main/static/vim.png?raw=true" alt="Java" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

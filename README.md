@@ -5,8 +5,6 @@
 
 <h2>😍 &nbsp;Technologies & Tools</h2>
 <p align="left">
-<img src="https://cdn-icons-png.flaticon.com/128/5968/5968282.png" alt="Java" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="https://cdn-icons-png.flaticon.com/128/5968/5968350.png" alt="Python" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="https://cdn1.iconfinder.com/data/icons/akar-vol-1/24/django-fill-128.png" alt="Django" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>

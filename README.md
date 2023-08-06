@@ -24,7 +24,7 @@
 
 <h2>📫 How to reach me:</h2>
 <ul>
-    <li>📧 Email: <a href="mailto:macro@email.com">xiehongzhe04@gmail.com</a></li>
+    <li>📧 Email: <a href="mailto:xiehongzhe04@gmail.com">xiehongzhe04@gmail.com</a></li>
 </ul>
 
 <h2>😎 &nbsp;Programming Tools</h2>

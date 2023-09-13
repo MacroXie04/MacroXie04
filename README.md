@@ -27,8 +27,6 @@
 
 <h2>😎 &nbsp;Integrated Development Environment</h2>
 <p align="left">
-<img src="https://github.com/MacroXie/MacroXie/blob/main/static/vim.png?raw=true" alt="Java" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="https://github.com/MacroXie/MacroXie/blob/main/static/Vscode.jpg?raw=true" alt="vscode" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="https://github.com/MacroXie/MacroXie/blob/main/static/Pycharm.jpg?raw=true" alt="Pycharm" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
@@ -36,8 +34,6 @@
 <img src="https://github.com/MacroXie/MacroXie/blob/main/static/fleet.jpg?raw=true" alt="Fleet" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="https://github.com/MacroXie/MacroXie/blob/main/static/jb.png?raw=true" alt="JB" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="https://simpleicons.org/icons/anaconda.svg" alt="anconda" width="60" height="60" style="margin-right: 10px; margin-left: 10px;"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </p>
 

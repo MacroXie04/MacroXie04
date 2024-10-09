@@ -13,6 +13,6 @@
 
 <h2>LinkedIn</h2>
 
-![image](https://github.com/user-attachments/assets/97f9aae3-0a63-4c01-8117-473fcedba7b4)
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
 
 

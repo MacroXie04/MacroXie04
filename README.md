@@ -11,3 +11,8 @@
     <li>📧 Email: <a href="mailto:xiehongzhe04@gmail.com">xiehongzhe04@gmail.com</a></li>
 </ul>
 
+<h2>LinkedIn</h2>
+
+![image](https://github.com/user-attachments/assets/97f9aae3-0a63-4c01-8117-473fcedba7b4)
+
+

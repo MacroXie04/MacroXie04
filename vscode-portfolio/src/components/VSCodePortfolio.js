@@ -15,31 +15,12 @@ const VSCodePortfolio = () => {
       const contentLines = currentContent.split('\n').length;
       
       // Calculate minimum lines needed to fill the editor height
-      const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       
-      // Determine line height based on screen size
-      let lineHeight = 28; // Default desktop
-      let uiHeight = 96; // Title bar + tabs + status bar
-      let padding = 48; // Top and bottom padding
-      
-      if (viewportWidth <= 360) {
-        lineHeight = 20;
-        uiHeight = 76;
-        padding = 20;
-      } else if (viewportWidth <= 480) {
-        lineHeight = 22;
-        uiHeight = 80;
-        padding = 24;
-      } else if (viewportWidth <= 768) {
-        lineHeight = 24;
-        uiHeight = 88; // Smaller UI elements on mobile
-        padding = 32;
-      } else if (viewportWidth <= 1024) {
-        lineHeight = 26;
-        uiHeight = 92;
-        padding = 40;
-      }
+      // Use consistent values regardless of screen size
+      const lineHeight = 28;
+      const uiHeight = 120; // Title bar + tabs + status bar (adjusted for larger padding)
+      const padding = 48; // Top and bottom padding
       
       const editorHeight = viewportHeight - uiHeight - padding;
       const minLines = Math.max(contentLines, Math.floor(editorHeight / lineHeight));
@@ -50,14 +31,10 @@ const VSCodePortfolio = () => {
     updateLineNumbers();
   }, [activeTab]);
 
-  // Update line numbers on window resize and handle sidebar visibility
+  // Handle sidebar visibility and line numbers on window resize
   useEffect(() => {
     const handleResize = () => {
-      const currentContent = portfolioData[activeTab]?.content || '';
-      const contentLines = currentContent.split('\n').length;
-      
       const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
       
       // Auto-hide sidebar on mobile screens
       if (viewportWidth <= 768) {
@@ -66,27 +43,14 @@ const VSCodePortfolio = () => {
         setSidebarVisible(true);
       }
       
-      let lineHeight = 28;
-      let uiHeight = 96;
-      let padding = 48;
+      // Update line numbers with consistent values
+      const currentContent = portfolioData[activeTab]?.content || '';
+      const contentLines = currentContent.split('\n').length;
+      const viewportHeight = window.innerHeight;
       
-      if (viewportWidth <= 360) {
-        lineHeight = 20;
-        uiHeight = 76;
-        padding = 20;
-      } else if (viewportWidth <= 480) {
-        lineHeight = 22;
-        uiHeight = 80;
-        padding = 24;
-      } else if (viewportWidth <= 768) {
-        lineHeight = 24;
-        uiHeight = 88;
-        padding = 32;
-      } else if (viewportWidth <= 1024) {
-        lineHeight = 26;
-        uiHeight = 92;
-        padding = 40;
-      }
+      const lineHeight = 28;
+      const uiHeight = 120; // Adjusted for larger padding
+      const padding = 48;
       
       const editorHeight = viewportHeight - uiHeight - padding;
       const minLines = Math.max(contentLines, Math.floor(editorHeight / lineHeight));
@@ -272,7 +236,7 @@ const VSCodePortfolio = () => {
         >
           ☰
         </button>
-        <span>Hongzhe Xie - Portfolio - Visual Studio Code</span>
+        <span>Hongzhe Xie - Portfolio</span>
         <div className="window-controls">
           <div className="control minimize"></div>
           <div className="control maximize"></div>
@@ -296,7 +260,6 @@ const VSCodePortfolio = () => {
             {fileStructure.map((folder, folderIndex) => (
               <div key={folderIndex} className="folder">
                 <div className="folder-name">
-                  <span className="folder-icon">▼</span>
                   {folder.name}
                 </div>
                 {folder.files.map((file, fileIndex) => (
@@ -335,12 +298,6 @@ const VSCodePortfolio = () => {
           </div>
 
           <div className="editor">
-            <div className="line-numbers">
-              {lineNumbers.map((num) => (
-                <div key={num}>{num}</div>
-              ))}
-            </div>
-            
             {openTabs.map((tabKey) => {
               const tabData = portfolioData[tabKey];
               return (
@@ -348,6 +305,11 @@ const VSCodePortfolio = () => {
                   key={tabKey}
                   className={`editor-content ${activeTab === tabKey ? 'active' : ''}`}
                 >
+                  <div className="line-numbers">
+                    {lineNumbers.map((num) => (
+                      <div key={num}>{num}</div>
+                    ))}
+                  </div>
                   {renderContent(tabData?.content, tabData?.language)}
                 </div>
               );
@@ -359,15 +321,12 @@ const VSCodePortfolio = () => {
       {/* Status Bar */}
       <div className="status-bar">
         <div className="status-left">
-          <span>● Git</span>
-          <span>✓ No issues</span>
-          <span>Ln {portfolioData[activeTab]?.content.split('\n').length}, Col 1</span>
+          <span>GitHub Pages</span>
         </div>
         <div className="status-right">
           <span>{portfolioData[activeTab]?.language || 'Markdown'}</span>
+          <span>LF</span>
           <span>UTF-8</span>
-          <span>CRLF</span>
-          <span>Spaces: 2</span>
         </div>
       </div>
     </div>

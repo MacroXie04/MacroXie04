@@ -7,7 +7,5 @@
 
 <h2>How to reach me:</h2>
 <ul>
-    <li>Email: <a href="mailto:hongzhexie@ucmerced.edu">hongzhexie@ucmerced.edu</a></li>
-    <li>Email: <a href="mailto:xiehongzhe04@gmail.com">xiehongzhe04@gmail.com</a></li>
+    <li>Website: <a href="https://macroxie04.github.io/MacroXie04/" target="_blank" rel="noopener noreferrer">macroxie04.github.io/MacroXie04/</a></li>
 </ul>
-

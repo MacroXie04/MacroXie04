@@ -1,0 +1,38 @@
+# Configuration for GitHub labeler action
+# This automatically labels PRs based on file changes
+
+# Frontend changes
+frontend:
+  - pages/src/**/*
+  - pages/public/**/*
+  - pages/*.json
+  - pages/*.js
+
+# Test changes
+tests:
+  - pages/**/*.test.js
+  - pages/**/*.spec.js
+  - pages/jest.config.js
+  - pages/.eslintrc.js
+
+# Documentation
+documentation:
+  - README.md
+  - pages/README.md
+  - '**/*.md'
+
+# CI/CD changes
+ci/cd:
+  - .github/workflows/**/*
+  - .github/**/*
+
+# Dependencies
+dependencies:
+  - pages/package.json
+  - pages/package-lock.json
+
+# Configuration
+config:
+  - pages/.eslintrc.js
+  - pages/jest.config.js
+  - '**/*.config.js'

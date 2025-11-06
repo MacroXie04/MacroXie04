@@ -3,23 +3,23 @@ import CodeEditor from './index';
 
 describe('CodeEditor Component', () => {
   test('renders without crashing', () => {
-    render(<CodeEditor />);
-    const container = document.querySelector('.code-editor-container');
-    expect(container).toBeInTheDocument();
+    const { container } = render(<CodeEditor />);
+    const editorContainer = container.querySelector('.code-editor-container');
+    expect(editorContainer).toBeInTheDocument();
   });
 
   test('displays title bar with name', () => {
-    render(<CodeEditor />);
+    const { container } = render(<CodeEditor />);
     // Be specific - look for the title text in the title bar
-    const titleBar = document.querySelector('.title-text');
+    const titleBar = container.querySelector('.title-text');
     expect(titleBar).toBeInTheDocument();
     expect(titleBar.textContent).toBe('Hongzhe Xie');
   });
 
   test('shows README.md tab by default', () => {
-    render(<CodeEditor />);
+    const { container } = render(<CodeEditor />);
     // Check if README.md tab is visible - be specific to tab area
-    const tab = document.querySelector('.tab.active span');
+    const tab = container.querySelector('.tab.active span');
     expect(tab).toBeInTheDocument();
     expect(tab.textContent).toBe('README.md');
   });

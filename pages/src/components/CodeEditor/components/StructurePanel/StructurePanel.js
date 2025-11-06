@@ -26,16 +26,16 @@ const StructurePanel = ({ structureItems, hasActiveTab }) => {
           {item.type === 'class'
             ? 'C'
             : item.type === 'function'
-            ? 'f'
-            : item.type === 'method'
-            ? 'm'
-            : item.type === 'variable'
-            ? 'v'
-            : item.type === 'import'
-            ? 'i'
-            : item.type.startsWith('h')
-            ? '#'
-            : '•'}
+              ? 'f'
+              : item.type === 'method'
+                ? 'm'
+                : item.type === 'variable'
+                  ? 'v'
+                  : item.type === 'import'
+                    ? 'i'
+                    : item.type.startsWith('h')
+                      ? '#'
+                      : '•'}
         </span>
         <span className="structure-name">{item.name}</span>
         {item.children && item.children.length > 0 && (

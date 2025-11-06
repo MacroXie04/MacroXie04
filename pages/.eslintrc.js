@@ -25,6 +25,11 @@ module.exports = {
       env: {
         jest: true,
       },
+      rules: {
+        // Disable testing-library rules that enforce specific query methods
+        'testing-library/no-container': 'off',
+        'testing-library/no-node-access': 'off',
+      },
     },
   ],
 };

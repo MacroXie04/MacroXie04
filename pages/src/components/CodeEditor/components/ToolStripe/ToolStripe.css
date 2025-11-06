@@ -1,0 +1,85 @@
+.tool-stripe {
+  width: 48px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-separator);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md) 0;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.tool-button {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-normal), color var(--transition-normal);
+  position: relative;
+}
+
+.tool-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tool-button.active {
+  color: var(--text-primary);
+}
+
+.tool-button.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: var(--accent-primary);
+  border-radius: 0 2px 2px 0;
+}
+
+@media (max-width: 768px) {
+  .tool-stripe {
+    width: 44px;
+  }
+
+  .tool-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-stripe {
+    width: 40px;
+  }
+
+  .tool-button {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  .tool-stripe {
+    width: 36px;
+  }
+
+  .tool-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .tool-button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+

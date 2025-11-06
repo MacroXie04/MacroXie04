@@ -1,0 +1,123 @@
+.structure-panel {
+  width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-normal), opacity var(--transition-normal);
+  overflow: hidden;
+}
+
+.structure-content {
+  flex: 1;
+  padding: var(--space-sm) 0;
+  overflow: auto;
+}
+
+.structure-placeholder {
+  padding: var(--space-2xl) var(--space-lg);
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+.structure-list {
+  padding: var(--space-xs) 0;
+}
+
+.structure-item {
+  padding: var(--space-xs) var(--space-lg);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: background var(--transition-normal), color var(--transition-normal);
+  height: 28px;
+}
+
+.structure-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.structure-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.icon-class {
+  color: #C77DBB;
+  background: rgba(199, 125, 187, 0.15);
+}
+
+.icon-function,
+.icon-method {
+  color: #56A8F5;
+  background: rgba(86, 168, 245, 0.15);
+}
+
+.icon-variable {
+  color: #E8BF6A;
+  background: rgba(232, 191, 106, 0.15);
+}
+
+.icon-import {
+  color: var(--text-disabled);
+  background: rgba(139, 141, 145, 0.1);
+  font-size: 8px;
+}
+
+.icon-h1,
+.icon-h2,
+.icon-h3,
+.icon-h4,
+.icon-h5,
+.icon-h6 {
+  color: #6BA7EB;
+  background: rgba(107, 167, 235, 0.15);
+}
+
+.structure-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.structure-children {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .structure-panel {
+    width: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 768px) {
+  .structure-panel {
+    width: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 480px) {
+  .structure-panel {
+    width: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 360px) {
+  .structure-item {
+    font-size: 13px;
+    height: 24px;
+  }
+}
+

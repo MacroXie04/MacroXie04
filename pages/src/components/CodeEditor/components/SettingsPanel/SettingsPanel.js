@@ -1,4 +1,3 @@
-import React from 'react';
 import './SettingsPanel.css';
 
 const FONT_SIZES = ['small', 'medium', 'large', 'xlarge'];

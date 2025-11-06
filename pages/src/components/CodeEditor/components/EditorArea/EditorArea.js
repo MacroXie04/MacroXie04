@@ -1,4 +1,3 @@
-import React from 'react';
 import './EditorArea.css';
 import { formatJavaScriptLine, formatJSONLine, formatPythonLine } from '../../utils/syntaxHighlighting';
 

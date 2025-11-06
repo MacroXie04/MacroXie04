@@ -1,4 +1,3 @@
-import React from 'react';
 import './StructurePanel.css';
 
 const StructurePanel = ({ structureItems, hasActiveTab }) => {

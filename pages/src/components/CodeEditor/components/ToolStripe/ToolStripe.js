@@ -1,4 +1,3 @@
-import React from 'react';
 import './ToolStripe.css';
 
 const ToolStripe = ({ activeView, leftPanelVisible, onProjectClick, onStructureClick }) => {

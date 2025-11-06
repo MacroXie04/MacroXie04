@@ -1,4 +1,3 @@
-import React from 'react';
 import './TitleBar.css';
 
 const TitleBar = ({ currentFileName, fileExtension, onSettingsToggle }) => {

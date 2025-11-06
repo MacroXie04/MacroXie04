@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import '../../styles/variables.css';
 import '../../styles/global.css';
 import './CodeEditor.css';
@@ -99,13 +99,13 @@ const CodeEditor = () => {
 
   const allFoldersExpanded = useMemo(() => {
     return fileStructure.every((folder, index) => expandedFolders[index] !== false);
-  }, [expandedFolders, fileStructure]);
+  }, [expandedFolders]);
 
   const currentStructure = useMemo(() => {
     const content = tabContents[activeTab] ?? portfolioData[activeTab]?.content ?? '';
     const language = portfolioData[activeTab]?.language ?? '';
     return parseStructure(content, language);
-  }, [activeTab, tabContents, portfolioData]);
+  }, [activeTab, tabContents]);
 
   const currentFile = portfolioData[activeTab];
   const currentFileName = currentFile?.title || 'Untitled';

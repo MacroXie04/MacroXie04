@@ -4,39 +4,84 @@ import CodeEditor from './index';
 describe('CodeEditor Component', () => {
   test('renders without crashing', () => {
     render(<CodeEditor />);
-    expect(screen.getByRole('main')).toBeInTheDocument();
+    const container = document.querySelector('.code-editor-container');
+    expect(container).toBeInTheDocument();
   });
 
-  test('displays title bar', () => {
+  test('displays title bar with name', () => {
     render(<CodeEditor />);
-    const titleBar = screen.getByText(/macro xie/i);
+    // Be specific - look for the title text in the title bar
+    const titleBar = document.querySelector('.title-text');
     expect(titleBar).toBeInTheDocument();
+    expect(titleBar.textContent).toBe('Hongzhe Xie');
   });
 
-  test('shows file explorer panel', () => {
+  test('shows README.md tab by default', () => {
     render(<CodeEditor />);
-    // Check for Explorer heading
-    expect(screen.getByText('EXPLORER')).toBeInTheDocument();
+    // Check if README.md tab is visible - be specific to tab area
+    const tab = document.querySelector('.tab.active span');
+    expect(tab).toBeInTheDocument();
+    expect(tab.textContent).toBe('README.md');
   });
 
-  test('displays welcome tab by default', () => {
+  test('displays portfolio content', () => {
     render(<CodeEditor />);
-    // Check if Welcome tab is visible
-    const welcomeTab = screen.getByText(/welcome/i);
-    expect(welcomeTab).toBeInTheDocument();
-  });
-
-  test('can toggle file explorer visibility', () => {
-    render(<CodeEditor />);
-    // Find and click the explorer toggle button
-    const explorerToggle = screen.getByTitle(/toggle primary sidebar/i);
+    // Check for content from the README
+    const heading = screen.getByText(/Hi, I'm Hongzhe Xie/i);
+    expect(heading).toBeInTheDocument();
     
-    fireEvent.click(explorerToggle);
-    // Explorer should be hidden
-    expect(screen.queryByText('EXPLORER')).not.toBeVisible();
+    // Check for professional summary
+    const summary = screen.getByText(/Professional Summary/i);
+    expect(summary).toBeInTheDocument();
+  });
+
+  test('has project and structure view buttons', () => {
+    render(<CodeEditor />);
+    // Check for Project button
+    const projectButton = screen.getByTitle('Project');
+    expect(projectButton).toBeInTheDocument();
     
-    fireEvent.click(explorerToggle);
-    // Explorer should be visible again
-    expect(screen.getByText('EXPLORER')).toBeVisible();
+    // Check for Structure button
+    const structureButton = screen.getByTitle('Structure');
+    expect(structureButton).toBeInTheDocument();
+  });
+
+  test('can toggle between project and structure views', () => {
+    render(<CodeEditor />);
+    const projectButton = screen.getByTitle('Project');
+    const structureButton = screen.getByTitle('Structure');
+    
+    // Click structure button
+    fireEvent.click(structureButton);
+    
+    // Structure view should be active (button gets different styling)
+    expect(structureButton.className).toContain('tool-button');
+    
+    // Click project button to go back
+    fireEvent.click(projectButton);
+    expect(projectButton.className).toContain('tool-button');
+  });
+
+  test('displays status bar with correct info', () => {
+    render(<CodeEditor />);
+    // Check status bar content
+    const githubPages = screen.getByText('GitHub Pages');
+    expect(githubPages).toBeInTheDocument();
+    
+    const markdown = screen.getByText('markdown');
+    expect(markdown).toBeInTheDocument();
+  });
+
+  test('has markdown preview toggle', () => {
+    render(<CodeEditor />);
+    // Check for markdown toggle buttons
+    const codeButton = screen.getByText('Code');
+    const previewButton = screen.getByText('Preview');
+    
+    expect(codeButton).toBeInTheDocument();
+    expect(previewButton).toBeInTheDocument();
+    
+    // Preview should be active by default
+    expect(previewButton.className).toContain('active');
   });
 });

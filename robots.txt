@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://macroxie04.github.io/MacroXie04/sitemap.xml
+

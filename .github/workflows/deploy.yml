@@ -202,8 +202,8 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ vars.AWS_REGION || 'us-west-2' }}
 
-      - name: Start Amplify release job
-        id: amplify_start
+      - name: Locate Amplify auto-deploy job
+        id: amplify_job
         env:
           APP_ID: ${{ vars.AMPLIFY_APP_ID }}
           AMPLIFY_BRANCH: ${{ vars.AMPLIFY_BRANCH }}
@@ -220,37 +220,28 @@ jobs:
             AMPLIFY_BRANCH="main"
           fi
 
-          set +e
-          START_OUTPUT=$(aws amplify start-job \
-            --app-id "${APP_ID}" \
-            --branch-name "${AMPLIFY_BRANCH}" \
-            --job-type RELEASE \
-            --job-reason "GitHub Actions run ${GITHUB_RUN_ID}" \
-            --region "${AWS_REGION}" \
-            --query 'jobSummary.jobId' \
-            --output text 2>&1)
-          START_EXIT=$?
-          set -e
-
-          if [ "${START_EXIT}" -eq 0 ]; then
-            JOB_ID="${START_OUTPUT}"
-            echo "Started Amplify job ${JOB_ID} for ${AMPLIFY_BRANCH}"
-          elif echo "${START_OUTPUT}" | grep -q "already have pending or running jobs"; then
-            JOB_ID=$(aws amplify get-branch \
+          JOB_ID=""
+          for attempt in $(seq 1 90); do
+            JOBS_JSON=$(aws amplify list-jobs \
               --app-id "${APP_ID}" \
               --branch-name "${AMPLIFY_BRANCH}" \
               --region "${AWS_REGION}" \
-              --query 'branch.activeJobId' \
-              --output text)
+              --max-results 50 \
+              --output json)
 
-            if [ -z "${JOB_ID}" ] || [ "${JOB_ID}" = "None" ]; then
-              echo "::error::Amplify branch is busy but active job ID was not returned."
-              exit 1
+            JOB_ID=$(COMMIT_SHA="${GITHUB_SHA}" python -c 'import json,os,sys; sha=os.environ["COMMIT_SHA"].lower(); jobs=json.loads(sys.stdin.read()).get("jobSummaries", []); print(next((j.get("jobId","") for j in jobs if (j.get("commitId") or "").lower()==sha), ""))' <<<"${JOBS_JSON}")
+
+            if [ -n "${JOB_ID}" ] && [ "${JOB_ID}" != "None" ]; then
+              echo "Found Amplify auto-deploy job ${JOB_ID} for commit ${GITHUB_SHA}"
+              break
             fi
 
-            echo "Reusing existing Amplify job ${JOB_ID} for ${AMPLIFY_BRANCH}"
-          else
-            echo "${START_OUTPUT}" >&2
+            echo "Attempt ${attempt}: waiting for Amplify auto-deploy job for commit ${GITHUB_SHA}"
+            sleep 10
+          done
+
+          if [ -z "${JOB_ID}" ] || [ "${JOB_ID}" = "None" ]; then
+            echo "::error::No Amplify auto-deploy job found for commit ${GITHUB_SHA} on branch ${AMPLIFY_BRANCH}."
             exit 1
           fi
 
@@ -261,10 +252,10 @@ jobs:
 
       - name: Wait for Amplify job completion
         env:
-          APP_ID: ${{ steps.amplify_start.outputs.app_id }}
-          AMPLIFY_BRANCH: ${{ steps.amplify_start.outputs.branch }}
-          AWS_REGION: ${{ steps.amplify_start.outputs.region }}
-          JOB_ID: ${{ steps.amplify_start.outputs.job_id }}
+          APP_ID: ${{ steps.amplify_job.outputs.app_id }}
+          AMPLIFY_BRANCH: ${{ steps.amplify_job.outputs.branch }}
+          AWS_REGION: ${{ steps.amplify_job.outputs.region }}
+          JOB_ID: ${{ steps.amplify_job.outputs.job_id }}
         run: |
           set -euo pipefail
 
@@ -297,9 +288,9 @@ jobs:
       - name: Resolve Amplify deployment URL
         id: amplify_url
         env:
-          APP_ID: ${{ steps.amplify_start.outputs.app_id }}
-          AMPLIFY_BRANCH: ${{ steps.amplify_start.outputs.branch }}
-          AWS_REGION: ${{ steps.amplify_start.outputs.region }}
+          APP_ID: ${{ steps.amplify_job.outputs.app_id }}
+          AMPLIFY_BRANCH: ${{ steps.amplify_job.outputs.branch }}
+          AWS_REGION: ${{ steps.amplify_job.outputs.region }}
         run: |
           set -euo pipefail
 

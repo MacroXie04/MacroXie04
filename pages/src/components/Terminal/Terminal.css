@@ -19,6 +19,57 @@
 }
 
 /* ============================================================
+   Background Themes
+   ============================================================ */
+.t-root[data-theme="dracula"] {
+  --t-bg:      #282A36;
+  --t-bg-bar:  #21222C;
+  --t-bg-card: #21222C;
+  --t-border:  #44475A;
+  --t-text:    #F8F8F2;
+  --t-dim:     #6272A4;
+  --t-comment: #6272A4;
+}
+
+.t-root[data-theme="nord"] {
+  --t-bg:      #2E3440;
+  --t-bg-bar:  #3B4252;
+  --t-bg-card: #3B4252;
+  --t-border:  #434C5E;
+  --t-text:    #ECEFF4;
+  --t-dim:     #4C566A;
+  --t-comment: #616E88;
+}
+
+.t-root[data-theme="solarized"] {
+  --t-bg:      #002B36;
+  --t-bg-bar:  #073642;
+  --t-bg-card: #073642;
+  --t-border:  #586E75;
+  --t-text:    #EEE8D5;
+  --t-dim:     #657B83;
+  --t-comment: #93A1A1;
+}
+
+.t-root[data-theme="light"] {
+  --t-bg:      #F5F5F5;
+  --t-bg-bar:  #E8E8E8;
+  --t-bg-card: #FFFFFF;
+  --t-border:  #D0D0D0;
+  --t-text:    #333333;
+  --t-dim:     #888888;
+  --t-comment: #999999;
+}
+
+/* ============================================================
+   Accent Colors
+   ============================================================ */
+.t-root[data-color="blue"]   { --t-green: #58A6FF; --t-string: #58A6FF; }
+.t-root[data-color="purple"] { --t-green: #BD93F9; --t-string: #BD93F9; }
+.t-root[data-color="orange"] { --t-green: #FFA657; --t-string: #FFA657; }
+.t-root[data-color="cyan"]   { --t-green: #56D3C2; --t-string: #56D3C2; }
+
+/* ============================================================
    Root Layout
    ============================================================ */
 .t-root {
@@ -31,7 +82,7 @@
   color: var(--t-text);
   font-family: var(--t-font);
   font-size: 17px;
-  line-height: 1.7;
+  line-height: 1.2;
   overflow: hidden;
   cursor: text;
 }
@@ -83,9 +134,10 @@
   background: transparent;
   border: 1px solid var(--t-border);
   color: var(--t-dim);
-  font-size: 18px;
-  width: 36px;
-  height: 36px;
+  font-family: var(--t-font);
+  font-size: 13px;
+  padding: 0 12px;
+  height: 34px;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -94,14 +146,14 @@
   flex-shrink: 0;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
   -webkit-tap-highlight-color: transparent;
-  line-height: 1;
+  white-space: nowrap;
 }
 
 .t-settings-btn:hover,
 .t-settings-btn:active {
   color: var(--t-green);
   border-color: var(--t-green);
-  background: rgba(57, 211, 83, 0.07);
+  background: color-mix(in srgb, var(--t-green) 7%, transparent);
 }
 
 /* Settings panel */
@@ -109,12 +161,12 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 12px;
-  background: #1E1E1E;
+  background: var(--t-bg-bar);
   border: 1px solid var(--t-border);
   border-radius: 8px;
   padding: 14px 16px;
   z-index: 100;
-  min-width: 240px;
+  min-width: 280px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
@@ -154,7 +206,13 @@
 .t-settings-opt.active {
   color: var(--t-green);
   border-color: var(--t-green);
-  background: rgba(57, 211, 83, 0.1);
+  background: color-mix(in srgb, var(--t-green) 10%, transparent);
+}
+
+.t-settings-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--t-border);
 }
 
 /* ============================================================
@@ -175,11 +233,11 @@
   background: transparent;
 }
 .t-output::-webkit-scrollbar-thumb {
-  background: #2A2A2A;
+  background: var(--t-border);
   border-radius: 3px;
 }
 .t-output::-webkit-scrollbar-thumb:hover {
-  background: #3A3A3A;
+  background: var(--t-dim);
 }
 
 .t-entry {
@@ -212,7 +270,7 @@
 
 .t-line {
   padding: 0;
-  min-height: 1.7em;
+  min-height: 1.2em;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -229,6 +287,11 @@
 .t-string   { color: var(--t-string); }
 .t-comment  { color: var(--t-comment); font-style: italic; }
 .t-number   { color: var(--t-blue); }
+
+/* Iframe embeds */
+.t-iframe-wrap {
+  margin: 6px 0;
+}
 
 /* Link */
 .t-link {
@@ -377,7 +440,55 @@
 .t-quick-btn:active {
   color: var(--t-green);
   border-color: var(--t-green);
-  background: rgba(57, 211, 83, 0.07);
+  background: color-mix(in srgb, var(--t-green) 7%, transparent);
+}
+
+/* ============================================================
+   Bomb Easter Egg
+   ============================================================ */
+.t-bomb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: none;
+  animation: t-bomb-bg 3.5s linear forwards;
+}
+
+@keyframes t-bomb-bg {
+  0%   { background: rgb(200, 0, 0); }
+  85%  { background: rgb(200, 0, 0); }
+  100% { background: transparent;    }
+}
+
+.t-bomb-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  animation: t-bomb-msg 3.5s ease-out forwards;
+}
+
+@keyframes t-bomb-msg {
+  0%  { opacity: 1; }
+  85% { opacity: 1; }
+  100%{ opacity: 0; }
+}
+
+.t-bomb-title {
+  font-size: clamp(2rem, 7vw, 4rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.t-bomb-sub {
+  font-size: clamp(1rem, 3vw, 1.6rem);
+  color: #FFCCCC;
+  margin-top: 10px;
 }
 
 /* ============================================================
@@ -462,9 +573,9 @@
   }
 
   .t-settings-btn {
-    width: 40px;
     height: 40px;
-    font-size: 20px;
+    padding: 0 12px;
+    font-size: 13px;
   }
 
   .t-settings-panel {

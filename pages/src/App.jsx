@@ -1,10 +1,10 @@
-import CodeEditor from './components/CodeEditor';
+import Terminal from './components/Terminal';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <CodeEditor />
+      <Terminal />
     </div>
   );
 }

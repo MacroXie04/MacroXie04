@@ -1,25 +1,24 @@
 import { render } from '@testing-library/react';
 import App from './App';
 
-test('renders CodeEditor component', () => {
+test('renders Terminal component', () => {
   const { container } = render(<App />);
   // Check that the app container renders
   const appContainer = container.querySelector('.App');
   expect(appContainer).toBeInTheDocument();
-  
-  // Check that CodeEditor renders with its title - be specific to title bar
-  const titleBar = container.querySelector('.title-text');
-  expect(titleBar).toBeInTheDocument();
-  expect(titleBar.textContent).toBe('Hongzhe Xie');
+
+  // Check that Terminal renders
+  const terminal = container.querySelector('.t-root');
+  expect(terminal).toBeInTheDocument();
 });
 
-test('renders VSCode-style interface', () => {
+test('renders terminal-style interface', () => {
   const { container } = render(<App />);
-  // Check for VSCode-like elements
-  const titleBar = container.querySelector('.title-bar');
+  // Check for terminal title bar
+  const titleBar = container.querySelector('.t-titlebar');
   expect(titleBar).toBeInTheDocument();
-  
-  // Check for status bar
-  const statusBar = container.querySelector('.status-bar');
-  expect(statusBar).toBeInTheDocument();
+
+  // Check for terminal output area
+  const output = container.querySelector('.t-output');
+  expect(output).toBeInTheDocument();
 });

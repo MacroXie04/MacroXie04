@@ -127,6 +127,7 @@ dist
 
 # Firebase cache directory
 .firebase/
+firebase-debug.log
 
 # TernJS port file
 .tern-port
@@ -146,3 +147,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# claude code
+CLAUDE.md

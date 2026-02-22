@@ -6,18 +6,16 @@
 
 body {
   margin: 0;
-  font-family: var(--font-family);
-  font-size: var(--font-size-md);
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+  background: #0C0C0C;
+  color: #E5E5E5;
   height: 100vh;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
+  line-height: 1.7;
 }
 
 code {
-  font-family: var(--font-family);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
 }
-

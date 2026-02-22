@@ -46,8 +46,8 @@ jobs:
       run: |
         cd pages
         # Run tests related to changed files
-        npm test -- --findRelatedTests --passWithNoTests --watchAll=false
-        
+        npx jest --findRelatedTests --passWithNoTests --watchAll=false
+
     - name: Check bundle size impact
       run: |
         cd pages
@@ -56,7 +56,7 @@ jobs:
         echo "### Bundle Size Report" >> $GITHUB_STEP_SUMMARY
         echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
         echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-        find build/static -name "*.js" -o -name "*.css" | while read file; do
+        find build -name "*.js" -o -name "*.css" | while read file; do
           size=$(du -h "$file" | cut -f1)
           name=$(basename "$file")
           echo "| $name | $size |" >> $GITHUB_STEP_SUMMARY

@@ -12,6 +12,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  deployments: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -93,6 +94,8 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
     needs: [test, lint]  # Only build if tests and linting pass
+    env:
+      DEPLOY_TARGET: github-pages
     
     steps:
     - name: Checkout code
@@ -155,4 +158,143 @@ jobs:
         
       - name: Output deployment URL
         run: |
-          echo "🚀 Deployed to: ${{ steps.deployment.outputs.page_url }}" 
+          echo "🚀 Deployed to: ${{ steps.deployment.outputs.page_url }}"
+
+  deploy_amplify:
+    name: Deploy to AWS Amplify
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: AWS - Amplify
+      url: ${{ steps.amplify_url.outputs.web_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: pages/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd pages
+          npm ci
+
+      - name: Build application for Amplify
+        env:
+          DEPLOY_TARGET: amplify
+        run: |
+          cd pages
+          npm run build
+          test -d build
+          test -f build/index.html
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-west-2' }}
+
+      - name: Start Amplify release job
+        id: amplify_start
+        env:
+          APP_ID: ${{ vars.AMPLIFY_APP_ID }}
+          AMPLIFY_BRANCH: ${{ vars.AMPLIFY_BRANCH }}
+          AWS_REGION: ${{ vars.AWS_REGION || 'us-west-2' }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${APP_ID}" ]; then
+            echo "::error::Repository variable AMPLIFY_APP_ID is required."
+            exit 1
+          fi
+
+          if [ -z "${AMPLIFY_BRANCH}" ]; then
+            AMPLIFY_BRANCH="main"
+          fi
+
+          JOB_ID=$(aws amplify start-job \
+            --app-id "${APP_ID}" \
+            --branch-name "${AMPLIFY_BRANCH}" \
+            --job-type RELEASE \
+            --job-reason "GitHub Actions run ${GITHUB_RUN_ID}" \
+            --region "${AWS_REGION}" \
+            --query 'jobSummary.jobId' \
+            --output text)
+
+          echo "app_id=${APP_ID}" >> "${GITHUB_OUTPUT}"
+          echo "branch=${AMPLIFY_BRANCH}" >> "${GITHUB_OUTPUT}"
+          echo "region=${AWS_REGION}" >> "${GITHUB_OUTPUT}"
+          echo "job_id=${JOB_ID}" >> "${GITHUB_OUTPUT}"
+
+          echo "Started Amplify job ${JOB_ID} for ${AMPLIFY_BRANCH}"
+
+      - name: Wait for Amplify job completion
+        env:
+          APP_ID: ${{ steps.amplify_start.outputs.app_id }}
+          AMPLIFY_BRANCH: ${{ steps.amplify_start.outputs.branch }}
+          AWS_REGION: ${{ steps.amplify_start.outputs.region }}
+          JOB_ID: ${{ steps.amplify_start.outputs.job_id }}
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 60); do
+            STATUS=$(aws amplify get-job \
+              --app-id "${APP_ID}" \
+              --branch-name "${AMPLIFY_BRANCH}" \
+              --job-id "${JOB_ID}" \
+              --region "${AWS_REGION}" \
+              --query 'job.summary.status' \
+              --output text)
+
+            echo "Attempt ${attempt}: ${STATUS}"
+
+            if [ "${STATUS}" = "SUCCEED" ]; then
+              exit 0
+            fi
+
+            if [ "${STATUS}" = "FAILED" ] || [ "${STATUS}" = "CANCELLED" ]; then
+              echo "::error::Amplify job ${JOB_ID} ended with status ${STATUS}."
+              exit 1
+            fi
+
+            sleep 20
+          done
+
+          echo "::error::Timed out waiting for Amplify job ${JOB_ID}."
+          exit 1
+
+      - name: Resolve Amplify deployment URL
+        id: amplify_url
+        env:
+          APP_ID: ${{ steps.amplify_start.outputs.app_id }}
+          AMPLIFY_BRANCH: ${{ steps.amplify_start.outputs.branch }}
+          AWS_REGION: ${{ steps.amplify_start.outputs.region }}
+        run: |
+          set -euo pipefail
+
+          WEB_URL=$(aws amplify get-branch \
+            --app-id "${APP_ID}" \
+            --branch-name "${AMPLIFY_BRANCH}" \
+            --region "${AWS_REGION}" \
+            --query 'branch.webUrl' \
+            --output text)
+
+          if [ -z "${WEB_URL}" ] || [ "${WEB_URL}" = "None" ]; then
+            DEFAULT_DOMAIN=$(aws amplify get-app \
+              --app-id "${APP_ID}" \
+              --region "${AWS_REGION}" \
+              --query 'app.defaultDomain' \
+              --output text)
+            WEB_URL="https://${AMPLIFY_BRANCH}.${DEFAULT_DOMAIN}"
+          fi
+
+          echo "web_url=${WEB_URL}" >> "${GITHUB_OUTPUT}"
+          echo "Amplify URL: ${WEB_URL}"

@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://MacroXie04.github.io/sitemap.xml
-
+Sitemap: https://hongzhe.i2g.ucmerced.edu/sitemap.xml

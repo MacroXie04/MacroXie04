@@ -220,21 +220,44 @@ jobs:
             AMPLIFY_BRANCH="main"
           fi
 
-          JOB_ID=$(aws amplify start-job \
+          set +e
+          START_OUTPUT=$(aws amplify start-job \
             --app-id "${APP_ID}" \
             --branch-name "${AMPLIFY_BRANCH}" \
             --job-type RELEASE \
             --job-reason "GitHub Actions run ${GITHUB_RUN_ID}" \
             --region "${AWS_REGION}" \
             --query 'jobSummary.jobId' \
-            --output text)
+            --output text 2>&1)
+          START_EXIT=$?
+          set -e
+
+          if [ "${START_EXIT}" -eq 0 ]; then
+            JOB_ID="${START_OUTPUT}"
+            echo "Started Amplify job ${JOB_ID} for ${AMPLIFY_BRANCH}"
+          elif echo "${START_OUTPUT}" | grep -q "already have pending or running jobs"; then
+            JOB_ID=$(aws amplify get-branch \
+              --app-id "${APP_ID}" \
+              --branch-name "${AMPLIFY_BRANCH}" \
+              --region "${AWS_REGION}" \
+              --query 'branch.activeJobId' \
+              --output text)
+
+            if [ -z "${JOB_ID}" ] || [ "${JOB_ID}" = "None" ]; then
+              echo "::error::Amplify branch is busy but active job ID was not returned."
+              exit 1
+            fi
+
+            echo "Reusing existing Amplify job ${JOB_ID} for ${AMPLIFY_BRANCH}"
+          else
+            echo "${START_OUTPUT}" >&2
+            exit 1
+          fi
 
           echo "app_id=${APP_ID}" >> "${GITHUB_OUTPUT}"
           echo "branch=${AMPLIFY_BRANCH}" >> "${GITHUB_OUTPUT}"
           echo "region=${AWS_REGION}" >> "${GITHUB_OUTPUT}"
           echo "job_id=${JOB_ID}" >> "${GITHUB_OUTPUT}"
-
-          echo "Started Amplify job ${JOB_ID} for ${AMPLIFY_BRANCH}"
 
       - name: Wait for Amplify job completion
         env:

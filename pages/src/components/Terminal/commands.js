@@ -10,6 +10,36 @@ import {
 } from './handlers/utilCommands';
 export { getCompletions } from './utils/completions';
 
+const ALL_COMMANDS = [
+  'help', 'about', 'whoami', 'experience', 'skills', 'contact', 'github',
+  'pwd', 'echo', 'cd', 'uname', 'date', 'uptime', 'ping', 'exit', 'quit',
+  'clear', 'cat', 'ls', 'sudo', 'history', 'rm', 'settings', 'font',
+  'theme', 'color', 'man', 'which', 'print', 'cv', 'resume', 'download',
+  'seventeen', 'svt',
+];
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+  return dp[m][n];
+}
+
+function findClosestCommand(cmd) {
+  let best = null, bestDist = Infinity;
+  for (const c of ALL_COMMANDS) {
+    const d = levenshtein(cmd, c);
+    if (d < bestDist) { bestDist = d; best = c; }
+  }
+  const threshold = Math.max(2, Math.floor(cmd.length / 2));
+  return bestDist <= threshold ? best : null;
+}
+
 export function processCommand(input, settings = {}, cmdHistory = []) {
   const { fontSize, theme, accentColor } = settings;
   const trimmed = input.trim();
@@ -63,10 +93,11 @@ export function processCommand(input, settings = {}, cmdHistory = []) {
 
   if (MAP[cmd]) return MAP[cmd]();
 
+  const suggestion = findClosestCommand(cmd);
   return {
     output: [
       txt(''),
-      txt(`${trimmed}: command not found. Type 'help' for available commands.`, 't-error'),
+      txt(`Unknown command: '${cmd}'.${suggestion ? ` Did you mean '${suggestion}'?` : " Type 'help' for available commands."}`, 't-error'),
       txt(''),
     ],
   };

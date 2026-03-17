@@ -5,11 +5,6 @@ export const EXPERIENCE_ITEMS = [
     desc: 'Build and operate production web systems serving external business stakeholders through UC Merced\'s Innovate to Grow initiative. Translate business requirements into scalable backend architectures using Django and RESTful service design principles. Own end-to-end delivery lifecycle including database schema design, API development, cloud deployment, and production monitoring.',
   },
   {
-    title: 'Undergraduate Researcher',
-    org: 'Yu’s Cognitive Computing and Automation Lab - UC Merced',
-    desc: 'Assisted in a cognitive and computational science research lab by helping design behavioral experiments, setting up study protocols, writing Python scripts for data processing, and supporting graduate researchers with analysis and documentation. Gained experience working with real research workflows and human-subject data.',
-  },
-  {
     title: 'Attendee',
     org: 'Google I/O 2025',
     desc: 'Attended keynote and developer sessions on AI, Android, and web technologies. Participated in hands-on workshops utilizing the Agent Development Kit (ADK) and applying best practices in web performance optimization.',

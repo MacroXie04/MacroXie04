@@ -20,17 +20,6 @@ experiences = [
         ),
     },
     {
-        "title": "Undergraduate Researcher",
-        "organization": "Yu's Cognitive Computing and Automation Lab - UC Merced",
-        "summary": (
-            "Assisted in a cognitive and computational science research lab by helping "
-            "design behavioral experiments, setting up study protocols, writing Python "
-            "scripts for data processing, and supporting graduate researchers with "
-            "analysis and documentation. Gained experience working with real research "
-            "workflows and human-subject data."
-        ),
-    },
-    {
         "title": "Attendee",
         "organization": "Google I/O 2025",
         "summary": (

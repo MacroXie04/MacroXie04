@@ -2,7 +2,7 @@
 
 **Dream it. Chase it. Code it.**
 
-Backend & Cloud Engineer · Django REST Framework · Scalable RESTful Architectures · CI/CD Automation
+Full-Stack & Cloud Engineer
 
 - Pages: https://macroxie04.github.io/MacroXie04/
 - LinkedIn: https://www.linkedin.com/in/hongzhexie/

@@ -60,7 +60,7 @@ export default function useTerminal() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' });
-  }, [history]);
+  }, [history, tabHint]);
 
   useEffect(() => {
     const handleBeforePrint = () => {
@@ -135,7 +135,7 @@ export default function useTerminal() {
       if (result.type === 'cmd') {
         setInputValue(result.matches[0] + ' ');
       } else {
-        setInputValue('cat ' + result.matches[0]);
+        setInputValue(result.prefix + result.matches[0]);
       }
       return;
     }
@@ -143,7 +143,7 @@ export default function useTerminal() {
     if (result.type === 'cmd' && result.common.length > result.partial.length) {
       setInputValue(result.common);
     } else if (result.type === 'arg' && result.common.length > result.partial.length) {
-      setInputValue('cat ' + result.common);
+      setInputValue(result.prefix + result.common);
     }
 
     setTabHint(result.matches.join('    '));
@@ -184,9 +184,17 @@ export default function useTerminal() {
     focusInput();
   }, [runCommand, focusInput]);
 
+  const inlineHint = (() => {
+    const completion = getCompletions(inputValue);
+    if (!['cmd', 'arg'].includes(completion.type) || completion.matches.length === 0) return '';
+    const suggestion = completion.matches.length === 1 ? completion.matches[0] : completion.common;
+    if (!suggestion || suggestion === completion.partial) return '';
+    return suggestion.slice(completion.partial.length);
+  })();
+
   return {
     history, inputValue, handleInputChange,
-    tabHint,
+    tabHint, inlineHint,
     fontSize, setFontSize,
     theme, setTheme,
     accentColor, setColor,

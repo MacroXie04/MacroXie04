@@ -7,6 +7,9 @@
 # Cursor IDE metadata
 .cursor/
 
+# JetBrains IDE metadata
+.idea/
+
 # Logs
 logs
 *.log
@@ -150,3 +153,4 @@ vite.config.ts.timestamp-*
 
 # claude code
 CLAUDE.md
+.claude/

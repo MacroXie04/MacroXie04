@@ -100,15 +100,33 @@ export function cmdSeventeen() {
   };
 }
 
+/** Unicode text presentation (U+FE0E) keeps ✉/☎ from rendering as emoji on some platforms. */
+const GLYPH_TEXT = '\uFE0E';
+
 export function cmdContact() {
   return {
     output: [
       txt(''),
-      txt('Contact Information', 't-title'),
+      txt('Contact Information', 't-contact-title'),
       txt(''),
-      { type: 'link', text: '  \u2709  xiehongzhe04@gmail.com', href: 'mailto:xiehongzhe04@gmail.com' },
-      { type: 'link', text: '  \u25a0  github.com/MacroXie04', href: 'https://github.com/MacroXie04' },
-      txt('  \u260e  +1 (206) 333-8881', 't-dim'),
+      {
+        type: 'link',
+        href: 'mailto:index@hongzhexie.com',
+        icon: `\u2709${GLYPH_TEXT}`,
+        label: 'index@hongzhexie.com',
+      },
+      {
+        type: 'link',
+        href: 'https://github.com/MacroXie04',
+        icon: '\u25A0',
+        label: 'github.com/MacroXie04',
+      },
+      {
+        type: 'contactRow',
+        icon: `\u260E${GLYPH_TEXT}`,
+        text: '+1 (206) 333-8881',
+        cls: 't-green',
+      },
       txt(''),
     ],
   };

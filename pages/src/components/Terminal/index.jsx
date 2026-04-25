@@ -8,7 +8,7 @@ const HOSTNAME = 'visitor@hongzhe:~$';
 export default function Terminal() {
   const {
     history, inputValue, handleInputChange,
-    tabHint,
+    tabHint, inlineHint,
     fontSize, setFontSize,
     theme, setTheme,
     accentColor, setColor,
@@ -49,51 +49,71 @@ export default function Terminal() {
           type="button"
           aria-label="Settings"
         >
-          settings
+          <svg
+            className="t-settings-icon"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
         </button>
         {settingsOpen && (
           <div className="t-settings-panel" onClick={e => e.stopPropagation()}>
             <div className="t-settings-label">Font Size</div>
-            <div className="t-settings-options">
+            <div className="t-settings-options t-settings-options-font">
               {Object.keys(FONT_SIZES).map(size => (
                 <button
                   key={size}
                   type="button"
-                  className={`t-settings-opt${fontSize === size ? ' active' : ''}`}
+                  className={`t-settings-opt t-settings-opt-font${fontSize === size ? ' active' : ''}`}
                   onClick={() => { setFontSize(size); setSettingsOpen(false); }}
                 >
-                  {size}
+                  <span
+                    className="t-settings-font-preview"
+                    style={{ fontSize: FONT_SIZES[size] }}
+                  >
+                    {size}
+                  </span>
+                  <span className="t-settings-font-px">{FONT_SIZES[size]}</span>
                 </button>
               ))}
             </div>
 
-            <div className="t-settings-label t-settings-section">Background</div>
-            <div className="t-settings-options">
-              {THEMES.map(t => (
-                <button
-                  key={t.key}
-                  type="button"
-                  className={`t-settings-opt${theme === t.key ? ' active' : ''}`}
-                  onClick={() => setTheme(t.key)}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="t-settings-label t-settings-section">Accent Color</div>
-            <div className="t-settings-options">
-              {COLORS.map(c => (
-                <button
-                  key={c.key}
-                  type="button"
-                  className={`t-settings-opt${accentColor === c.key ? ' active' : ''}`}
-                  onClick={() => setColor(c.key)}
-                >
-                  <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: c.hex, marginRight: 6, verticalAlign: 'middle' }} />
-                  {c.label}
-                </button>
-              ))}
+            <div className="t-settings-label t-settings-section">Terminal profile</div>
+            <div className="t-settings-profile">
+              <div className="t-settings-options">
+                {THEMES.map(t => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    className={`t-settings-opt${theme === t.key ? ' active' : ''}`}
+                    onClick={() => setTheme(t.key)}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              <div className="t-settings-options">
+                {COLORS.map(c => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    className={`t-settings-opt${accentColor === c.key ? ' active' : ''}`}
+                    onClick={() => setColor(c.key)}
+                  >
+                    <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: c.hex, marginRight: 6, verticalAlign: 'middle' }} />
+                    {c.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -120,7 +140,7 @@ export default function Terminal() {
             {entry.cmd && (
               <div className="t-prompt-line">
                 <span className="t-prompt">{HOSTNAME}</span>
-                <span className="t-cmd-text">&nbsp;{entry.cmd}</span>
+                <span className="t-cmd-text">{entry.cmd}</span>
               </div>
             )}
             {entry.output.map((item, idx) => (
@@ -131,21 +151,25 @@ export default function Terminal() {
 
         {/* Current input line */}
         <div className="t-input-wrapper">
-          <span className="t-prompt">{HOSTNAME}&nbsp;</span>
-          <input
-            ref={inputRef}
-            className="t-input"
-            value={inputValue}
-            onChange={e => handleInputChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onClick={e => e.stopPropagation()}
-            autoFocus
-            spellCheck={false}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            aria-label="Terminal input"
-          />
+          <span className="t-prompt">{HOSTNAME}</span>
+          <div className="t-input-line">
+            <input
+              ref={inputRef}
+              className="t-input"
+              style={{ width: `${Math.max(inputValue.length, 1)}ch` }}
+              value={inputValue}
+              onChange={e => handleInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onClick={e => e.stopPropagation()}
+              autoFocus
+              spellCheck={false}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              aria-label="Terminal input"
+            />
+            {inlineHint && <span className="t-inline-hint">{inlineHint}</span>}
+          </div>
         </div>
         {tabHint && <div className="t-line t-dim">{tabHint}</div>}
 

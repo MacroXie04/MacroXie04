@@ -136,7 +136,8 @@
   color: var(--t-dim);
   font-family: var(--t-font);
   font-size: 13px;
-  padding: 0 12px;
+  padding: 0;
+  width: 34px;
   height: 34px;
   border-radius: 6px;
   cursor: pointer;
@@ -146,7 +147,10 @@
   flex-shrink: 0;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
   -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
+}
+
+.t-settings-btn .t-settings-icon {
+  flex-shrink: 0;
 }
 
 .t-settings-btn:hover,
@@ -184,6 +188,10 @@
   flex-wrap: wrap;
 }
 
+.t-settings-options-font {
+  align-items: flex-end;
+}
+
 .t-settings-opt {
   background: transparent;
   border: 1px solid var(--t-border);
@@ -197,10 +205,38 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.t-settings-opt-font {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  font-size: inherit;
+}
+
+.t-settings-font-preview {
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.t-settings-font-px {
+  font-size: 11px;
+  color: var(--t-dim);
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+
 .t-settings-opt:hover,
 .t-settings-opt:active {
   color: var(--t-text);
   border-color: var(--t-dim);
+}
+
+.t-settings-opt-font:hover .t-settings-font-px,
+.t-settings-opt-font:active .t-settings-font-px {
+  color: var(--t-text);
+  opacity: 1;
 }
 
 .t-settings-opt.active {
@@ -209,10 +245,21 @@
   background: color-mix(in srgb, var(--t-green) 10%, transparent);
 }
 
+.t-settings-opt-font.active .t-settings-font-px {
+  color: var(--t-green);
+  opacity: 1;
+}
+
 .t-settings-section {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--t-border);
+}
+
+.t-settings-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* ============================================================
@@ -251,7 +298,7 @@
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 0;
+  gap: 0.5ch;
   margin-top: 10px;
   margin-bottom: 2px;
 }
@@ -277,6 +324,12 @@
 
 /* Text color helpers */
 .t-title  { color: var(--t-blue); font-weight: 600; letter-spacing: 0.05em; }
+
+.t-contact-title {
+  color: var(--t-green);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
 .t-green  { color: var(--t-green); }
 .t-blue   { color: var(--t-blue); }
 .t-dim    { color: var(--t-dim); }
@@ -295,14 +348,56 @@
 
 /* Link */
 .t-link {
-  color: var(--t-blue);
+  color: var(--t-green);
   text-decoration: none;
-  border-bottom: 1px dashed var(--t-blue);
+  border-bottom: 1px dashed var(--t-green);
   transition: color 0.15s, border-color 0.15s;
 }
 .t-link:hover {
-  color: var(--t-green);
-  border-color: var(--t-green);
+  color: var(--t-text);
+  border-color: var(--t-text);
+}
+
+/* Terminal output: link underline width follows text, not the full line box */
+.t-link-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  padding-left: 2ch;
+}
+
+.t-link-line .t-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.75em;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.t-contact-glyph {
+  display: inline-block;
+  min-width: 2ch;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.t-contact-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75em;
+  padding-left: 2ch;
+}
+
+.t-line.t-contact-title + .t-line + .t-line.t-link-line {
+  margin-top: 4px;
+}
+
+.t-line.t-link-line + .t-line.t-link-line {
+  margin-top: 6px;
+}
+
+.t-line.t-link-line + .t-line.t-contact-row {
+  margin-top: 6px;
 }
 
 /* ============================================================
@@ -355,7 +450,7 @@
 }
 
 .t-profile-tagline {
-  color: var(--t-blue);
+  color: var(--t-green);
   font-style: italic;
   font-size: 13px;
   margin-top: 4px;
@@ -364,6 +459,7 @@
 .t-profile-links {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 3px;
   margin-top: 8px;
   font-size: 13px;
@@ -376,16 +472,22 @@
   display: flex;
   align-items: center;
   padding: 4px 0 12px;
-  gap: 0;
+  gap: 0.5ch;
 }
 
 .t-input-wrapper .t-prompt {
   flex-shrink: 0;
-  padding-right: 8px;
+}
+
+.t-input-line {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .t-input {
-  flex: 1;
+  flex: 0 1 auto;
   background: transparent;
   border: none;
   outline: none;
@@ -395,8 +497,17 @@
   line-height: inherit;
   caret-color: var(--t-green);
   padding: 0;
-  min-width: 0;
+  min-width: 1ch;
+  max-width: 100%;
   -webkit-tap-highlight-color: transparent;
+}
+
+.t-inline-hint {
+  color: color-mix(in srgb, var(--t-text) 42%, transparent);
+  margin-left: 0.5ch;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ============================================================
@@ -573,9 +684,14 @@
   }
 
   .t-settings-btn {
+    width: 40px;
     height: 40px;
-    padding: 0 12px;
     font-size: 13px;
+  }
+
+  .t-settings-btn .t-settings-icon {
+    width: 20px;
+    height: 20px;
   }
 
   .t-settings-panel {

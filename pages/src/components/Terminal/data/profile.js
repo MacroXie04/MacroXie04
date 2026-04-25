@@ -7,7 +7,7 @@ export const PROFILE = {
   role: 'Full Stack & Cloud Engineer',
   education: 'UC Merced · CS&E · Class of 2028',
   tagline: 'Dream it. Chase it. Code it.',
-  email: 'xiehongzhe04@gmail.com',
+  email: 'index@hongzhexie.com',
   github: 'https://github.com/MacroXie04',
   phone: '+1 (206) 333-8881',
 };

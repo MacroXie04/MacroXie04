@@ -21,7 +21,7 @@ Class of 2028
 - Google I/O 2025: Hands-on with the Agent Development Kit (ADK) and latest AI, Android, and web performance practices.
 
 ## Contact
-[xiehongzhe04@gmail.com](mailto:xiehongzhe04@gmail.com)  
+[index@hongzhexie.com](mailto:index@hongzhexie.com)  
 [GitHub](https://github.com/MacroXie04)  
 [+1 (206) 333-8881](tel:+12063338881)
 `,

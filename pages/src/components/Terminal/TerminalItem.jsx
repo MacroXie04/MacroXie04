@@ -13,7 +13,7 @@ export default function TerminalItem({ item, idx }) {
             <a href={item.github} target="_blank" rel="noopener noreferrer" className="t-link">
               {item.github.replace('https://', '')}
             </a>
-            <span className="t-dim">{item.phone}</span>
+            <span className="t-green">{item.phone}</span>
           </div>
         </div>
       </div>
@@ -50,10 +50,27 @@ export default function TerminalItem({ item, idx }) {
     );
   }
 
+  if (item.type === 'contactRow') {
+    return (
+      <div key={idx} className={`t-line t-contact-row ${item.cls || ''}`}>
+        <span className="t-contact-glyph" aria-hidden="true">{item.icon}</span>
+        <span>{item.text}</span>
+      </div>
+    );
+  }
+
   if (item.type === 'link') {
     const isExternal = item.href.startsWith('http');
+    const linkBody = item.label != null ? (
+      <>
+        <span className="t-contact-glyph" aria-hidden="true">{item.icon}</span>
+        <span>{item.label}</span>
+      </>
+    ) : (
+      item.text
+    );
     return (
-      <div key={idx} className="t-line">
+      <div key={idx} className="t-line t-link-line">
         <a
           href={item.href}
           target={isExternal ? '_blank' : undefined}
@@ -61,7 +78,7 @@ export default function TerminalItem({ item, idx }) {
           className="t-link"
           onClick={e => e.stopPropagation()}
         >
-          {item.text}
+          {linkBody}
         </a>
       </div>
     );

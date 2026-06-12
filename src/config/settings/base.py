@@ -46,6 +46,7 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
 INSTALLED_APPS = [
     "authn.apps.AuthnConfig",
     "core.apps.CoreConfig",
+    "cms.apps.CmsConfig",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "django.contrib.admin",
@@ -137,5 +138,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

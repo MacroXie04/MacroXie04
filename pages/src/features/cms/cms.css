@@ -1,0 +1,112 @@
+.cms-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.6;
+}
+
+.cms-page a {
+  color: var(--text-link);
+}
+
+.cms-page section {
+  margin-bottom: 32px;
+}
+
+.cms-section-title {
+  color: var(--text-accent);
+  border-bottom: 1px solid var(--border-separator);
+  padding-bottom: 8px;
+}
+
+.cms-hero-heading {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.cms-hero-subheading {
+  color: var(--text-secondary);
+}
+
+.cms-hero-image,
+.cms-image-text-image {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.cms-image-text-left .cms-image-text-content,
+.cms-image-text-right .cms-image-text-content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.cms-image-text-right .cms-image-text-content {
+  flex-direction: row-reverse;
+}
+
+.cms-image-text-left .cms-image-text-image,
+.cms-image-text-right .cms-image-text-image {
+  max-width: 40%;
+}
+
+.cms-link-list-items {
+  list-style: none;
+  padding: 0;
+}
+
+.cms-link-list-items li {
+  padding: 4px 0;
+}
+
+.cms-faq-item {
+  margin-bottom: 16px;
+}
+
+.cms-faq-item h3 {
+  color: var(--syntax-string);
+  margin-bottom: 4px;
+}
+
+.cms-table-block-wrap {
+  overflow-x: auto;
+}
+
+.cms-table-block-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.cms-table-block-table th,
+.cms-table-block-table td {
+  border: 1px solid var(--border-primary);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.cms-table-block-table th {
+  background: var(--bg-secondary);
+  color: var(--text-accent);
+}
+
+.cms-page-loading {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.cms-page-not-found,
+.cms-page-error {
+  text-align: center;
+  padding-top: 120px;
+}
+
+.cms-page-footer {
+  margin-top: 48px;
+  border-top: 1px solid var(--border-separator);
+  padding-top: 16px;
+}

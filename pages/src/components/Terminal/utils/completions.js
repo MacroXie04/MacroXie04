@@ -1,10 +1,4 @@
-const ALL_COMMANDS = [
-  'about', 'cat', 'cd', 'clear', 'color', 'contact', 'cv', 'date', 'download', 'echo', 'exit', 'experience',
-  'font', 'github', 'help', 'history', 'ls', 'man', 'ping', 'print', 'pwd', 'rm',
-  'quit', 'resume', 'settings', 'skills', 'sudo', 'theme', 'uname', 'uptime', 'which', 'whoami',
-];
-
-const CAT_FILES = ['README.md', 'experience.py', 'skills.sql'];
+import { ALL_NAMES, getCommand } from '../registry';
 
 function commonPrefix(strs) {
   if (!strs.length) return '';
@@ -15,22 +9,34 @@ function commonPrefix(strs) {
   });
 }
 
-export function getCompletions(input) {
-  const parts = input.split(/\s+/);
+// Tab-completion. Returns one of:
+//   { type:'cmd', partial, matches, common }
+//   { type:'arg', partial, matches, common, prefix }   // prefix = input up to the partial
+//   { type:'none', matches: [] }
+export function getCompletions(input, cwd) {
   const afterSpace = input.endsWith(' ');
+  const parts = input.split(/\s+/);
+  const cmdToken = parts[0].toLowerCase();
 
-  if (parts[0].toLowerCase() === 'cat' && (parts.length >= 2 || afterSpace)) {
-    const partial = afterSpace ? '' : (parts[1] || '');
-    const matches = CAT_FILES.filter(f => f.toLowerCase().startsWith(partial.toLowerCase()));
-    const prefix = commonPrefix(matches);
-    return { type: 'arg', prefix: 'cat ', partial, matches, common: prefix };
+  // First word still being typed -> complete the command name.
+  if (parts.length === 1 && !afterSpace) {
+    const partial = cmdToken;
+    const matches = ALL_NAMES.filter((c) => c.startsWith(partial));
+    return { type: 'cmd', partial, matches, common: commonPrefix(matches) };
   }
 
-  if (parts.length === 1 && !afterSpace) {
-    const partial = parts[0].toLowerCase();
-    const matches = ALL_COMMANDS.filter(c => c.startsWith(partial));
-    const prefix = commonPrefix(matches);
-    return { type: 'cmd', partial, matches, common: prefix };
+  // Argument completion for commands that expose a path completer.
+  const desc = getCommand(cmdToken);
+  if (desc && desc.completer) {
+    const partialArg = afterSpace ? '' : (parts[parts.length - 1] || '');
+    const slash = partialArg.lastIndexOf('/');
+    const dirPart = slash >= 0 ? partialArg.slice(0, slash + 1) : '';
+    const basePart = slash >= 0 ? partialArg.slice(slash + 1) : partialArg;
+    const candidates = desc.completer({ cwd, dirPart }) || [];
+    const matches = candidates.filter((n) => n.toLowerCase().startsWith(basePart.toLowerCase()));
+    // Everything in the input before the part we're completing.
+    const prefix = input.slice(0, input.length - basePart.length);
+    return { type: 'arg', partial: basePart, matches, common: commonPrefix(matches), prefix };
   }
 
   return { type: 'none', matches: [] };

@@ -1,22 +1,8 @@
 import { txt } from './handlers/shared';
 import { PROFILE } from './data/profile';
-import { handleSudo, isDestructiveRm } from './handlers/sudo';
-import { cmdHelp, cmdAbout, cmdExperience, cmdSkills, cmdContact, cmdSeventeen } from './handlers/infoCommands';
-import { cmdLs, cmdCat, cmdGithub, cmdPwd, cmdEcho, cmdCd } from './handlers/fsCommands';
-import {
-  cmdUname, cmdDate, cmdUptime, cmdPing, cmdExit,
-  cmdHistory as buildHistory, cmdSettings, cmdFont, cmdTheme, cmdColor,
-  cmdMan, cmdWhich, cmdPrint, cmdDownloadCv,
-} from './handlers/utilCommands';
+import { byName } from './registry';
+import { cmdSandwich } from './handlers/funCommands';
 export { getCompletions } from './utils/completions';
-
-const ALL_COMMANDS = [
-  'help', 'about', 'whoami', 'experience', 'skills', 'contact', 'github',
-  'pwd', 'echo', 'cd', 'uname', 'date', 'uptime', 'ping', 'exit', 'quit',
-  'clear', 'cat', 'ls', 'sudo', 'history', 'rm', 'settings', 'font',
-  'theme', 'color', 'man', 'which', 'print', 'cv', 'resume', 'download',
-  'seventeen', 'svt',
-];
 
 function levenshtein(a, b) {
   const m = a.length, n = b.length;
@@ -32,7 +18,9 @@ function levenshtein(a, b) {
 
 function findClosestCommand(cmd) {
   let best = null, bestDist = Infinity;
-  for (const c of ALL_COMMANDS) {
+  // Suggest any dispatchable name (canonical + aliases, including hidden like
+  // rm/quit) — anything the user could legitimately have typed.
+  for (const c of byName.keys()) {
     const d = levenshtein(cmd, c);
     if (d < bestDist) { bestDist = d; best = c; }
   }
@@ -40,64 +28,55 @@ function findClosestCommand(cmd) {
   return bestDist <= threshold ? best : null;
 }
 
+// Multi-token "commands" that can't be a single-token descriptor are matched
+// here, before tokenized lookup. Each entry: { test(lowercasedTrimmed) -> bool, run(ctx) }.
+const PHRASES = [
+  { test: (s) => /^(sudo\s+)?make me a sandwich$/.test(s), run: (ctx) => cmdSandwich(ctx) },
+];
+
+function resolvePhrase(trimmed) {
+  const lower = trimmed.toLowerCase();
+  return PHRASES.find((p) => p.test(lower)) || null;
+}
+
 export function processCommand(input, settings = {}, cmdHistory = []) {
-  const { fontSize, theme, accentColor } = settings;
+  const { fontSize, theme, accentColor, cwd } = settings;
   const trimmed = input.trim();
   if (!trimmed) return null;
 
   const parts = trimmed.split(/\s+/);
-  const cmd = parts[0].toLowerCase();
+  const name = parts[0].toLowerCase();
   const args = parts.slice(1);
 
-  if (cmd === 'quit')     return { quit: true };
-  if (cmd === 'clear')    return { clear: true };
-  if (cmd === 'cat')      return { output: cmdCat(args[0]) };
-  if (cmd === 'ls')       return cmdLs(args);
-  if (cmd === 'sudo')     return handleSudo(args);
-  if (cmd === 'history')  return buildHistory(cmdHistory);
-
-  if (cmd === 'rm') {
-    if (isDestructiveRm(args)) return { bomb: true, output: [] };
-    return { output: [txt(''), txt('rm: permission denied', 't-error'), txt('')] };
-  }
-
-  const MAP = {
-    help:       () => cmdHelp(),
-    about:      () => cmdAbout(),
-    whoami:     () => cmdAbout(),
-    experience: () => cmdExperience(),
-    skills:     () => cmdSkills(),
-    contact:    () => cmdContact(),
-    github:     () => cmdGithub(),
-    pwd:        () => cmdPwd(),
-    echo:       () => cmdEcho(args),
-    cd:         () => cmdCd(args),
-    uname:      () => cmdUname(args),
-    date:       () => cmdDate(),
-    uptime:     () => cmdUptime(),
-    ping:       () => cmdPing(args),
-    exit:       () => cmdExit(),
-    settings:   () => cmdSettings({ fontSize, theme, color: accentColor }),
-    font:       () => cmdFont(args, fontSize),
-    theme:      () => cmdTheme(args, theme),
-    color:      () => cmdColor(args, accentColor),
-    man:        () => cmdMan(args),
-    which:      () => cmdWhich(args),
-    print:      () => cmdPrint(),
-    cv:         () => cmdDownloadCv(),
-    resume:     () => cmdDownloadCv(),
-    download:   () => cmdDownloadCv(),
-    seventeen:  () => cmdSeventeen(),
-    svt:        () => cmdSeventeen(),
+  const ctx = {
+    args,
+    raw: trimmed,
+    name,
+    settings: { fontSize, theme, accentColor },
+    cmdHistory,
+    cwd,
+    // Injected so handlers (e.g. `please <cmd>`) can re-dispatch without
+    // importing commands.js (which would create a circular import).
+    dispatch: (line) => processCommand(line, settings, cmdHistory),
   };
 
-  if (MAP[cmd]) return MAP[cmd]();
+  const phrase = resolvePhrase(trimmed);
+  if (phrase) return phrase.run(ctx);
 
-  const suggestion = findClosestCommand(cmd);
+  const cmd = byName.get(name);
+  if (cmd) {
+    if (cmd.pre) {
+      const short = cmd.pre(ctx);
+      if (short != null) return short;
+    }
+    return cmd.run(ctx);
+  }
+
+  const suggestion = findClosestCommand(name);
   return {
     output: [
       txt(''),
-      txt(`Unknown command: '${cmd}'.${suggestion ? ` Did you mean '${suggestion}'?` : " Type 'help' for available commands."}`, 't-error'),
+      txt(`Unknown command: '${name}'.${suggestion ? ` Did you mean '${suggestion}'?` : " Type 'help' for available commands."}`, 't-error'),
       txt(''),
     ],
   };

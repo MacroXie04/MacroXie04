@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { processCommand, getWelcomeOutput, getCompletions } from '../commands';
 import { getPdfUrl } from '../handlers/utilCommands';
+import { HOME, getNode } from '../data/filesystem';
 
 export const FONT_SIZES = {
   small:  '14px',
@@ -33,6 +34,11 @@ export default function useTerminal() {
   const [fontSize, setFontSizeState] = useState(() => localStorage.getItem('t-font-size') || 'medium');
   const [theme, setThemeState] = useState(() => localStorage.getItem('t-theme') || 'default');
   const [accentColor, setColorState] = useState(() => localStorage.getItem('t-color') || 'green');
+  const [cwd, setCwdState] = useState(() => {
+    const saved = localStorage.getItem('t-cwd');
+    const node = saved ? getNode(saved) : null;
+    return node && node.type === 'dir' ? saved : HOME;
+  });
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bombing, setBombing] = useState(false);
   const [tabHint, setTabHint] = useState(null);
@@ -52,6 +58,11 @@ export default function useTerminal() {
   const setColor = useCallback((c) => {
     setColorState(c);
     localStorage.setItem('t-color', c);
+  }, []);
+
+  const setCwd = useCallback((p) => {
+    setCwdState(p);
+    localStorage.setItem('t-cwd', p);
   }, []);
 
   useEffect(() => {
@@ -84,7 +95,7 @@ export default function useTerminal() {
     const trimmed = cmd.trim();
     if (!trimmed) return;
 
-    const result = processCommand(trimmed, { fontSize, theme, accentColor }, cmdHistory);
+    const result = processCommand(trimmed, { fontSize, theme, accentColor, cwd }, cmdHistory);
 
     if (result?.quit) {
       window.close();
@@ -114,6 +125,9 @@ export default function useTerminal() {
     if (result?.action === 'setColor') {
       setColor(result.value);
     }
+    if (result?.setCwd) {
+      setCwd(result.setCwd);
+    }
     if (result?.clear) {
       setHistory([]);
       setCmdHistory(prev => [trimmed, ...prev]);
@@ -124,10 +138,10 @@ export default function useTerminal() {
     setHistory(prev => [...prev, { id: Date.now(), cmd: trimmed, output: result?.output || [] }]);
     setCmdHistory(prev => [trimmed, ...prev]);
     setHistoryIdx(-1);
-  }, [fontSize, theme, accentColor, setFontSize, setTheme, setColor, cmdHistory]);
+  }, [fontSize, theme, accentColor, cwd, setFontSize, setTheme, setColor, setCwd, cmdHistory]);
 
   const handleTab = useCallback((currentInput) => {
-    const result = getCompletions(currentInput);
+    const result = getCompletions(currentInput, cwd);
     if (result.matches.length === 0) return;
 
     if (result.matches.length === 1) {
@@ -135,7 +149,7 @@ export default function useTerminal() {
       if (result.type === 'cmd') {
         setInputValue(result.matches[0] + ' ');
       } else {
-        setInputValue('cat ' + result.matches[0]);
+        setInputValue(result.prefix + result.matches[0]);
       }
       return;
     }
@@ -143,11 +157,11 @@ export default function useTerminal() {
     if (result.type === 'cmd' && result.common.length > result.partial.length) {
       setInputValue(result.common);
     } else if (result.type === 'arg' && result.common.length > result.partial.length) {
-      setInputValue('cat ' + result.common);
+      setInputValue(result.prefix + result.common);
     }
 
     setTabHint(result.matches.join('    '));
-  }, []);
+  }, [cwd]);
 
   const handleInputChange = useCallback((value) => {
     setTabHint(null);
@@ -190,6 +204,7 @@ export default function useTerminal() {
     fontSize, setFontSize,
     theme, setTheme,
     accentColor, setColor,
+    cwd,
     settingsOpen, setSettingsOpen,
     bombing,
     bottomRef, inputRef,

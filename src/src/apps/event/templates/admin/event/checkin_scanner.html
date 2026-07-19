@@ -1,0 +1,128 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'event/css/checkin_console.css' %}?v=20260608-dark-mode">
+    <script src="{% static 'vendor/html5-qrcode/2.3.8/html5-qrcode.min.js' %}" defer></script>
+    <script src="{% static 'event/js/checkin_shared.js' %}" defer></script>
+    <script src="{% static 'event/js/checkin_ticket_input.js' %}" defer></script>
+    <script src="{% static 'event/js/checkin_camera.js' %}" defer></script>
+    <script src="{% static 'event/js/checkin_console.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+    {{ scanner_config|json_script:"checkin-console-config" }}
+
+    <main class="checkin-console" data-checkin-console>
+        <header class="checkin-header">
+            <div>
+                <a class="checkin-back" href="{{ change_url }}">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Back to Check-in
+                </a>
+                <h1>{{ check_in.name }}</h1>
+                <p>{{ check_in.event.name }}</p>
+            </div>
+            <div class="checkin-header-actions">
+                <div data-sync-status class="checkin-sync is-syncing" role="status" aria-live="polite">
+                    <span class="checkin-sync-dot" aria-hidden="true"></span>
+                    <span data-sync-label>Syncing...</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="checkin-stats" aria-label="Check-in stats">
+            <div>
+                <span>Total</span>
+                <strong data-stat-total>-</strong>
+            </div>
+            <div>
+                <span>Checked in</span>
+                <strong data-stat-scanned>-</strong>
+            </div>
+            <div>
+                <span>Remaining</span>
+                <strong data-stat-remaining>-</strong>
+            </div>
+        </section>
+
+        <section class="checkin-primary">
+            <form data-scan-form class="checkin-scan-form">
+                <label for="checkin-code">Ticket code</label>
+                <div class="checkin-input-row">
+                    <div class="checkin-code-field">
+                        <input
+                            id="checkin-code"
+                            data-scan-input
+                            type="text"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="TKT-0123456789AB"
+                            title="Ticket code format: TKT- followed by 12 hexadecimal characters (0-9, A-F)."
+                        >
+                    </div>
+                    <button data-scan-button type="submit">
+                        <span class="material-symbols-outlined">login</span>
+                        Check In
+                    </button>
+                </div>
+            </form>
+
+            <div data-scan-result class="checkin-result" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="checkin-grid">
+            <div class="checkin-panel">
+                <div class="checkin-panel-header">
+                    <h2>Remaining attendees</h2>
+                    <button data-refresh-button type="button" class="checkin-icon-button" title="Refresh">
+                        <span class="material-symbols-outlined">refresh</span>
+                    </button>
+                </div>
+                <input
+                    data-roster-search
+                    class="checkin-search"
+                    type="search"
+                    autocomplete="off"
+                    placeholder="Search name, email, or code"
+                >
+                <div data-roster-list class="checkin-list">
+                    <div class="checkin-empty">Loading attendees...</div>
+                </div>
+            </div>
+
+            <div class="checkin-side">
+                <div class="checkin-panel">
+                    <div class="checkin-panel-header">
+                        <h2>Camera</h2>
+                        <span data-camera-status class="checkin-camera-status">Idle</span>
+                    </div>
+                    <div data-camera-reader class="checkin-camera-reader"></div>
+                    <div data-camera-message class="checkin-camera-message"></div>
+                    <div class="checkin-camera-actions">
+                        <button data-camera-start type="button">
+                            <span class="material-symbols-outlined">photo_camera</span>
+                            Request camera access
+                        </button>
+                        <button data-camera-stop type="button" disabled>
+                            <span class="material-symbols-outlined">stop_circle</span>
+                            Stop
+                        </button>
+                    </div>
+                </div>
+
+                <div class="checkin-panel">
+                    <div class="checkin-panel-header">
+                        <h2>Recent scans</h2>
+                    </div>
+                    <div data-recent-list class="checkin-list checkin-list--compact">
+                        <div class="checkin-empty">No scans yet.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}

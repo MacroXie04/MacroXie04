@@ -1,0 +1,22 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+    <div class="admin-object-tools">
+        {% if show_import_buttons %}
+            <a
+                    href="{% url 'admin:cms_cmspage_export' %}"
+                    class="admin-action"
+            >
+                Export JSON
+            </a>
+            <a
+                    href="{% url 'admin:cms_cmspage_import' %}"
+                    class="admin-action"
+            >
+                Import JSON
+            </a>
+        {% endif %}
+        {{ block.super }}
+    </div>
+{% endblock %}

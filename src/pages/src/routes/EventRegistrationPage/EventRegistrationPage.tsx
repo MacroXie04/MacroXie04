@@ -1,0 +1,130 @@
+import {CodeVerificationStep} from './steps/CodeVerificationStep.tsx';
+import {DoneState} from './steps/DoneState.tsx';
+import {EmailAuthStep} from './steps/EmailAuthStep.tsx';
+import {EventSelectionStep} from './steps/EventSelectionStep.tsx';
+import {formatEventDateRange} from '@/features/events/formatEventDateRange.ts';
+import {LoadingState} from './steps/LoadingState.tsx';
+import {RegistrationFormStep} from './steps/RegistrationFormStep.tsx';
+import {useEventRegistration} from './useEventRegistration.ts';
+
+export const EventRegistrationPage = () => {
+  const reg = useEventRegistration();
+
+  if (reg.step === 'done' && reg.registration) {
+    return (
+      <DoneState
+        registration={reg.registration}
+        showChooseAnother={reg.events.length > 1}
+        onChooseAnother={reg.handleShowEventList}
+      />
+    );
+  }
+
+  // Fatal: no event payload and we only have an error (e.g. no live event for authenticated bootstrap)
+  if (reg.step === 'loading' && reg.error && !reg.options) {
+    return <LoadingState error={reg.error} />;
+  }
+
+  const bootLoading = reg.step === 'loading' && !reg.options && !reg.error;
+  const routingLoading = reg.step === 'loading' && Boolean(reg.options);
+
+  return (
+    <div className="event-reg-page">
+      <h1 className="event-reg-title">Event Registration</h1>
+
+      {reg.options ? (
+        <div className="event-reg-info">
+          <h2>{reg.options.name}</h2>
+          <p>
+            <strong>Date:</strong> {formatEventDateRange(reg.options.date, reg.options.end_date)}
+          </p>
+          <p>
+            <strong>Location:</strong> {reg.options.location}
+          </p>
+          {reg.options.description ? <p style={{marginTop: '0.5rem'}}>{reg.options.description}</p> : null}
+        </div>
+      ) : null}
+
+      {bootLoading ? <div className="event-reg-loading">Loading event details...</div> : null}
+
+      {routingLoading ? <div className="event-reg-loading event-reg-loading--inline">Loading registration form...</div> : null}
+
+      {reg.error ? <div className="event-reg-alert error">{reg.error}</div> : null}
+
+      {reg.step === 'select' ? (
+        <EventSelectionStep
+          events={reg.events}
+          selectedEventSlug={reg.selectedEventSlug}
+          onSelect={reg.handleSelectEvent}
+        />
+      ) : null}
+
+      {reg.step === 'email' ? (
+        <EmailAuthStep
+          email={reg.email}
+          authLoading={reg.authLoading}
+          onEmailChange={reg.setEmail}
+          onSubmit={reg.handleEmailSubmit}
+        />
+      ) : null}
+
+      {reg.step === 'code' ? (
+        <CodeVerificationStep
+          email={reg.email}
+          code={reg.code}
+          authLoading={reg.authLoading}
+          onCodeChange={reg.setCode}
+          onSubmit={reg.handleCodeSubmit}
+          onBack={() => {
+            reg.setCode('');
+            reg.setError(null);
+            reg.setStep('email');
+          }}
+        />
+      ) : null}
+
+      {reg.step === 'form' && reg.options ? (
+        <RegistrationFormStep
+          options={reg.options}
+          selectedTicketId={reg.selectedTicketId}
+          answers={reg.answers}
+          submitting={reg.submitting}
+          attendeeFirstName={reg.attendeeFirstName}
+          attendeeMiddleName={reg.attendeeMiddleName}
+          attendeeLastName={reg.attendeeLastName}
+          attendeeOrgType={reg.attendeeOrgType}
+          attendeeOrganization={reg.attendeeOrganization}
+          attendeeTitle={reg.attendeeTitle}
+          attendeeSecondaryEmail={reg.attendeeSecondaryEmail}
+          attendeePhone={reg.attendeePhone}
+          primaryEmail={reg.primaryEmail}
+          phoneError={reg.phoneError}
+          onFirstNameChange={reg.setAttendeeFirstName}
+          onMiddleNameChange={reg.setAttendeeMiddleName}
+          onLastNameChange={reg.setAttendeeLastName}
+          onOrgTypeChange={(value) => {
+            reg.setAttendeeOrgType(value);
+            reg.setAttendeeOrganization('');
+            reg.setAttendeeTitle('');
+          }}
+          onOrganizationChange={reg.setAttendeeOrganization}
+          onTitleChange={reg.setAttendeeTitle}
+          onTicketChange={reg.setSelectedTicketId}
+          onAnswerChange={(questionId, answer) => reg.setAnswers((current) => ({...current, [questionId]: answer}))}
+          onSecondaryEmailChange={reg.setAttendeeSecondaryEmail}
+          onPhoneChange={reg.handlePhoneChange}
+          phoneCode={reg.phoneCode}
+          phoneCodeSent={reg.phoneCodeSent}
+          phoneSending={reg.phoneSending}
+          phoneVerified={reg.phoneVerified}
+          verifyingPhone={reg.verifyingPhone}
+          onPhoneCodeChange={reg.setPhoneCode}
+          onSendPhoneCode={reg.handleSendPhoneCode}
+          onVerifyPhoneCode={reg.handleVerifyPhoneCode}
+          onSubmit={reg.handleRegistrationSubmit}
+        />
+      ) : null}
+
+    </div>
+  );
+};

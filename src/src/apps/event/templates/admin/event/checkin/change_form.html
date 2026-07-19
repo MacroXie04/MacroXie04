@@ -1,0 +1,91 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+{% if original and checkin_summary_config %}
+<link rel="stylesheet" href="{% static 'event/css/checkin_change_summary.css' %}?v=20260608-dark-mode">
+<script src="{% static 'event/js/checkin_change_summary.js' %}?v=20260514-lookup-actions" defer></script>
+{% endif %}
+{% endblock %}
+
+{% block field_sets %}
+{% if original and checkin_summary_config %}
+{{ checkin_summary_config|json_script:"checkin-summary-config" }}
+<div class="checkin-summary" data-checkin-summary>
+  <div class="checkin-summary__header">
+    <div>
+      <strong class="checkin-summary__title">Check-in Console</strong>
+      <p class="checkin-summary__description">
+        Use the dedicated console for live check-in. Current status updates automatically.
+      </p>
+    </div>
+    <div class="checkin-summary__actions">
+      <div data-summary-sync class="checkin-summary__sync is-syncing" role="status" aria-live="polite">
+        <span class="checkin-summary__sync-dot" aria-hidden="true"></span>
+        <span data-summary-sync-label>Loading...</span>
+      </div>
+      <a class="checkin-summary__console-link" href="{{ checkin_summary_config.consoleUrl }}" target="_blank">
+        Open Check-in Console
+      </a>
+      <a class="checkin-summary__export-link" href="{{ checkin_summary_config.exportUrl }}">
+        Export Excel
+      </a>
+    </div>
+  </div>
+
+  <div class="checkin-summary__stats" aria-label="Current check-in status">
+    <div class="checkin-summary__stat">
+      <span>Total registrations</span>
+      <strong data-summary-total>-</strong>
+    </div>
+    <div class="checkin-summary__stat">
+      <span>Checked in</span>
+      <strong data-summary-scanned>-</strong>
+    </div>
+    <div class="checkin-summary__stat">
+      <span>Remaining</span>
+      <strong data-summary-remaining>-</strong>
+    </div>
+  </div>
+
+  <div class="checkin-summary__recent">
+    <div class="checkin-summary__recent-header">
+      <strong>Recent scans</strong>
+    </div>
+    <div data-summary-recent-list class="checkin-summary__recent-list">
+      <div class="checkin-summary__empty">Loading recent scans...</div>
+    </div>
+  </div>
+
+  <div class="checkin-summary__lookup">
+    <div class="checkin-summary__lookup-header">
+      <strong>Registration lookup</strong>
+      <span data-summary-lookup-count>Loading...</span>
+    </div>
+    <div class="checkin-summary__lookup-controls">
+      <label class="checkin-summary__lookup-search">
+        <span>Search</span>
+        <input
+          type="search"
+          data-summary-lookup-search
+          aria-label="Search registrations"
+          placeholder="Name, email, organization, title, code"
+          autocomplete="off"
+        >
+      </label>
+      <label class="checkin-summary__ticket-filter">
+        <span>Ticket Type</span>
+        <select data-summary-ticket-filter aria-label="Filter by ticket type">
+          <option value="">All ticket types</option>
+        </select>
+      </label>
+    </div>
+    <div data-summary-lookup-list class="checkin-summary__lookup-list">
+      <div class="checkin-summary__empty">Loading registrations...</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

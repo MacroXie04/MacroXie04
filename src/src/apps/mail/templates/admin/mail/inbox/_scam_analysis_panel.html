@@ -1,0 +1,450 @@
+<style>
+    .scam-panel {
+        --scam-risk-color: #d97706;
+        --scam-risk-soft: #fffbeb;
+        --scam-risk-border: #fcd34d;
+        background: var(--md-sys-color-surface-container-lowest);
+        border: 1px solid color-mix(in srgb, var(--scam-risk-color) 28%, var(--md-sys-color-outline-variant));
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(60, 64, 67, 0.12), 0 1px 3px rgba(60, 64, 67, 0.08);
+        color: var(--md-sys-color-on-surface);
+        overflow: hidden;
+    }
+
+    .scam-panel[data-risk-level="high"] {
+        --scam-risk-color: #dc2626;
+        --scam-risk-soft: #fef2f2;
+        --scam-risk-border: #fecaca;
+    }
+
+    .scam-panel[data-risk-level="low"] {
+        --scam-risk-color: #16a34a;
+        --scam-risk-soft: #f0fdf4;
+        --scam-risk-border: #bbf7d0;
+    }
+
+    .dark .scam-panel {
+        --scam-risk-color: #fbbf24;
+        --scam-risk-soft: color-mix(in srgb, var(--scam-risk-color) 12%, transparent);
+        --scam-risk-border: color-mix(in srgb, var(--scam-risk-color) 40%, transparent);
+        background: var(--md-sys-color-surface-container-lowest);
+    }
+
+    .dark .scam-panel[data-risk-level="high"] {
+        --scam-risk-color: #fca5a5;
+    }
+
+    .dark .scam-panel[data-risk-level="low"] {
+        --scam-risk-color: #4ade80;
+    }
+
+    .scam-panel__body {
+        border-left: 4px solid var(--scam-risk-color);
+        padding: 1rem;
+    }
+
+    .scam-panel__header {
+        align-items: flex-start;
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+    }
+
+    .scam-panel__identity {
+        display: flex;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .scam-panel__icon {
+        align-items: center;
+        background: var(--scam-risk-soft);
+        border: 1px solid var(--scam-risk-border);
+        border-radius: 8px;
+        color: var(--scam-risk-color) !important;
+        display: flex !important;
+        flex: 0 0 36px;
+        font-size: 20px !important;
+        height: 36px;
+        justify-content: center;
+        line-height: 1;
+        width: 36px;
+    }
+
+    .scam-panel__intro {
+        min-width: 0;
+    }
+
+    .scam-panel__title-row {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .scam-panel__title {
+        color: var(--md-sys-color-on-surface);
+        font-size: 0.925rem;
+        font-weight: 650;
+        line-height: 1.25rem;
+    }
+
+    .scam-panel__risk-badge {
+        align-items: center;
+        background: var(--scam-risk-soft);
+        border: 1px solid var(--scam-risk-border);
+        border-radius: 999px;
+        color: color-mix(in srgb, var(--scam-risk-color) 72%, #111827);
+        display: inline-flex;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        height: 1.5rem;
+        line-height: 1;
+        padding: 0 0.625rem;
+        text-transform: uppercase;
+    }
+
+    .dark .scam-panel__risk-badge {
+        color: var(--scam-risk-color);
+    }
+
+    .scam-panel__summary {
+        color: var(--md-sys-color-on-surface-variant);
+        font-size: 0.8125rem;
+        line-height: 1.35rem;
+        margin: 0.25rem 0 0;
+        max-width: 42rem;
+    }
+
+    .scam-panel__score {
+        align-items: center;
+        background: var(--md-sys-color-surface-container-low);
+        border: 1px solid var(--md-sys-color-outline-variant);
+        border-radius: 8px;
+        display: flex;
+        flex: 0 0 auto;
+        gap: 0.625rem;
+        padding: 0.625rem 0.75rem;
+    }
+
+    .scam-panel__score-label {
+        color: var(--md-sys-color-on-surface-variant);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .scam-panel__score-value {
+        color: var(--md-sys-color-on-surface);
+        font-size: 1.15rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .scam-panel__meter {
+        background: var(--md-sys-color-surface-container);
+        border-radius: 999px;
+        height: 0.5rem;
+        margin-top: 1rem;
+        overflow: hidden;
+    }
+
+    .scam-panel__meter-fill {
+        background: var(--scam-risk-color);
+        border-radius: inherit;
+        height: 100%;
+    }
+
+    .scam-panel__recommendation {
+        align-items: flex-start;
+        background: var(--md-sys-color-surface-container-low);
+        border-radius: 8px;
+        color: var(--md-sys-color-on-surface);
+        display: flex;
+        font-size: 0.8125rem;
+        gap: 0.5rem;
+        line-height: 1.35rem;
+        margin-top: 1rem;
+        padding: 0.625rem 0.75rem;
+    }
+
+    .scam-panel__recommendation-icon,
+    .scam-panel__section-heading .material-symbols-outlined,
+    .scam-panel__signal-icon {
+        color: var(--scam-risk-color) !important;
+        flex: 0 0 auto;
+    }
+
+    .scam-panel__recommendation-icon {
+        font-size: 16px !important;
+        margin-top: 0.125rem;
+    }
+
+    .scam-panel__section {
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .scam-panel__section-heading {
+        align-items: center;
+        color: var(--scam-risk-color);
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        gap: 0.5rem;
+        line-height: 1rem;
+        text-transform: uppercase;
+    }
+
+    .scam-panel__section-heading .material-symbols-outlined {
+        font-size: 15px !important;
+    }
+
+    .scam-panel__section-meta {
+        color: var(--md-sys-color-on-surface-variant);
+        font-weight: 500;
+        text-transform: none;
+    }
+
+    .scam-panel__link-list,
+    .scam-panel__signals {
+        margin-top: 0.5rem;
+    }
+
+    .scam-panel__link-row {
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 0.625rem 0;
+    }
+
+    .scam-panel__link-row:first-child {
+        border-top: 0;
+    }
+
+    .scam-panel__link-cell {
+        min-width: 0;
+    }
+
+    .scam-panel__label {
+        color: var(--md-sys-color-on-surface-variant);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        line-height: 1rem;
+        text-transform: uppercase;
+    }
+
+    .scam-panel__domain {
+        color: var(--md-sys-color-on-surface);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        line-height: 1.25rem;
+        overflow-wrap: anywhere;
+    }
+
+    .scam-panel__signals {
+        list-style: none;
+        margin-bottom: 0;
+        padding: 0;
+    }
+
+    .scam-panel__signal {
+        align-items: flex-start;
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+        display: flex;
+        gap: 0.75rem;
+        justify-content: space-between;
+        padding: 0.625rem 0;
+    }
+
+    .scam-panel__signal:first-child {
+        border-top: 0;
+    }
+
+    .scam-panel__signal-body {
+        display: flex;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .scam-panel__signal-icon {
+        font-size: 15px !important;
+        margin-top: 0.125rem;
+    }
+
+    .scam-panel__signal-copy {
+        min-width: 0;
+    }
+
+    .scam-panel__signal-title,
+    .scam-panel__signal-reason {
+        display: block;
+        font-size: 0.8125rem;
+        line-height: 1.25rem;
+    }
+
+    .scam-panel__signal-title {
+        color: var(--md-sys-color-on-surface);
+        font-weight: 650;
+    }
+
+    .scam-panel__signal-reason {
+        color: var(--md-sys-color-on-surface-variant);
+        overflow-wrap: anywhere;
+    }
+
+    .scam-panel__signal-score {
+        align-items: center;
+        background: var(--md-sys-color-surface-container);
+        border-radius: 999px;
+        color: var(--md-sys-color-on-surface-variant);
+        display: inline-flex;
+        flex: 0 0 auto;
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: 650;
+        height: 1.5rem;
+        padding: 0 0.5rem;
+    }
+
+    @media (max-width: 720px) {
+        .scam-panel__header,
+        .scam-panel__signal {
+            flex-direction: column;
+        }
+
+        .scam-panel__score {
+            align-self: flex-start;
+        }
+
+        .scam-panel__link-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div data-scam-analysis-panel
+     data-risk-level="{{ scam_analysis.risk_level }}"
+     class="{{ panel_margin|default:'mb-3' }} scam-panel">
+    <div class="scam-panel__body">
+        <div class="scam-panel__header">
+            <div class="scam-panel__identity">
+                <span class="material-symbols-outlined scam-panel__icon">{% if scam_analysis.risk_level == 'low' %}gpp_good{% elif scam_analysis.risk_level == 'high' %}gpp_bad{% else %}gpp_maybe{% endif %}</span>
+
+                <div class="scam-panel__intro">
+                    <div class="scam-panel__title-row">
+                        <span class="scam-panel__title">Security analysis</span>
+                        <span class="scam-panel__risk-badge">{{ scam_analysis.risk_level }} risk</span>
+                    </div>
+                    <p class="scam-panel__summary">
+                        {% firstof scam_analysis.summary "No automated security signals were flagged for this message." %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="scam-panel__score">
+                <span class="scam-panel__score-label">Signal score</span>
+                <span class="scam-panel__score-value">{{ scam_analysis.score }}</span>
+            </div>
+        </div>
+
+        <div class="scam-panel__meter" aria-hidden="true">
+            <div class="scam-panel__meter-fill" style="width:{% firstof scam_analysis.score_percent 0 %}%;"></div>
+        </div>
+
+        <div class="scam-panel__recommendation">
+            <span class="material-symbols-outlined scam-panel__recommendation-icon">verified_user</span>
+            <span>{% firstof scam_analysis.recommendation "Verify the sender and destination before taking action from this message." %}</span>
+        </div>
+
+        {% if scam_analysis.ai_review %}
+        <div class="scam-panel__section" data-scam-ai-review>
+            <div class="scam-panel__section-heading">
+                <span class="material-symbols-outlined">smart_toy</span>
+                <span>AI review</span>
+                <span class="scam-panel__section-meta">{{ scam_analysis.ai_review.verdict|title }} &middot; {{ scam_analysis.ai_review.risk_score }}/100</span>
+            </div>
+            {% if scam_analysis.ai_review.reasons %}
+            <ul class="scam-panel__signals">
+                {% for reason in scam_analysis.ai_review.reasons %}
+                <li class="scam-panel__signal">
+                    <span class="scam-panel__signal-body">
+                        <span class="material-symbols-outlined scam-panel__signal-icon">smart_toy</span>
+                        <span class="scam-panel__signal-reason">{{ reason }}</span>
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if scam_analysis.link_warnings %}
+        <div class="scam-panel__section">
+            <div class="scam-panel__section-heading">
+                <span class="material-symbols-outlined">link</span>
+                <span>Link check</span>
+                <span class="scam-panel__section-meta">{{ scam_analysis.link_warnings|length }} flagged</span>
+            </div>
+            <div class="scam-panel__link-list">
+                {% for warning in scam_analysis.link_warnings %}
+                <div class="scam-panel__link-row">
+                    <div class="scam-panel__link-cell">
+                        <div class="scam-panel__label">Shown as</div>
+                        <div class="scam-panel__domain">{{ warning.display_domain }}</div>
+                    </div>
+                    <div class="scam-panel__link-cell">
+                        <div class="scam-panel__label">Destination</div>
+                        <div class="scam-panel__domain">{{ warning.actual_domain }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="scam-panel__section">
+            <div class="scam-panel__section-heading">
+                <span class="material-symbols-outlined">rule</span>
+                <span>Detected signals</span>
+            </div>
+            <ul class="scam-panel__signals">
+                {% if scam_analysis.findings %}
+                    {% for finding in scam_analysis.findings %}
+                    <li class="scam-panel__signal">
+                        <span class="scam-panel__signal-body">
+                            <span class="material-symbols-outlined scam-panel__signal-icon">warning</span>
+                            <span class="scam-panel__signal-copy">
+                                <span class="scam-panel__signal-title">{{ finding.category }} - {{ finding.impact }} impact</span>
+                                <span class="scam-panel__signal-reason">{{ finding.reason }}</span>
+                            </span>
+                        </span>
+                        <span class="scam-panel__signal-score">+{{ finding.score }}</span>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    {% for reason in scam_analysis.reasons %}
+                    <li class="scam-panel__signal">
+                        <span class="scam-panel__signal-body">
+                            <span class="material-symbols-outlined scam-panel__signal-icon">warning</span>
+                            <span class="scam-panel__signal-reason">{{ reason }}</span>
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="scam-panel__signal">
+                        <span class="scam-panel__signal-body">
+                            <span class="material-symbols-outlined scam-panel__signal-icon">check_circle</span>
+                            <span class="scam-panel__signal-reason">No suspicious signals detected.</span>
+                        </span>
+                    </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+import {DeleteAccountSection} from './account/DeleteAccountSection.tsx';
+import {DetailsSection} from './account/DetailsSection.tsx';
+import {PasswordSection} from './account/PasswordSection.tsx';
+import {ProfileSection} from './account/ProfileSection.tsx';
+import {TicketsSection} from './account/TicketsSection.tsx';
+import {useAccountDashboard} from './account/useAccountDashboard.ts';
+import {EmailCenter} from '../sections/EmailCenter.tsx';
+import {MySharedLinksSection} from '../sections/MySharedLinksSection.tsx';
+import {PhoneCenter} from '../sections/PhoneCenter.tsx';
+
+import './account/accountSharedLinks.css';
+
+export const AccountPage = () => {
+    const account = useAccountDashboard();
+
+    if (!account.canRender) return null;
+    if (account.profileLoading) {
+        return (
+            <div className="account-page">
+                <div className="account-section">
+                    <p className="account-status-text account-status-text--center">Loading profile...</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="account-page">
+            <h1 className="account-page-title">Account Dashboard</h1>
+
+            <div className="account-grid">
+                <div className="account-column account-column--primary">
+                    <ProfileSection
+                        firstName={account.firstName}
+                        middleName={account.middleName}
+                        lastName={account.lastName}
+                        organizationType={account.organizationType}
+                        organization={account.organization}
+                        title={account.title}
+                        profileImage={account.profileImage}
+                        imageUploading={account.imageUploading}
+                        imageError={account.imageError}
+                        profileSaving={account.profileSaving}
+                        profileMessage={account.profileMessage}
+                        profileError={account.profileError}
+                        isEditingProfile={account.isEditingProfile}
+                        onImageChange={account.handleImageChange}
+                        onSubmit={account.handleProfileSubmit}
+                        onFirstNameChange={account.setFirstName}
+                        onMiddleNameChange={account.setMiddleName}
+                        onLastNameChange={account.setLastName}
+                        onOrganizationTypeChange={(value) => {
+                            account.setOrganizationType(value);
+                            account.setOrganization('');
+                            account.setTitle('');
+                        }}
+                        onOrganizationChange={account.setOrganization}
+                        onTitleChange={account.setTitle}
+                        onRetryProfile={() => void account.loadProfile()}
+                        onStartEditing={() => account.setIsEditingProfile(true)}
+                        onCancelEditing={account.handleCancelEditing}
+                    />
+                    <TicketsSection
+                        tickets={account.tickets}
+                        openEvents={account.registrationEvents}
+                        ticketsLoading={account.ticketsLoading}
+                        registrationEventsLoading={account.registrationEventsLoading}
+                        resendingId={account.resendingId}
+                        onResendTicketEmail={(registrationId) => void account.handleResendTicketEmail(registrationId)}
+                    />
+                </div>
+
+                <div className="account-column account-column--secondary">
+                    {account.profile ? <EmailCenter profile={account.profile} onProfileUpdate={account.setProfile}/> : null}
+                    {account.profile ? <PhoneCenter/> : null}
+                    <MySharedLinksSection/>
+                    <DetailsSection displayEmail={account.displayEmail} dateJoined={account.profile?.date_joined}/>
+                    <PasswordSection
+                        passwordCodeRequested={account.passwordCodeRequested}
+                        passwordCode={account.passwordCode}
+                        passwordVerificationToken={account.passwordVerificationToken}
+                        newPassword={account.newPassword}
+                        confirmPassword={account.confirmPassword}
+                        passwordLoading={account.passwordLoading}
+                        passwordMessage={account.passwordMessage}
+                        passwordError={account.passwordError}
+                        onPasswordRequestCode={account.handlePasswordRequestCode}
+                        onPasswordVerifyCode={account.handlePasswordVerifyCode}
+                        onPasswordConfirm={account.handlePasswordConfirm}
+                        onPasswordCodeChange={account.setPasswordCode}
+                        onNewPasswordChange={account.setNewPassword}
+                        onConfirmPasswordChange={account.setConfirmPassword}
+                    />
+                    <div className="account-section account-signout-row">
+                        <button
+                            type="button"
+                            className="profile-logout"
+                            onClick={account.logout}
+                        >
+                            <i className="fa fa-sign-out" aria-hidden/>
+                            Sign Out
+                        </button>
+                    </div>
+                    <DeleteAccountSection
+                        deleteCodeRequested={account.deleteCodeRequested}
+                        deleteCode={account.deleteCode}
+                        deleteVerificationToken={account.deleteVerificationToken}
+                        deleteLoading={account.deleteLoading}
+                        deleteMessage={account.deleteMessage}
+                        deleteError={account.deleteError}
+                        onDeleteRequestCode={account.handleDeleteRequestCode}
+                        onDeleteVerifyCode={account.handleDeleteVerifyCode}
+                        onDeleteConfirm={account.handleDeleteConfirm}
+                        onDeleteCodeChange={account.setDeleteCode}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};

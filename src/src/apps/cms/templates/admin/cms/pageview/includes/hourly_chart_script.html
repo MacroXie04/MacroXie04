@@ -1,0 +1,52 @@
+<script>
+    (function () {
+        const labels = [{% for h in hourly_views %}"{{ h.hour }}:00"{% if not forloop.last %},{% endif %}{% endfor %}];
+        const data = [{% for h in hourly_views %}{{ h.count }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        const theme = window.pageViewTheme;
+        const colors = theme.palette();
+
+        function applyTheme(chart, palette) {
+            chart.data.datasets[0].backgroundColor = palette.tealBar;
+            chart.options.plugins.datalabels.color = palette.textColor;
+            chart.options.plugins.tooltip.backgroundColor = palette.tooltipBg;
+            chart.options.plugins.tooltip.titleColor = palette.titleColor;
+            chart.options.plugins.tooltip.bodyColor = palette.textColor;
+            chart.options.plugins.tooltip.borderColor = palette.gridColor;
+            chart.options.scales.x.ticks.color = palette.textColor;
+            chart.options.scales.y.grid.color = palette.gridColor;
+            chart.options.scales.y.ticks.color = palette.textColor;
+        }
+
+        const chart = new Chart(document.getElementById('hourlyChart'), {
+            type: 'bar',
+            data: {labels: labels, datasets: [{label: 'Views', data: data, backgroundColor: colors.tealBar, borderRadius: 3, borderSkipped: false}]},
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: {mode: 'index', intersect: false},
+                plugins: {
+                    legend: {display: false},
+                    datalabels: {anchor: 'end', align: 'top', color: colors.textColor, font: {size: 9}, display: function (ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; }},
+                    tooltip: {
+                        backgroundColor: colors.tooltipBg,
+                        titleColor: colors.titleColor,
+                        bodyColor: colors.textColor,
+                        borderColor: colors.gridColor,
+                        borderWidth: 1,
+                        padding: 10,
+                        cornerRadius: 6,
+                        displayColors: false,
+                        callbacks: {label: function (ctx) { return ctx.parsed.y + ' views'; }}
+                    }
+                },
+                scales: {
+                    x: {grid: {display: false}, ticks: {color: colors.textColor, font: {size: 9}, maxRotation: 0, callback: function (val, idx) { return idx % 3 === 0 ? this.getLabelForValue(val) : ''; }}, border: {display: false}},
+                    y: {beginAtZero: true, grid: {color: colors.gridColor}, ticks: {color: colors.textColor, font: {size: 11}, precision: 0, maxTicksLimit: 5}, border: {display: false}}
+                }
+            }
+        });
+
+        theme.register(chart, applyTheme);
+    })();
+</script>

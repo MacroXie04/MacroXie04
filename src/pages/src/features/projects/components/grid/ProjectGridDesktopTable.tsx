@@ -1,0 +1,224 @@
+import {
+  getPastProjectDetailUrl,
+  hasProjectGridDetails,
+  type ProjectGridColumn,
+  type ProjectGridColumnKey,
+  type ProjectGridItem,
+  type ProjectGridSortDirection,
+} from '../projectGrid.ts';
+
+const COLUMN_WIDTHS: Partial<Record<ProjectGridColumnKey, string>> = {
+  semester_label: '9%',
+  class_code: '6%',
+  team_number: '7%',
+  team_name: '12%',
+  project_title: '22%',
+  organization: '16%',
+  industry: '10%',
+  is_presenting: '8%',
+};
+const DEFAULT_COL_WIDTH = '10%';
+const SELECT_COL_WIDTH = '4%';
+const DETAIL_COL_WIDTH = '8%';
+const DELETE_COL_WIDTH = '10%';
+
+interface ProjectGridDesktopTableProps {
+  columns: ProjectGridColumn[];
+  rows: ProjectGridItem[];
+  pagedRows: ProjectGridItem[];
+  emptyMessage: string;
+  selectable: boolean;
+  selectedKeys: Set<string>;
+  selectAllStateRows?: ProjectGridItem[];
+  onToggleSelected?: (rowKey: string) => void;
+  onToggleSelectAll?: () => void;
+  sortField: ProjectGridColumn['key'];
+  sortDirection: ProjectGridSortDirection;
+  onSortChange: (field: ProjectGridColumn['key']) => void;
+  expandedKeys: Set<string>;
+  onToggleExpanded: (rowKey: string) => void;
+  onDeleteRow?: (row: ProjectGridItem) => void;
+}
+
+const detailColspan = (baseColumns: number, selectable: boolean, hasDelete: boolean) =>
+  baseColumns + 1 + Number(selectable) + Number(hasDelete);
+
+export const ProjectGridDesktopTable = ({
+  columns,
+  rows, pagedRows, emptyMessage, selectable, selectedKeys, selectAllStateRows, onToggleSelected, onToggleSelectAll,
+  sortField, sortDirection, onSortChange, expandedKeys, onToggleExpanded, onDeleteRow,
+}: ProjectGridDesktopTableProps) => {
+  const selectionScopeRows = selectAllStateRows ?? rows;
+  const selectedInScopeCount = selectionScopeRows.filter((row) => selectedKeys.has(row.__key)).length;
+  const allSelected = selectable && selectionScopeRows.length > 0 && selectedInScopeCount === selectionScopeRows.length;
+  const partiallySelected = selectable && selectedInScopeCount > 0 && !allSelected;
+  const colSpan = detailColspan(columns.length, selectable, Boolean(onDeleteRow));
+
+  return (
+    <div className="project-grid-table-wrap">
+      <table className="project-grid-table" style={{tableLayout: 'fixed', width: '100%'}}>
+        <colgroup>
+          {selectable ? <col style={{width: SELECT_COL_WIDTH}} /> : null}
+          {columns.map((column) => (
+            <col key={column.key} style={{width: COLUMN_WIDTHS[column.key] ?? DEFAULT_COL_WIDTH}} />
+          ))}
+          <col style={{width: DETAIL_COL_WIDTH}} />
+          {onDeleteRow ? <col style={{width: DELETE_COL_WIDTH}} /> : null}
+        </colgroup>
+        <thead>
+          <tr>
+            {selectable ? (
+              <th className="project-grid-select-col">
+                <input
+                  type="checkbox"
+                  aria-label="Select all rows"
+                  checked={allSelected}
+                  ref={(input) => {
+                    if (input) input.indeterminate = partiallySelected;
+                  }}
+                  onChange={onToggleSelectAll}
+                />
+              </th>
+            ) : null}
+
+            {columns.map((column) => (
+              <th key={column.key}>
+                <button type="button" onClick={() => onSortChange(column.key)}>
+                  <span>{column.label}</span>
+                  {sortField === column.key ? (
+                    <span className="project-grid-sort-indicator">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  ) : null}
+                </button>
+              </th>
+            ))}
+
+            <th className="project-grid-detail-col">Details</th>
+            {onDeleteRow ? <th className="project-grid-delete-col">Remove</th> : null}
+          </tr>
+        </thead>
+
+        <tbody>
+          {!pagedRows.length ? (
+            <tr>
+              <td colSpan={colSpan}>
+                <div className="project-grid-empty">{emptyMessage}</div>
+              </td>
+            </tr>
+          ) : null}
+
+          {pagedRows.map((row) => (
+            <DesktopRow
+              key={row.__key}
+              row={row}
+              columns={columns}
+              selectable={selectable}
+              isSelected={selectedKeys.has(row.__key)}
+              onToggleSelected={onToggleSelected}
+              isExpanded={expandedKeys.has(row.__key)}
+              onToggleExpanded={onToggleExpanded}
+              onDeleteRow={onDeleteRow}
+              colSpan={colSpan}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+interface DesktopRowProps {
+  row: ProjectGridItem;
+  columns: ProjectGridColumn[];
+  selectable: boolean;
+  isSelected: boolean;
+  onToggleSelected?: (rowKey: string) => void;
+  isExpanded: boolean;
+  onToggleExpanded: (rowKey: string) => void;
+  onDeleteRow?: (row: ProjectGridItem) => void;
+  colSpan: number;
+}
+
+const DesktopRow = ({
+  row,
+  columns,
+  selectable,
+  isSelected,
+  onToggleSelected,
+  isExpanded,
+  onToggleExpanded,
+  onDeleteRow,
+  colSpan,
+}: DesktopRowProps) => {
+  const hasDetails = hasProjectGridDetails(row);
+  const individualHref = row.id ? getPastProjectDetailUrl(row.id) : '';
+
+  return (
+    <>
+      <tr className={`project-grid-row${isSelected ? ' is-selected' : ''}${isExpanded ? ' is-expanded' : ''}`}>
+        {selectable ? (
+          <td className="project-grid-select-col">
+            <input
+              type="checkbox"
+              aria-label={`Select ${row.project_title}`}
+              checked={isSelected}
+              onChange={() => onToggleSelected?.(row.__key)}
+            />
+          </td>
+        ) : null}
+
+        {columns.map((column) => (
+          <td key={column.key}>{row[column.key]}</td>
+        ))}
+
+        <td className="project-grid-detail-col">
+          <button
+            type="button"
+            className="project-grid-detail-button"
+            disabled={!hasDetails}
+            onClick={() => {
+              if (hasDetails) onToggleExpanded(row.__key);
+            }}
+          >
+            {hasDetails ? (isExpanded ? 'Hide' : 'View') : 'N/A'}
+          </button>
+        </td>
+
+        {onDeleteRow ? (
+          <td className="project-grid-delete-col">
+            <button
+              type="button"
+              className="project-grid-delete-button"
+              onClick={() => onDeleteRow(row)}
+            >
+              Remove
+            </button>
+          </td>
+        ) : null}
+      </tr>
+
+      {isExpanded ? (
+        <tr className="project-grid-detail-row">
+          <td colSpan={colSpan}>
+            <div className="project-grid-detail-content">
+              {individualHref ? (
+                <div className="project-grid-individual-link-row">
+                  <span className="project-grid-individual-link-label">Individual Project URL</span>
+                  <a
+                    className="project-grid-individual-link"
+                    href={individualHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {individualHref}
+                  </a>
+                </div>
+              ) : null}
+              {row.abstract ? <div><strong>Abstract:</strong> {row.abstract}</div> : null}
+              {row.student_names ? <div><strong>Student Names:</strong> {row.student_names}</div> : null}
+            </div>
+          </td>
+        </tr>
+      ) : null}
+    </>
+  );
+};

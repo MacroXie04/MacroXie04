@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/assets/images/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    <title>Innovate To Grow | School of Engineering</title>
+
+    <!-- Detect iframe-isolated routes (admin block preview + public embed widget)
+         synchronously before any CSS applies, so the chrome-strip rules below
+         can target html[data-block-preview]. -->
+    <script>
+      (function () {
+        var p = window.location.pathname;
+        if (p === '/_block-preview' || p.indexOf('/_embed/') === 0) {
+          document.documentElement.dataset.blockPreview = '';
+        }
+      })();
+    </script>
+
+    <!-- Critical CSS: paints an init-loader spinner the moment HTML parses, so
+         first paint is never blank. The spinner uses #root:empty::before and
+         auto-disappears the instant React mounts content into #root. Kept in
+         sync with _INIT_LOADER_CSS in src/cms/views/views.py (server no longer
+         emits this block). -->
+    <style>
+      html { background: #fff; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; }
+
+      /* ---- init loader ---- */
+      @keyframes itg-init-loader-spin { to { transform: rotate(360deg); } }
+      @keyframes itg-init-loader-fade-in { from { opacity: 0; } to { opacity: 1; } }
+      #root:empty::before {
+        content: "";
+        display: block;
+        width: 44px;
+        height: 44px;
+        margin: 96px auto;
+        border: 3px solid rgba(15, 45, 82, 0.15);
+        border-top-color: var(--itg-color-primary, #0f2d52);
+        border-radius: 50%;
+        animation:
+          itg-init-loader-spin 0.9s linear infinite,
+          itg-init-loader-fade-in 0.25s ease-out;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #root:empty::before {
+          animation: itg-init-loader-fade-in 0.25s ease-out;
+          opacity: 0.7;
+        }
+      }
+
+      /* Block preview iframe: strip all page chrome so only the block content renders. */
+      html[data-block-preview] { background: transparent; }
+      html[data-block-preview] body { background: transparent; }
+      html[data-block-preview] #root,
+      html[data-block-preview] .main-content,
+      html[data-block-preview] .mc-content { min-height: 0; display: block; }
+      html[data-block-preview] #main,
+      html[data-block-preview] .container,
+      html[data-block-preview] #main-content,
+      html[data-block-preview] #content,
+      html[data-block-preview] #content-wrapper { padding: 0; margin: 0; max-width: none; width: auto; }
+      html[data-block-preview] #root:empty::before { display: none; }
+    </style>
+    <!-- Font Awesome: load the local vendored copy asynchronously so icons don't block first paint. -->
+    <script>
+      (function () {
+        var href = '/static/vendor/font-awesome/4.7.0/css/font-awesome.min.css';
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'style';
+        link.href = href;
+        link.onload = function () {
+          link.onload = null;
+          link.rel = 'stylesheet';
+        };
+        document.head.appendChild(link);
+      })();
+    </script>
+    <!-- Server-managed design tokens + stylesheets. Render-blocking so tokens
+         resolve before first paint of the styled page; the inline spinner above
+         already covers the pre-stylesheet paint window. -->
+    <link rel="stylesheet" href="/api/layout/styles.css?v=6">
+  </head>
+  <body class="html front not-logged-in no-sidebars page-node">
+    <!-- NAVBAR -->
+    <div id="menu-root"></div>
+    <!-- END NAVBAR -->
+
+    <div id="main" class="clearfix main" role="main">
+        <div class="container">
+            <div id="main-content" class="row main-content">
+                <div id="content" class="mc-content span12">
+                    <div id="content-wrapper" class="content-wrapper">
+                        <!-- React Root -->
+                        <div id="root"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER: rendered dynamically by React -->
+    <div id="footer-root"></div>
+    <!-- END FOOTER -->
+
+    <!-- CHATBOT: public floating AI assistant widget, rendered by React -->
+    <div id="chatbot-root"></div>
+    <!-- END CHATBOT -->
+
+    <!-- Template Scripts (skipped in iframe-isolated routes: block preview + embeds) -->
+    <script>
+      (function () {
+        var p = window.location.pathname;
+        if (p === '/_block-preview' || p.indexOf('/_embed/') === 0) return;
+        (function (d) { var s = d.createElement("script"); s.setAttribute("data-account", "6Uvgvyrrph"); s.setAttribute("src", "https://cdn.userway.org/widget.js"); (d.body || d.head).appendChild(s); })(document);
+        (function() {
+          var sz = document.createElement('script'); sz.type = 'text/javascript'; sz.async = true;
+          sz.src = '//siteimproveanalytics.com/js/siteanalyze_8343.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(sz, s);
+        })();
+      })();
+    </script>
+    <noscript>Please ensure Javascript is enabled for purposes of <a href="https://userway.org">website accessibility</a></noscript>
+
+    <!-- React App Entry -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

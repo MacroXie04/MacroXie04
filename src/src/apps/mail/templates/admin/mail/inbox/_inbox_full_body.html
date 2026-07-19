@@ -1,0 +1,157 @@
+<div class="mail-shell">
+    <div class="mail-toolbar">
+        <div class="mail-toolbar__identity">
+            <span class="material-symbols-outlined mail-toolbar__icon">{% if folder == 'SENT' %}send{% else %}inbox{% endif %}</span>
+            <div class="mail-toolbar__copy">
+                <div class="mail-toolbar__title">{% if folder == 'SENT' %}Sent{% else %}Inbox{% endif %}</div>
+                <div class="mail-toolbar__meta">
+                    {{ gmail_config.gmail_username|default:"Not configured" }} &middot; {{ folder|default:"INBOX" }}
+                </div>
+            </div>
+        </div>
+
+        <div class="mail-folder-tabs" data-inbox-folder-tabs role="tablist" aria-label="Mail folders">
+            <button type="button" data-inbox-folder="INBOX" role="tab"
+                    aria-selected="{% if folder == 'SENT' %}false{% else %}true{% endif %}"
+                    class="mail-folder-tab{% if folder != 'SENT' %} mail-folder-tab--active{% endif %} cursor-pointer font-sans">
+                <span class="material-symbols-outlined !text-[16px]">inbox</span>
+                Inbox
+            </button>
+            <button type="button" data-inbox-folder="SENT" role="tab"
+                    aria-selected="{% if folder == 'SENT' %}true{% else %}false{% endif %}"
+                    class="mail-folder-tab{% if folder == 'SENT' %} mail-folder-tab--active{% endif %} cursor-pointer font-sans">
+                <span class="material-symbols-outlined !text-[16px]">send</span>
+                Sent
+            </button>
+        </div>
+
+        <div class="mail-toolbar__actions">
+            <button type="button"
+                    data-inbox-refresh
+                    class="inbox-refresh-btn cursor-pointer font-sans">
+                <span class="material-symbols-outlined !text-[16px] inbox-refresh-icon">refresh</span>
+                Refresh
+            </button>
+
+            <label class="inbox-limit-control">
+                <span>Show</span>
+                <select data-inbox-limit
+                        class="rounded border border-base-200 dark:border-base-600 bg-white dark:bg-base-800 text-xs px-1.5 py-0.5 text-font-default-light dark:text-font-default-dark focus:outline-none focus:ring-1 focus:ring-primary-500">
+                    {% for c in limit_choices %}
+                    <option value="{{ c }}" {% if c == limit %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <span class="mail-toolbar__divider" aria-hidden="true"></span>
+
+            <button type="button"
+                    data-inbox-account-toggle
+                    aria-expanded="true"
+                    aria-controls="inbox-account-panel"
+                    class="inbox-account-toggle cursor-pointer font-sans">
+                <span class="material-symbols-outlined inbox-account-toggle__icon">expand_more</span>
+                <span data-inbox-account-toggle-label>Hide details</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="inbox-account-panel"
+         data-inbox-account-panel
+         class="mail-account-panel">
+        <div class="mail-account-field">
+            <span class="mail-account-field__label">Account</span>
+            <span class="mail-account-field__value">{{ gmail_config.gmail_username|default:"Not configured" }}</span>
+        </div>
+        <div class="mail-account-field">
+            <span class="mail-account-field__label">IMAP host</span>
+            <span class="mail-account-field__value">{{ gmail_config.imap_host|default:"N/A" }}</span>
+        </div>
+        <div class="mail-account-field">
+            <span class="mail-account-field__label">Folder</span>
+            <span class="mail-account-field__value">{{ folder|default:"INBOX" }}</span>
+        </div>
+    </div>
+
+    {% if error_message %}
+    <div data-inbox-status class="inbox-status inbox-status--error">
+        <span class="material-symbols-outlined !text-[18px]">error</span>
+        <span>{{ error_message }}</span>
+    </div>
+    {% endif %}
+
+    {% if inbox_messages %}
+    <div class="inbox-split">
+        <div class="inbox-list-panel">
+            <div class="inbox-list-head">
+                <span class="inbox-list-head__title">Messages</span>
+                <span class="inbox-list-head__actions">
+                    <span class="inbox-list-head__count">{{ inbox_messages|length }} loaded</span>
+                    <button type="button"
+                            data-inbox-list-toggle
+                            aria-expanded="true"
+                            aria-controls="inbox-message-list"
+                            aria-label="Collapse message list"
+                            title="Collapse message list"
+                            class="inbox-list-toggle cursor-pointer font-sans">
+                        <span class="material-symbols-outlined inbox-list-toggle__icon">chevron_left</span>
+                    </button>
+                </span>
+            </div>
+
+            <div id="inbox-message-list" class="inbox-list" data-inbox-list>
+                {% for msg in inbox_messages %}
+                <a href="{% url 'admin:mail_inbox_detail' msg.uid %}?folder={{ folder|default:'INBOX' }}"
+                   data-inbox-row
+                   data-uid="{{ msg.uid }}"
+                   data-preview-url="{% url 'admin:mail_inbox_detail_fragment' msg.uid %}?folder={{ folder|default:'INBOX' }}"
+                   class="inbox-list-row group flex gap-3 px-4 py-3 text-left no-underline transition-colors cursor-pointer
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500
+                          {% if not msg.is_seen %}is-unread{% endif %}">
+                    <div class="shrink-0 flex justify-center pt-0.5 w-5" aria-hidden="true">
+                        {% if not msg.is_seen %}
+                        <span class="material-symbols-outlined !text-[18px] text-primary-600 dark:text-primary-400" title="Unread">mark_email_unread</span>
+                        {% else %}
+                        <span class="material-symbols-outlined !text-[18px] text-base-400 dark:text-base-500" title="Read">mail</span>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0 flex-1 flex flex-col gap-0.5">
+                        <div class="flex items-baseline gap-1.5 min-w-0">
+                            <span class="min-w-0 truncate text-[13px] max-w-[58%] {% if not msg.is_seen %}font-semibold text-font-important-light dark:text-font-important-dark{% else %}font-medium text-base-700 dark:text-base-200{% endif %}">
+                                {% if folder == 'SENT' %}{% with recipient=msg.to.0 %}{% if recipient.name %}{{ recipient.name }}{% elif recipient.email %}{{ recipient.email }}{% else %}(No recipient){% endif %}{% if msg.to|length > 1 %} +{{ msg.to|length|add:"-1" }}{% endif %}{% endwith %}{% else %}{% if msg.from_name %}{{ msg.from_name }}{% else %}{{ msg.from_email }}{% endif %}{% endif %}
+                            </span>
+                            <span class="shrink-0 text-[11px] text-base-400 dark:text-base-500 tabular-nums leading-none whitespace-nowrap ml-auto">
+                                {{ msg.date }}
+                            </span>
+                        </div>
+                        <div class="text-[13px] leading-snug truncate {% if not msg.is_seen %}font-semibold text-font-default-light dark:text-font-default-dark{% else %}font-medium text-base-600 dark:text-base-300{% endif %} group-hover:text-primary-700 dark:group-hover:text-primary-300">
+                            {% if msg.subject %}{{ msg.subject }}{% else %}<span class="text-base-400 font-normal italic">(No subject)</span>{% endif %}
+                        </div>
+                        {% if msg.snippet %}
+                        <div class="text-[11px] text-base-500 dark:text-base-400 truncate leading-snug">
+                            {{ msg.snippet }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="inbox-preview-pane"
+             class="inbox-preview">
+            <div id="inbox-preview-content" class="min-w-0 p-5">
+                <div id="inbox-preview-empty" class="inbox-empty-preview flex flex-col items-center justify-center text-base-400">
+                    <span class="material-symbols-outlined !text-[48px] mb-2">mail</span>
+                    <p class="text-sm">Select a message to preview</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif not error_message %}
+    <div class="inbox-empty-state">
+        <span class="material-symbols-outlined !text-[48px] mb-2 block">{% if folder == 'SENT' %}send{% else %}inbox{% endif %}</span>
+        <p class="text-sm">No messages in {% if folder == 'SENT' %}Sent{% else %}Inbox{% endif %}.</p>
+    </div>
+    {% endif %}
+</div>

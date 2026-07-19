@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.git
+.gitignore
+.env
+.env.example
+db.sqlite3
+data/
+media/
+staticfiles/
+*.log
+.ruff_cache/
+.pytest_cache/
+node_modules/

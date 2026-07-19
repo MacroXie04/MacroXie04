@@ -1,0 +1,90 @@
+import {PhoneAddForm} from './PhoneAddForm.tsx';
+import {PhoneCard} from './PhoneCard.tsx';
+import {PhonePendingVerifyPanel} from './PhonePendingVerifyPanel.tsx';
+import {StatusAlert} from '../shared/StatusAlert.tsx';
+import {usePhoneCenter} from './internal/usePhoneCenter.ts';
+
+export const PhoneCenter = () => {
+    const pc = usePhoneCenter();
+
+    return (
+        <div className="account-section">
+            <h2 className="account-section-title">Phone Numbers</h2>
+
+            {pc.successMessage ? <StatusAlert tone="success" message={pc.successMessage} style={{marginBottom: '1rem'}} /> : null}
+            {pc.error ? <StatusAlert tone="error" message={pc.error} style={{marginBottom: '1rem'}} /> : null}
+
+            {pc.loading ? (
+                <p className="account-status-text">Loading phone numbers...</p>
+            ) : (
+                pc.phones.map((phone) => (
+                    <PhoneCard
+                        key={phone.id}
+                        phone={phone}
+                        verifyingId={pc.verifyingId}
+                        verifyCode={pc.verifyCode}
+                        verifyLoading={pc.verifyLoading}
+                        verifyError={pc.verifyError}
+                        resendLoading={pc.resendLoading}
+                        onToggleSubscribe={pc.handleSubscribeToggle}
+                        onToggleVerify={pc.handleToggleVerify}
+                        onVerifyCodeChange={pc.setVerifyCode}
+                        onVerifySubmit={pc.handleVerifySubmit}
+                        onResend={pc.handleResend}
+                        onCancelVerify={pc.handleCancelVerify}
+                        onDelete={pc.handleDelete}
+                    />
+                ))
+            )}
+
+            {!pc.loading && pc.phones.length === 0 && !pc.showAddForm && (
+                <p className="account-status-text account-status-text--spaced">
+                    No phone numbers added yet.
+                </p>
+            )}
+
+            {pc.showAddForm && pc.pendingNewPhone ? (
+                <PhonePendingVerifyPanel
+                    phone={pc.pendingNewPhone}
+                    verifyCode={pc.verifyCode}
+                    smsConsent={pc.addSubscribe}
+                    termsAccepted={pc.addTermsAccepted}
+                    verifyLoading={pc.verifyLoading}
+                    verifyError={pc.verifyError}
+                    resendLoading={pc.resendLoading}
+                    abandonLoading={pc.abandonPendingLoading}
+                    onVerifyCodeChange={pc.setVerifyCode}
+                    onSmsConsentChange={pc.setAddSubscribe}
+                    onTermsAcceptedChange={pc.setAddTermsAccepted}
+                    onVerifySubmit={pc.handleVerifySubmit}
+                    onResend={pc.handleResendPendingPhone}
+                    onAbandon={() => void pc.handleAbandonPendingPhone()}
+                />
+            ) : pc.showAddForm ? (
+                <PhoneAddForm
+                    addPhoneNumber={pc.addPhoneNumber}
+                    addSubscribe={pc.addSubscribe}
+                    addTermsAccepted={pc.addTermsAccepted}
+                    addLoading={pc.addLoading}
+                    addError={pc.addError}
+                    onPhoneNumberChange={pc.setAddPhoneNumber}
+                    onSubscribeChange={pc.setAddSubscribe}
+                    onTermsAcceptedChange={pc.setAddTermsAccepted}
+                    onSubmit={pc.handleAddSubmit}
+                    onCancel={() => {
+                        pc.setShowAddForm(false);
+                        pc.setAddError(null);
+                    }}
+                />
+            ) : (
+                <button
+                    type="button"
+                    className="auth-form-submit account-action-primary account-action-primary--inline"
+                    onClick={pc.beginAddPhoneFlow}
+                >
+                    Add Phone
+                </button>
+            )}
+        </div>
+    );
+};

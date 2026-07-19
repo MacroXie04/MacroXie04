@@ -1,0 +1,64 @@
+import type { AuthTokens, LoginResponse, User } from './types.ts';
+
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
+const USER_KEY = 'auth_user';
+const PROFILE_COMPLETION_REQUIRED_KEY = 'profile_completion_required';
+
+export const isProfileCompletionRequired = (): boolean => {
+  return sessionStorage.getItem(PROFILE_COMPLETION_REQUIRED_KEY) === 'true';
+};
+
+export const setProfileCompletionRequired = (required: boolean): void => {
+  if (required) {
+    sessionStorage.setItem(PROFILE_COMPLETION_REQUIRED_KEY, 'true');
+    return;
+  }
+  sessionStorage.removeItem(PROFILE_COMPLETION_REQUIRED_KEY);
+};
+
+export const clearProfileCompletionRequired = (): void => {
+  sessionStorage.removeItem(PROFILE_COMPLETION_REQUIRED_KEY);
+};
+
+export const getAccessToken = (): string | null => {
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
+};
+
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+};
+
+export const getStoredUser = (): User | null => {
+  const userStr = localStorage.getItem(USER_KEY);
+  if (!userStr) return null;
+  try {
+    return JSON.parse(userStr);
+  } catch {
+    return null;
+  }
+};
+
+export const setTokens = (tokens: AuthTokens, user: User): void => {
+  localStorage.setItem(ACCESS_TOKEN_KEY, tokens.access);
+  localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refresh);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
+
+export const persistAuthSession = (response: Pick<LoginResponse, 'access' | 'refresh' | 'user' | 'requires_profile_completion'>): void => {
+  setTokens({ access: response.access, refresh: response.refresh }, response.user);
+  setProfileCompletionRequired(Boolean(response.requires_profile_completion));
+};
+
+export const updateStoredUser = (updater: (user: User) => User): void => {
+  const user = getStoredUser();
+  if (!user) return;
+  localStorage.setItem(USER_KEY, JSON.stringify(updater(user)));
+};
+
+export const clearTokens = (): void => {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  clearProfileCompletionRequired();
+};

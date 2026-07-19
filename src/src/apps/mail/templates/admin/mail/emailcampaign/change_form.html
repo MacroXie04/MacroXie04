@@ -1,0 +1,157 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block form_before %}
+  {% if add %}
+    <div
+      class="mb-4 rounded-default border-2 border-red-600 bg-red-50 px-4 py-3 text-sm font-medium text-red-800 shadow-xs dark:border-red-500 dark:bg-red-950/50 dark:text-red-100"
+      role="alert"
+    >
+      Please fill in the <strong>Audience</strong> and <strong>Subject</strong>, then <strong>save</strong> to see
+      more options (Preview, Send, Import Gmail, and recipient tools).
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script>
+    (function () {
+      document.addEventListener("click", function (e) {
+        var btn = e.target.closest(".itg-copy-campaign-body");
+        if (!btn) return;
+        e.preventDefault();
+        var b64 = btn.getAttribute("data-b64");
+        if (!b64) return;
+        try {
+          var binary = atob(b64);
+          var bytes = new Uint8Array(binary.length);
+          for (var i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          var text = new TextDecoder("utf-8").decode(bytes);
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            return;
+          }
+          navigator.clipboard.writeText(text).then(function () {
+            var t = btn.textContent;
+            btn.textContent = "Copied!";
+            btn.setAttribute("disabled", "disabled");
+            setTimeout(function () {
+              btn.textContent = t;
+              btn.removeAttribute("disabled");
+            }, 2000);
+          });
+        } catch (err) {
+          console.error("Copy HTML failed", err);
+        }
+      });
+    })();
+  </script>
+
+  {# CodeMirror for HTML body editing (only activated when Email format = HTML). #}
+  <link rel="stylesheet" href="{% static 'vendor/codemirror/5.65.16/codemirror.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/codemirror/5.65.16/theme/material-darker.min.css' %}">
+  <script src="{% static 'vendor/codemirror/5.65.16/codemirror.min.js' %}"></script>
+  <script src="{% static 'vendor/codemirror/5.65.16/mode/xml/xml.min.js' %}"></script>
+  <script src="{% static 'vendor/codemirror/5.65.16/mode/javascript/javascript.min.js' %}"></script>
+  <script src="{% static 'vendor/codemirror/5.65.16/mode/css/css.min.js' %}"></script>
+  <script src="{% static 'vendor/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js' %}"></script>
+
+  {# js-beautify (HTML + embedded JS/CSS) — used by body_html_editor.js “Format code”. #}
+  <script src="{% static 'vendor/js-beautify/1.15.1/beautify.min.js' %}"></script>
+  <script src="{% static 'vendor/js-beautify/1.15.1/beautify-css.min.js' %}"></script>
+  <script src="{% static 'vendor/js-beautify/1.15.1/beautify-html.min.js' %}"></script>
+
+  <style>
+    /* Keep CodeMirror visually consistent with Unfold fields */
+    .CodeMirror {
+      border: 1px solid rgb(229, 231, 235);
+      border-radius: 0.5rem;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .dark .CodeMirror {
+      border-color: rgb(55, 65, 81);
+    }
+    .CodeMirror-gutters {
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .dark .CodeMirror-gutters {
+      background: rgba(255, 255, 255, 0.03);
+      border-right-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .itg-cm-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.5rem;
+    }
+
+    .itg-cm-toolbar__format {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      line-height: 1.25rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid rgb(229, 231, 235);
+      background: rgb(255, 255, 255);
+      color: rgb(55, 65, 81);
+      cursor: pointer;
+    }
+
+    .itg-cm-toolbar__format:hover {
+      background: rgb(249, 250, 251);
+    }
+
+    .dark .itg-cm-toolbar__format {
+      border-color: rgb(55, 65, 81);
+      background: rgb(31, 41, 55);
+      color: rgb(229, 231, 235);
+    }
+
+    .dark .itg-cm-toolbar__format:hover {
+      background: rgb(55, 65, 81);
+    }
+
+    .itg-cm-resize-handle {
+      box-sizing: border-box;
+      height: 10px;
+      margin-top: 2px;
+      border-radius: 0.375rem;
+      border: 1px solid rgb(229, 231, 235);
+      background: linear-gradient(
+        to bottom,
+        rgb(249, 250, 251) 0%,
+        rgb(243, 244, 246) 45%,
+        rgb(229, 231, 235) 55%,
+        rgb(243, 244, 246) 100%
+      );
+      cursor: ns-resize;
+      user-select: none;
+    }
+
+    .itg-cm-resize-handle:hover {
+      border-color: rgb(209, 213, 219);
+      background: linear-gradient(
+        to bottom,
+        rgb(243, 244, 246),
+        rgb(229, 231, 235)
+      );
+    }
+
+    .dark .itg-cm-resize-handle {
+      border-color: rgb(55, 65, 81);
+      background: linear-gradient(
+        to bottom,
+        rgb(55, 65, 81),
+        rgb(31, 41, 55)
+      );
+    }
+
+    .dark .itg-cm-resize-handle:hover {
+      border-color: rgb(75, 85, 99);
+    }
+  </style>
+{% endblock %}

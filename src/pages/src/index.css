@@ -1,0 +1,70 @@
+@import 'assets/styles/shared.css';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--itg-color-text-dark);
+  background-color: var(--itg-color-bg-page);
+}
+
+body .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#root, .main-content, .mc-content {
+  min-height: calc(100vh - 300px);
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  width: 100%;
+}
+
+.userway_buttons_wrapper {
+  margin-top: 5.5rem !important;
+}
+
+html[data-block-preview] body {
+  background-color: transparent;
+}
+
+html[data-block-preview] #root,
+html[data-block-preview] .main-content,
+html[data-block-preview] .mc-content {
+  min-height: 0;
+  display: block;
+}
+
+html[data-block-preview] #main,
+html[data-block-preview] .container,
+html[data-block-preview] #main-content,
+html[data-block-preview] #content,
+html[data-block-preview] #content-wrapper,
+html[data-block-preview] .app-layout {
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  width: auto;
+}
+
+html[data-block-preview] .userway_buttons_wrapper {
+  display: none !important;
+}

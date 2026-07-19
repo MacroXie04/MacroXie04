@@ -1,0 +1,9 @@
+export { authApi, API_BASE_URL } from './client.ts';
+export { getContactPhones, createContactPhone, updateContactPhone, deleteContactPhone, requestContactPhoneVerification, verifyContactPhoneCode, getContactEmails, createContactEmail, updateContactEmail, deleteContactEmail, requestContactEmailVerification, verifyContactEmailCode, makeContactEmailPrimary } from './contacts.ts';
+export { register, login, requestLoginCode, requestEmailAuthCode, verifyLoginCode, verifyEmailAuthCode, requestPhoneAuthCode, verifyPhoneAuthCode, verifyRegistrationCode, consumeEmailAuthQuery, resendRegistrationCode, requestPasswordReset, verifyPasswordResetCode, confirmPasswordReset, requestPasswordChangeCode, verifyPasswordChangeCode, confirmPasswordChange, requestAccountDeletionCode, verifyAccountDeletionCode, confirmAccountDeletion, subscribe } from './flows.ts';
+export { hasRequiredNameFields } from './profileCompletion.ts';
+export { getProfile, updateProfileFields, uploadProfileImage, getAccountEmails } from './profile.ts';
+export { getSafeInternalRedirectPath, buildCompleteProfilePath, getPostAuthPath, getEmailAuthSourcePath } from './redirects.ts';
+export { loginLinkAutoLogin, unsubscribeAutoLogin, impersonateAutoLogin, logout, isAuthenticated } from './session.ts';
+export { isProfileCompletionRequired, setProfileCompletionRequired, clearProfileCompletionRequired, getAccessToken, getRefreshToken, getStoredUser, setTokens, persistAuthSession, updateStoredUser, clearTokens } from './storage.ts';
+export type { User, AuthTokens, AuthNextStep, EmailAuthSource, EmailAuthFlow, PhoneAuthSource, LoginResponse, EmailAuthRequestResponse, EmailAuthVerifyResponse, RegisterResponse, MessageResponse, VerificationTokenResponse, AccountEmailsResponse, ProfileResponse, ContactEmail, ContactPhone } from './types.ts';

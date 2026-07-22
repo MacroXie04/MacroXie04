@@ -1,5 +1,5 @@
 """Coverage for small leftover branches: asset admin display, host admin deletes,
-app config ready(), the cms.urls stub, and a few model __str__ / validation paths."""
+app config ready(), and a few model __str__ / validation paths."""
 
 from unittest.mock import patch
 
@@ -74,14 +74,6 @@ class CmsConfigReadyTests(TestCase):
         with patch("builtins.__import__", side_effect=ImportError("boom")):
             # Should not raise despite the import failure.
             config.ready()
-
-
-class CmsUrlsStubTests(TestCase):
-    def test_urls_module_defines_empty_patterns(self):
-        from apps.cms import urls
-
-        self.assertEqual(urls.app_name, "cms")
-        self.assertEqual(urls.urlpatterns, [])
 
 
 class ModelStrAndValidationTests(TestCase):

@@ -53,18 +53,14 @@ urlpatterns = [
     path("layout/styles.css", LayoutStylesheetView.as_view(), name="layout-styles"),
     # event
     path("event/", include("apps.event.urls")),
-    # news
-    path("news/", include("apps.cms.news_urls")),
+    # CMS pages, news, and analytics
+    path("", include("apps.cms.urls")),
     # projects
     path("projects/", include("apps.projects.urls")),
     # ckeditor 5
     path("ckeditor5/", include("django_ckeditor_5.urls")),
-    # cms
-    path("cms/", include("apps.cms.cms_urls")),
     # authn
     path("authn/", include("apps.authn.urls")),
-    # analytics
-    path("analytics/", include("apps.cms.analytics_urls")),
     # mail (magic login links)
     path("mail/", include("apps.mail.urls")),
     # cli admin API (OAuth2 + PKCE generic CRUD for the admin CLI)

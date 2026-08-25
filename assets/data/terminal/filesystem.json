@@ -1,0 +1,95 @@
+{
+  "home": "/home/visitor",
+  "mtime": "Feb 22 10:30",
+  "files": {
+    "about.txt": [
+      "{name}",
+      "{role}",
+      "{education}",
+      "",
+      "\"{tagline}\"",
+      "",
+      "Type 'about' for the full profile card, or 'help' to explore.",
+      ""
+    ],
+    "contact.txt": [
+      "Email:   {email}",
+      "GitHub:  {github}",
+      "Phone:   {phone}",
+      ""
+    ],
+    ".profile": [
+      "# ~/.profile — sourced at login",
+      "export EDITOR=vim",
+      "export PS1='visitor@hongzhe:\\w$ '",
+      "alias ll='ls -la'",
+      "",
+      "# tip: try 'neofetch', 'cowsay hello', or 'fortune'",
+      ""
+    ],
+    ".secret": [
+      "You found the secret file. 🎉",
+      "",
+      "The cake is a lie, but the job search is real.",
+      "Liked poking around? I'm open to opportunities — let's talk:",
+      "  {email}",
+      ""
+    ],
+    "projects/portfolio.md": [
+      "# Portfolio Terminal",
+      "",
+      "This site — a terminal/CLI-style resume.",
+      "",
+      "- **Stack:** React + Vite, hooks-first, zero runtime deps for the shell",
+      "- **Features:** virtual filesystem, tab completion, theming, 60+ commands",
+      "- **Deploy:** GitHub Pages + AWS Amplify",
+      "",
+      "Run `github` to see the source.",
+      ""
+    ],
+    "projects/backend.md": [
+      "# Django REST Backend",
+      "",
+      "Production web systems for UC Merced Innovate to Grow.",
+      "",
+      "- **Stack:** Django 5, DRF, JWT auth (email login), DynamoDB + SQLite split",
+      "- **CMS:** block-based content, server-side bleach sanitization",
+      "- **Infra:** Docker, GitHub Actions CI/CD, AWS (EC2 · S3 · RDS)",
+      ""
+    ],
+    "projects/adk-agents.md": [
+      "# AI Agent Systems",
+      "",
+      "Autonomous agents built on the Google Agent Development Kit (ADK).",
+      "",
+      "- **Design:** multi-agent workflows, shared context stores, tool use",
+      "- **LLM:** streaming, function calling, structured outputs",
+      "- **Quality:** automated evals and trace-level observability",
+      ""
+    ]
+  },
+  "tree": {
+    "etc": {
+      "motd": "@motd"
+    },
+    "home": {
+      "visitor": {
+        "about.txt": "@file:about.txt",
+        "contact.txt": "@file:contact.txt",
+        "README.md": "@section:readme:markdown",
+        "experience.py": "@section:experience:python",
+        "skills.sql": "@section:skills:SQL",
+        ".profile": "@file:.profile",
+        ".secret": "@file:.secret",
+        "projects": {
+          "portfolio.md": "@file:projects/portfolio.md:markdown",
+          "backend.md": "@file:projects/backend.md:markdown",
+          "adk-agents.md": "@file:projects/adk-agents.md:markdown"
+        },
+        "resume": {
+          "resume.pdf": "@pdf"
+        }
+      }
+    }
+  }
+}

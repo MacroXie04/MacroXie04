@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig(() => {
   const deployTarget = process.env.DEPLOY_TARGET;
@@ -9,6 +10,11 @@ export default defineConfig(() => {
   return {
   plugins: [react()],
   base: isGitHubPages ? '/MacroXie04/' : '/',
+  resolve: {
+    alias: {
+      '@assets': path.resolve(__dirname, '../assets'),
+    },
+  },
   publicDir: '../assets',
   build: {
     outDir: 'build',

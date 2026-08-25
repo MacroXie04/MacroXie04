@@ -1,0 +1,125 @@
+{
+  "figlet": {
+    "defaultText": "HELLO"
+  },
+  "lolcat": {
+    "defaultText": "Dream it. Chase it. Code it."
+  },
+  "fortune": {
+    "quotes": [
+      "Dream it. Chase it. Code it.",
+      "A SELECT statement a day keeps the bugs away.",
+      "{pythonYears} years of Python and still reading the docs.",
+      "Currently shipping: {expTitle} @ {expOrg}.",
+      "There are 10 kinds of people: those who read binary and those who don't.",
+      "git commit -m \"final FINAL v3 (for real this time)\"",
+      "It works on my machine. ¯\\_(ツ)_/¯",
+      "The cloud is just someone else's computer.",
+      "Premature optimization is the root of all evil.  — Donald Knuth",
+      "sudo make me a sandwich."
+    ]
+  },
+  "neofetch": {
+    "user": "visitor@hongzhe",
+    "separator": "---------------",
+    "labels": [
+      ["OS", "Portfolio Linux x86_64"],
+      ["Host", "hongzhe.dev"],
+      ["Kernel", "6.8.0-portfolio"],
+      ["Uptime", "3 days, 14:22"],
+      ["Shell", "hsh 5.2"]
+    ]
+  },
+  "editorTrap": {
+    "message": "{name}: this is a portfolio terminal, not a real editor.",
+    "tips": {
+      "vim": "To exit Vim: press Esc, then type :q! and Enter.",
+      "vi": "To exit vi: press Esc, then type :q! and Enter.",
+      "emacs": "To exit Emacs: C-x C-c. (Or just close the tab — we won't judge.)",
+      "nano": "To exit nano: Ctrl+X. The friendliest editor."
+    },
+    "hint": "Type 'help' to see what you can actually run."
+  },
+  "sl": {
+    "caption": "(you typed sl instead of ls — choo choo! 🚂)"
+  },
+  "matrix": {
+    "caption": "Wake up, Neo… (a static frame — type clear to dismiss)"
+  },
+  "weather": {
+    "title": "Weather report: Merced, CA",
+    "condition": "Sunny",
+    "temp": "72 °F",
+    "wind": "↗ 6 mph",
+    "visibility": "10 mi",
+    "precipitation": "0.0 in",
+    "note": "(offline canned forecast — no network calls)"
+  },
+  "htop": {
+    "bars": {
+      "cpu": 37,
+      "mem": 58,
+      "swp": 4
+    },
+    "header": "  PID USER       CPU%  MEM%  COMMAND",
+    "processes": [
+      ["1337", "visitor", "12.0", "3.4", "node portfolio"],
+      ["2048", "visitor", "6.5", "2.1", "vite dev"],
+      ["4096", "visitor", "1.2", "0.8", "coffee --brew"],
+      ["8128", "visitor", "0.0", "0.1", "sleep 99999"]
+    ],
+    "note": "(static snapshot — type clear to dismiss)"
+  },
+  "please": {
+    "welcome": "You're welcome! 😊",
+    "empty": "please: please what? (try: please ls)",
+    "prefix": "Since you asked so nicely:"
+  },
+  "sandwich": {
+    "ok": "Okay. 🥪",
+    "deny": "What? Make it yourself.",
+    "hint": "(Hint: try 'sudo make me a sandwich'.)"
+  },
+  "telnet": {
+    "trying": "Trying {host}...",
+    "connected": "Connected to {host}.",
+    "caption": "(Star Wars ASCIImation — abridged)"
+  },
+  "aafire": {
+    "caption": "(press q… just kidding — type clear)"
+  },
+  "coffee": {
+    "status": "418 I'm a teapot",
+    "body": "The server refuses to brew {drink}, because it is — permanently — a teapot. ☕"
+  },
+  "ascii": {
+    "caption": "Hongzhe Xie · Full Stack & Cloud Engineer"
+  },
+  "claude": {
+    "title": "Claude — Anthropic's AI assistant.",
+    "subtitle": "This CLI portfolio was built with Claude Code.",
+    "hint": "Ask away:  claude <your question>",
+    "answer": [
+      "claude: Can't reach the API from a static portfolio — but for the record,",
+      "        this whole terminal (and its ~70 commands) was built with Claude Code. 🤖",
+      "        For the real thing, visit claude.ai."
+    ]
+  },
+  "hollywood": {
+    "lines": [
+      "Initializing kernel exploit...",
+      "Bypassing firewall [████████████] 100%",
+      "Decrypting RSA-4096 ... done",
+      "Injecting payload into the mainframe...",
+      "Rerouting through 7 proxies...",
+      "Downloading the entire internet... 99%"
+    ],
+    "granted": "ACCESS GRANTED",
+    "note": "(just kidding — this is a portfolio 😄)"
+  },
+  "seventeen": {
+    "title": "  ᐳ SEVENTEEN (세븐틴)",
+    "embedUrl": "https://open.spotify.com/embed/artist/7nqOGRxlXj7N2JYbgNEjYH?utm_source=generator",
+    "embedTitle": "SEVENTEEN on Spotify"
+  }
+}

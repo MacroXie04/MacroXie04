@@ -1,9 +1,11 @@
 import { QUICK_COMMANDS } from './commands';
 import useTerminal, { FONT_SIZES, THEMES, COLORS } from './hooks/useTerminal';
 import TerminalItem from './TerminalItem';
+import terminal from '@assets/data/terminal/terminal.json';
+import ui from '@assets/data/ui.json';
 import './Terminal.css';
 
-const HOSTNAME = 'visitor@hongzhe:~$';
+const HOSTNAME = terminal.hostname;
 
 export default function Terminal() {
   const {
@@ -29,8 +31,8 @@ export default function Terminal() {
       {bombing && (
         <div className="t-bomb-overlay">
           <div className="t-bomb-message">
-            <div className="t-bomb-title">PERMISSION DENIED</div>
-            <div className="t-bomb-sub">nice try — you don&apos;t have sudo privileges here</div>
+            <div className="t-bomb-title">{ui.terminal.bombOverlay.title}</div>
+            <div className="t-bomb-sub">{ui.terminal.bombOverlay.body}</div>
           </div>
         </div>
       )}
@@ -42,7 +44,7 @@ export default function Terminal() {
           <span className="t-dot t-dot-yellow" />
           <span className="t-dot t-dot-green" />
         </div>
-        <div className="t-titlebar-title">visitor@hongzhe:~ — Portfolio Terminal</div>
+        <div className="t-titlebar-title">{ui.terminal.windowTitle}</div>
         <button
           className="t-settings-btn"
           onClick={e => { e.stopPropagation(); setSettingsOpen(o => !o); }}
@@ -53,7 +55,7 @@ export default function Terminal() {
         </button>
         {settingsOpen && (
           <div className="t-settings-panel" onClick={e => e.stopPropagation()}>
-            <div className="t-settings-label">Font Size</div>
+            <div className="t-settings-label">{ui.terminal.settingsPanel.fontSize}</div>
             <div className="t-settings-options">
               {Object.keys(FONT_SIZES).map(size => (
                 <button
@@ -67,7 +69,7 @@ export default function Terminal() {
               ))}
             </div>
 
-            <div className="t-settings-label t-settings-section">Background</div>
+            <div className="t-settings-label t-settings-section">{ui.terminal.settingsPanel.background}</div>
             <div className="t-settings-options">
               {THEMES.map(t => (
                 <button
@@ -81,7 +83,7 @@ export default function Terminal() {
               ))}
             </div>
 
-            <div className="t-settings-label t-settings-section">Accent Color</div>
+            <div className="t-settings-label t-settings-section">{ui.terminal.settingsPanel.accentColor}</div>
             <div className="t-settings-options">
               {COLORS.map(c => (
                 <button

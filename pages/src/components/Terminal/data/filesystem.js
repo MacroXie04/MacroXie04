@@ -7,129 +7,58 @@
 // content length. Pure module — no React, no localStorage, no console, no
 // import.meta.env — and it lives under components/Terminal/** so it stays
 // excluded from coverage collection.
+//
+// Tree structure and authored file contents are editable in
+// assets/data/filesystem.json. Node spec strings:
+//   "@motd"                    → /etc/motd content from terminal.json motd
+//   "@section:<key>:<lang>"    → ref to data/sections/<key> (readme/experience/skills)
+//   "@file:<key>[:<lang>]"     → content from filesystem.json files[key]
+//   "@pdf"                     → empty file with the pdf flag (resume.pdf)
+// `{name}` / `{email}` / ... placeholders in file contents are filled from PROFILE.
 // ============================================================================
 
 import { readme } from '../../../data/sections/readme';
 import { experience } from '../../../data/sections/experience';
 import { skills } from '../../../data/sections/skills';
+import terminal from '@assets/data/terminal/terminal.json';
+import filesystem from '@assets/data/terminal/filesystem.json';
 import { PROFILE } from './profile';
 
-export const HOME = '/home/visitor';
-const MTIME = 'Feb 22 10:30';
+export const HOME = filesystem.home;
+const MTIME = filesystem.mtime;
 
-// ── Authored inline content (net-new text, derived from PROFILE) ────────────
-const ABOUT_TXT = [
-  PROFILE.name,
-  PROFILE.role,
-  PROFILE.education,
-  '',
-  `"${PROFILE.tagline}"`,
-  '',
-  "Type 'about' for the full profile card, or 'help' to explore.",
-  '',
-].join('\n');
+const SECTIONS = { readme, experience, skills };
 
-const CONTACT_TXT = [
-  `Email:   ${PROFILE.email}`,
-  `GitHub:  ${PROFILE.github}`,
-  `Phone:   ${PROFILE.phone}`,
-  '',
-].join('\n');
-
-const PROFILE_RC = [
-  '# ~/.profile — sourced at login',
-  'export EDITOR=vim',
-  "export PS1='visitor@hongzhe:\\w$ '",
-  "alias ll='ls -la'",
-  '',
-  "# tip: try 'neofetch', 'cowsay hello', or 'fortune'",
-  '',
-].join('\n');
-
-const SECRET_TXT = [
-  'You found the secret file. 🎉',
-  '',
-  'The cake is a lie, but the job search is real.',
-  "Liked poking around? I'm open to opportunities — let's talk:",
-  `  ${PROFILE.email}`,
-  '',
-].join('\n');
-
-const MOTD = [
-  'Welcome to hongzhe-portfolio (GNU/Linux 6.8.0)',
-  '',
-  " * Documentation:  type 'help'",
-  " * Source code:    type 'github'",
-  " * Resume:         type 'cv'",
-  '',
-  'Last login: just now from a curious browser',
-  '',
-].join('\n');
-
-const PORTFOLIO_MD = [
-  '# Portfolio Terminal',
-  '',
-  'This site — a terminal/CLI-style resume.',
-  '',
-  '- **Stack:** React + Vite, hooks-first, zero runtime deps for the shell',
-  '- **Features:** virtual filesystem, tab completion, theming, 60+ commands',
-  '- **Deploy:** GitHub Pages + AWS Amplify',
-  '',
-  'Run `github` to see the source.',
-  '',
-].join('\n');
-
-const BACKEND_MD = [
-  '# Django REST Backend',
-  '',
-  'Production web systems for UC Merced Innovate to Grow.',
-  '',
-  '- **Stack:** Django 5, DRF, JWT auth (email login), DynamoDB + SQLite split',
-  '- **CMS:** block-based content, server-side bleach sanitization',
-  '- **Infra:** Docker, GitHub Actions CI/CD, AWS (EC2 · S3 · RDS)',
-  '',
-].join('\n');
-
-const ADK_MD = [
-  '# AI Agent Systems',
-  '',
-  'Autonomous agents built on the Google Agent Development Kit (ADK).',
-  '',
-  '- **Design:** multi-agent workflows, shared context stores, tool use',
-  '- **LLM:** streaming, function calling, structured outputs',
-  '- **Quality:** automated evals and trace-level observability',
-  '',
-].join('\n');
+const fill = (s) => s.replace(/\{(\w+)\}/g, (m, k) => (PROFILE[k] !== undefined ? String(PROFILE[k]) : m));
 
 // ── Node constructors ───────────────────────────────────────────────────────
 const dir = (name, children) => ({ type: 'dir', name, children });
 const file = (name, lang, content, extra = {}) => ({ type: 'file', name, lang, content, ...extra });
 const ref = (name, lang, refObj) => ({ type: 'file', name, lang, ref: refObj });
 
-export const ROOT = dir('/', {
-  etc: dir('etc', {
-    motd: file('motd', null, MOTD),
-  }),
-  home: dir('home', {
-    visitor: dir('visitor', {
-      'about.txt': file('about.txt', null, ABOUT_TXT),
-      'contact.txt': file('contact.txt', null, CONTACT_TXT),
-      'README.md': ref('README.md', 'markdown', readme),
-      'experience.py': ref('experience.py', 'python', experience),
-      'skills.sql': ref('skills.sql', 'SQL', skills),
-      '.profile': file('.profile', null, PROFILE_RC),
-      '.secret': file('.secret', null, SECRET_TXT),
-      projects: dir('projects', {
-        'portfolio.md': file('portfolio.md', 'markdown', PORTFOLIO_MD),
-        'backend.md': file('backend.md', 'markdown', BACKEND_MD),
-        'adk-agents.md': file('adk-agents.md', 'markdown', ADK_MD),
-      }),
-      resume: dir('resume', {
-        'resume.pdf': file('resume.pdf', null, '', { pdf: true }),
-      }),
-    }),
-  }),
-});
+function build(name, spec) {
+  if (spec && typeof spec === 'object') {
+    const children = {};
+    for (const [childName, childSpec] of Object.entries(spec)) {
+      children[childName] = build(childName, childSpec);
+    }
+    return dir(name, children);
+  }
+  const s = String(spec);
+  if (s === '@pdf') return file(name, null, '', { pdf: true });
+  if (s === '@motd') return file(name, null, terminal.motd.join('\n'));
+  if (s.startsWith('@section:')) {
+    const [, key, lang] = s.split(':');
+    return ref(name, lang || null, SECTIONS[key]);
+  }
+  if (s.startsWith('@file:')) {
+    const [key, lang] = s.slice(6).split(':');
+    return file(name, lang || null, filesystem.files[key].map(fill).join('\n'));
+  }
+  throw new Error(`filesystem.json: unknown node spec "${s}"`);
+}
+
+export const ROOT = build('/', filesystem.tree);
 
 // ── Path helpers (all pure) ─────────────────────────────────────────────────
 export function splitPath(p) {

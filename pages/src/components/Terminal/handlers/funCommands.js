@@ -3,6 +3,10 @@ import { PROFILE } from '../data/profile';
 import { SKILL_GROUPS } from '../data/skillsData';
 import { EXPERIENCE_ITEMS } from '../data/experienceData';
 import { renderFiglet } from '../data/figletFont';
+import fun from '@assets/data/terminal/fun.json';
+
+// Fill `{key}` placeholders in a JSON-sourced string with runtime values.
+const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
 
 // Fixed colors (inline) — class t-green is remapped by the accent theme, so any
 // command whose color is semantically meaningful sets it inline instead.
@@ -39,13 +43,9 @@ export function cmdNeofetch() {
   ];
   const exp = EXPERIENCE_ITEMS[0];
   const info = [
-    ['', 'visitor@hongzhe'],
-    ['', '---------------'],
-    ['OS', 'Portfolio Linux x86_64'],
-    ['Host', 'hongzhe.dev'],
-    ['Kernel', '6.8.0-portfolio'],
-    ['Uptime', '3 days, 14:22'],
-    ['Shell', 'hsh 5.2'],
+    ['', fun.neofetch.user],
+    ['', fun.neofetch.separator],
+    ...fun.neofetch.labels,
     ['Role', PROFILE.role],
     ['Education', PROFILE.education],
     ['Skills', topSkills(3).join(', ')],
@@ -108,7 +108,7 @@ export function cmdCowsay(args = [], name = 'cowsay') {
 
 // figlet / banner / toilet — big ASCII text. toilet adds rainbow coloring.
 export function cmdFiglet(args = [], name = 'figlet') {
-  const text = args && args.length ? args.join(' ') : 'HELLO';
+  const text = args && args.length ? args.join(' ') : fun.figlet.defaultText;
   const rows = renderFiglet(text);
   const out = [txt('')];
   rows.forEach((r, i) => {
@@ -122,7 +122,7 @@ export function cmdFiglet(args = [], name = 'figlet') {
 
 // lolcat / rainbow — rainbow-gradient text.
 export function cmdLolcat(args = []) {
-  const text = args && args.length ? args.join(' ') : 'Dream it. Chase it. Code it.';
+  const text = args && args.length ? args.join(' ') : fun.lolcat.defaultText;
   return { output: [txt(''), html(rainbow(text)), txt('')] };
 }
 
@@ -130,36 +130,20 @@ export function cmdLolcat(args = []) {
 export function cmdFortune() {
   const py = (SKILL_GROUPS[0].skills.find((s) => s.name === 'Python') || {}).years || 7;
   const exp = EXPERIENCE_ITEMS[0];
-  const fortunes = [
-    'Dream it. Chase it. Code it.',
-    'A SELECT statement a day keeps the bugs away.',
-    `${py} years of Python and still reading the docs.`,
-    `Currently shipping: ${exp.title} @ ${exp.org}.`,
-    "There are 10 kinds of people: those who read binary and those who don't.",
-    'git commit -m "final FINAL v3 (for real this time)"',
-    'It works on my machine. ¯\\_(ツ)_/¯',
-    "The cloud is just someone else's computer.",
-    'Premature optimization is the root of all evil.  — Donald Knuth',
-    'sudo make me a sandwich.',
-  ];
+  const vars = { pythonYears: py, expTitle: exp.title, expOrg: exp.org };
+  const fortunes = fun.fortune.quotes.map((q) => fill(q, vars));
   const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
   return { output: [txt(''), txt(pick, 't-green'), txt('')] };
 }
 
 // vim / vi / emacs / nano — the "how do I exit" joke.
 export function cmdEditorTrap(name = 'vim') {
-  const tips = {
-    vim: 'To exit Vim: press Esc, then type :q! and Enter.',
-    vi: 'To exit vi: press Esc, then type :q! and Enter.',
-    emacs: "To exit Emacs: C-x C-c. (Or just close the tab — we won't judge.)",
-    nano: 'To exit nano: Ctrl+X. The friendliest editor.',
-  };
   return {
     output: [
       txt(''),
-      txt(`${name}: this is a portfolio terminal, not a real editor.`, 't-green'),
-      txt(tips[name] || tips.vim, 't-dim'),
-      txt("Type 'help' to see what you can actually run.", 't-dim'),
+      txt(fill(fun.editorTrap.message, { name }), 't-green'),
+      txt(fun.editorTrap.tips[name] || fun.editorTrap.tips.vim, 't-dim'),
+      txt(fun.editorTrap.hint, 't-dim'),
       txt(''),
     ],
   };
@@ -178,7 +162,7 @@ export function cmdSl() {
   ];
   return {
     output: [txt(''), ...train.map((l) => txt(l, 't-dim')), txt(''),
-      txt('(you typed sl instead of ls — choo choo! 🚂)', 't-dim'), txt('')],
+      txt(fun.sl.caption, 't-dim'), txt('')],
   };
 }
 
@@ -196,25 +180,26 @@ export function cmdMatrix() {
     out.push(html(row));
   }
   out.push(txt(''));
-  out.push(txt('Wake up, Neo… (a static frame — type clear to dismiss)', 't-dim'));
+  out.push(txt(fun.matrix.caption, 't-dim'));
   out.push(txt(''));
   return { output: out };
 }
 
 // weather / wttr — a canned, offline forecast card (no network).
 export function cmdWeather() {
+  const w = fun.weather;
   return {
     output: [
       txt(''),
-      txt('Weather report: Merced, CA', 't-title'),
+      txt(w.title, 't-title'),
       txt(''),
-      txt('     \\   /     Sunny', 't-dim'),
-      txt('      .-.      72 °F', 't-dim'),
-      txt('   ― (   ) ―   ↗ 6 mph', 't-dim'),
-      txt('      `-’      10 mi', 't-dim'),
-      txt('     /   \\     0.0 in', 't-dim'),
+      txt('     \\   /     ' + w.condition, 't-dim'),
+      txt('      .-.      ' + w.temp, 't-dim'),
+      txt('   ― (   ) ―   ' + w.wind, 't-dim'),
+      txt('      `-’      ' + w.visibility, 't-dim'),
+      txt('     /   \\     ' + w.precipitation, 't-dim'),
       txt(''),
-      txt('(offline canned forecast — no network calls)', 't-dim'),
+      txt(w.note, 't-dim'),
       txt(''),
     ],
   };
@@ -227,19 +212,14 @@ export function cmdHtop() {
     return `<span style="color:${color}">${'|'.repeat(n)}</span>${'.'.repeat(10 - n)} ${pct}%`;
   };
   const out = [txt('')];
-  out.push(html(`CPU [${bar(37, '#39D353')}]`));
-  out.push(html(`Mem [${bar(58, '#FFA657')}]`));
-  out.push(html(`Swp [${bar(4, '#58A6FF')}]`));
+  out.push(html(`CPU [${bar(fun.htop.bars.cpu, '#39D353')}]`));
+  out.push(html(`Mem [${bar(fun.htop.bars.mem, '#FFA657')}]`));
+  out.push(html(`Swp [${bar(fun.htop.bars.swp, '#58A6FF')}]`));
   out.push(txt(''));
-  out.push(txt('  PID USER       CPU%  MEM%  COMMAND', 't-blue'));
-  [
-    ['1337', 'visitor', '12.0', '3.4', 'node portfolio'],
-    ['2048', 'visitor', '6.5', '2.1', 'vite dev'],
-    ['4096', 'visitor', '1.2', '0.8', 'coffee --brew'],
-    ['8128', 'visitor', '0.0', '0.1', 'sleep 99999'],
-  ].forEach((p) => out.push(txt(`${p[0].padStart(5)} ${p[1].padEnd(9)} ${p[2].padStart(5)} ${p[3].padStart(5)}  ${p[4]}`, 't-dim')));
+  out.push(txt(fun.htop.header, 't-blue'));
+  fun.htop.processes.forEach((p) => out.push(txt(`${p[0].padStart(5)} ${p[1].padEnd(9)} ${p[2].padStart(5)} ${p[3].padStart(5)}  ${p[4]}`, 't-dim')));
   out.push(txt(''));
-  out.push(txt('(static snapshot — type clear to dismiss)', 't-dim'));
+  out.push(txt(fun.htop.note, 't-dim'));
   out.push(txt(''));
   return { output: out };
 }
@@ -247,28 +227,28 @@ export function cmdHtop() {
 // please / thanks / thx — politeness. please re-dispatches via ctx.dispatch.
 export function cmdPlease(ctx) {
   if (ctx.name === 'thanks' || ctx.name === 'thx') {
-    return { output: [txt(''), txt("You're welcome! 😊", 't-green'), txt('')] };
+    return { output: [txt(''), txt(fun.please.welcome, 't-green'), txt('')] };
   }
   const rest = (ctx.args || []).join(' ').trim();
   if (!rest) {
-    return { output: [txt(''), txt('please: please what? (try: please ls)', 't-dim'), txt('')] };
+    return { output: [txt(''), txt(fun.please.empty, 't-dim'), txt('')] };
   }
   const result = ctx.dispatch(rest) || {};
   return {
     ...result,
-    output: [txt(''), txt('Since you asked so nicely:', 't-green'), ...(result.output || [])],
+    output: [txt(''), txt(fun.please.prefix, 't-green'), ...(result.output || [])],
   };
 }
 
 // sandwich — xkcd 149. Also reached by the "make me a sandwich" phrase hook.
 export function cmdSandwich(ctx) {
   const sudo = /\bsudo\b/.test((ctx.raw || '').toLowerCase());
-  if (sudo) return { output: [txt(''), txt('Okay. 🥪', 't-green'), txt('')] };
+  if (sudo) return { output: [txt(''), txt(fun.sandwich.ok, 't-green'), txt('')] };
   return {
     output: [
       txt(''),
-      txt('What? Make it yourself.', 't-error'),
-      txt("(Hint: try 'sudo make me a sandwich'.)", 't-dim'),
+      txt(fun.sandwich.deny, 't-error'),
+      txt(fun.sandwich.hint, 't-dim'),
       txt(''),
     ],
   };
@@ -286,8 +266,8 @@ export function cmdTelnet(args = []) {
       '       -"-"-',
     ];
     return {
-      output: [txt(''), txt(`Trying ${host}...`, 't-dim'), txt(`Connected to ${host}.`, 't-dim'), txt(''),
-        ...vader.map((l) => txt(l, 't-green')), txt(''), txt('(Star Wars ASCIImation — abridged)', 't-dim'), txt('')],
+      output: [txt(''), txt(fill(fun.telnet.trying, { host }), 't-dim'), txt(fill(fun.telnet.connected, { host }), 't-dim'), txt(''),
+        ...vader.map((l) => txt(l, 't-green')), txt(''), txt(fun.telnet.caption, 't-dim'), txt('')],
     };
   }
   return { output: [txt(''), txt(`telnet: could not resolve ${host}: Name or service not known`, 't-error'), txt('')] };
@@ -306,7 +286,7 @@ export function cmdAafire() {
   ];
   return {
     output: [txt(''), ...flame.map(([l, c]) => html(`<span style="color:${c}">${escapeHtml(l)}</span>`)),
-      txt(''), txt('(press q… just kidding — type clear)', 't-dim'), txt('')],
+      txt(''), txt(fun.aafire.caption, 't-dim'), txt('')],
   };
 }
 
@@ -316,8 +296,8 @@ export function cmdCoffee(name = 'coffee') {
   return {
     output: [
       txt(''),
-      txt("418 I'm a teapot", 't-error'),
-      txt(`The server refuses to brew ${drink}, because it is — permanently — a teapot. ☕`, 't-dim'),
+      txt(fun.coffee.status, 't-error'),
+      txt(fill(fun.coffee.body, { drink }), 't-dim'),
       txt(''),
     ],
   };
@@ -328,7 +308,7 @@ export function cmdAscii() {
   const rows = renderFiglet('HX');
   return {
     output: [txt(''), ...rows.map((r) => html(`<span style="${GREEN}">${escapeHtml(r)}</span>`)),
-      txt(''), txt('Hongzhe Xie · Full Stack & Cloud Engineer', 't-dim'), txt('')],
+      txt(''), txt(fun.ascii.caption, 't-dim'), txt('')],
   };
 }
 
@@ -341,9 +321,7 @@ export function cmdClaude(args = []) {
       output: [
         txt(''),
         txt(`you:    ${q}`, 't-dim'),
-        txt("claude: Can't reach the API from a static portfolio — but for the record,"),
-        txt('        this whole terminal (and its ~70 commands) was built with Claude Code. 🤖'),
-        txt('        For the real thing, visit claude.ai.'),
+        ...fun.claude.answer.map((l) => txt(l)),
         txt(''),
       ],
     };
@@ -354,9 +332,9 @@ export function cmdClaude(args = []) {
       txt(''),
       ...rows.map((r) => html(`<span style="color:#D97757">${escapeHtml(r)}</span>`)),
       txt(''),
-      txt("Claude — Anthropic's AI assistant.", 't-green'),
-      txt('This CLI portfolio was built with Claude Code.', 't-dim'),
-      txt('Ask away:  claude <your question>', 't-dim'),
+      txt(fun.claude.title, 't-green'),
+      txt(fun.claude.subtitle, 't-dim'),
+      txt(fun.claude.hint, 't-dim'),
       txt(''),
     ],
   };
@@ -364,16 +342,8 @@ export function cmdClaude(args = []) {
 
 // hollywood / hacker — movie-grade "hacking" that ends in ACCESS GRANTED.
 export function cmdHollywood() {
-  const lines = [
-    'Initializing kernel exploit...',
-    'Bypassing firewall [████████████] 100%',
-    'Decrypting RSA-4096 ... done',
-    'Injecting payload into the mainframe...',
-    'Rerouting through 7 proxies...',
-    'Downloading the entire internet... 99%',
-  ];
   return {
-    output: [txt(''), ...lines.map((l) => txt(l, 't-green')), txt(''),
-      txt('ACCESS GRANTED', 't-green'), txt('(just kidding — this is a portfolio 😄)', 't-dim'), txt('')],
+    output: [txt(''), ...fun.hollywood.lines.map((l) => txt(l, 't-green')), txt(''),
+      txt(fun.hollywood.granted, 't-green'), txt(fun.hollywood.note, 't-dim'), txt('')],
   };
 }

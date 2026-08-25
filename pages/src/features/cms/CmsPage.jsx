@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { fetchCMSPage } from './api';
 import { BlockRenderer } from './BlockRenderer';
+import ui from '@assets/data/ui.json';
 import './cms.css';
 
 export const CmsPage = () => {
@@ -54,8 +55,8 @@ export const CmsPage = () => {
   if (error === 'error') {
     return (
       <div className="cms-page cms-page-error">
-        <p>Something went wrong loading this page.</p>
-        <Link to="/">Back to terminal</Link>
+        <p>{ui.cms.error}</p>
+        <Link to="/">{ui.cms.back}</Link>
       </div>
     );
   }
@@ -63,9 +64,9 @@ export const CmsPage = () => {
   if (error === 'not_found' || !page) {
     return (
       <div className="cms-page cms-page-not-found">
-        <h1>404</h1>
-        <p>Page not found.</p>
-        <Link to="/">Back to terminal</Link>
+        <h1>{ui.cms.notFoundTitle}</h1>
+        <p>{ui.cms.notFound}</p>
+        <Link to="/">{ui.cms.back}</Link>
       </div>
     );
   }
@@ -74,7 +75,7 @@ export const CmsPage = () => {
     <div className="cms-page">
       <BlockRenderer blocks={page.blocks} />
       <p className="cms-page-footer">
-        <Link to="/">← back to terminal</Link>
+        <Link to="/">{ui.cms.footerBack}</Link>
       </p>
     </div>
   );

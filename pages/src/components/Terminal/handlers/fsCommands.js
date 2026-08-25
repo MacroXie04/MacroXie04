@@ -1,5 +1,6 @@
 import { txt, html } from './shared';
 import { highlightMarkdown, highlightPython, highlightSQL } from '../utils/highlight';
+import filesystem from '@assets/data/terminal/filesystem.json';
 import {
   HOME, resolvePath, getNode, listDir, readFile,
   isDir, rawSize, humanSize,
@@ -15,7 +16,7 @@ export function renderFileLine(line, lang) {
   return txt(line);
 }
 
-const MTIME = 'Feb 22 10:30';
+const MTIME = filesystem.mtime;
 
 function longRow(node, displayName) {
   const d = isDir(node);

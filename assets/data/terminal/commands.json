@@ -1,0 +1,601 @@
+[
+  {
+    "id": "help",
+    "name": "help",
+    "category": "core",
+    "summary": "List available commands"
+  },
+  {
+    "id": "clear",
+    "name": "clear",
+    "category": "core",
+    "summary": "Clear terminal",
+    "man": "Clear terminal screen",
+    "path": "/usr/bin/clear"
+  },
+  {
+    "id": "quit",
+    "name": "quit",
+    "category": "core",
+    "hidden": true
+  },
+  {
+    "id": "exit",
+    "name": "exit",
+    "category": "core",
+    "summary": "Exit terminal"
+  },
+  {
+    "id": "history",
+    "name": "history",
+    "category": "core",
+    "summary": "Command history"
+  },
+  {
+    "id": "sudo",
+    "name": "sudo",
+    "category": "core",
+    "summary": "Execute a command as another user",
+    "man": "Execute a command as another user",
+    "path": "/usr/bin/sudo"
+  },
+  {
+    "id": "rm",
+    "name": "rm",
+    "category": "core",
+    "hidden": true
+  },
+  {
+    "id": "cv",
+    "name": "cv",
+    "category": "core",
+    "summary": "Download resume PDF",
+    "aliases": [
+      "resume",
+      "download"
+    ]
+  },
+  {
+    "id": "about",
+    "name": "about",
+    "category": "info",
+    "summary": "About me and contact info",
+    "aliases": [
+      "whoami"
+    ]
+  },
+  {
+    "id": "experience",
+    "name": "experience",
+    "category": "info",
+    "summary": "Work experience"
+  },
+  {
+    "id": "skills",
+    "name": "skills",
+    "category": "info",
+    "summary": "Technical skills"
+  },
+  {
+    "id": "contact",
+    "name": "contact",
+    "category": "info",
+    "summary": "Contact information"
+  },
+  {
+    "id": "projects",
+    "name": "projects",
+    "category": "info",
+    "summary": "Showcase projects  (projects <name>, --links)",
+    "aliases": [
+      "work",
+      "portfolio"
+    ]
+  },
+  {
+    "id": "education",
+    "name": "education",
+    "category": "info",
+    "summary": "Academic background  (-v, --courses)",
+    "aliases": [
+      "edu",
+      "school"
+    ]
+  },
+  {
+    "id": "stack",
+    "name": "stack",
+    "category": "info",
+    "summary": "Toolbox grouped by domain  (--flat)",
+    "aliases": [
+      "tools",
+      "tech"
+    ]
+  },
+  {
+    "id": "ls",
+    "name": "ls",
+    "category": "fs",
+    "summary": "List files  (-l long, -a all, -la combined)",
+    "man": "List directory contents",
+    "path": "/bin/ls"
+  },
+  {
+    "id": "cat",
+    "name": "cat",
+    "category": "fs",
+    "summary": "View a file (path-aware, syntax-highlighted)",
+    "man": "Concatenate and print files",
+    "path": "/bin/cat"
+  },
+  {
+    "id": "cd",
+    "name": "cd",
+    "category": "fs",
+    "summary": "Change directory"
+  },
+  {
+    "id": "pwd",
+    "name": "pwd",
+    "category": "fs",
+    "summary": "Print working directory",
+    "man": "Return working directory name",
+    "path": "/bin/pwd"
+  },
+  {
+    "id": "echo",
+    "name": "echo",
+    "category": "fs",
+    "summary": "Print text",
+    "man": "Write arguments to stdout",
+    "path": "/bin/echo"
+  },
+  {
+    "id": "github",
+    "name": "github",
+    "category": "fs",
+    "summary": "Open GitHub profile"
+  },
+  {
+    "id": "tree",
+    "name": "tree",
+    "category": "fs",
+    "summary": "Print the directory tree  (-a hidden)",
+    "man": "List contents of directories in a tree-like format",
+    "path": "/usr/bin/tree"
+  },
+  {
+    "id": "find",
+    "name": "find",
+    "category": "fs",
+    "summary": "Search the tree  (-name glob, -type f|d)",
+    "man": "Search for files in a directory hierarchy",
+    "path": "/usr/bin/find"
+  },
+  {
+    "id": "stat",
+    "name": "stat",
+    "category": "fs",
+    "summary": "Show file metadata",
+    "man": "Display file or file system status",
+    "path": "/usr/bin/stat"
+  },
+  {
+    "id": "file",
+    "name": "file",
+    "category": "fs",
+    "summary": "Identify a file type",
+    "man": "Determine file type",
+    "path": "/usr/bin/file"
+  },
+  {
+    "id": "touch",
+    "name": "touch",
+    "category": "fs",
+    "summary": "Modify files (read-only filesystem: denied)",
+    "aliases": [
+      "mkdir",
+      "rmdir",
+      "mv",
+      "cp"
+    ]
+  },
+  {
+    "id": "settings",
+    "name": "settings",
+    "category": "appearance",
+    "summary": "Show current settings"
+  },
+  {
+    "id": "font",
+    "name": "font",
+    "category": "appearance",
+    "summary": "Change font size (small|medium|large|xlarge)"
+  },
+  {
+    "id": "theme",
+    "name": "theme",
+    "category": "appearance",
+    "summary": "Change background (default|dracula|nord|solarized|light)"
+  },
+  {
+    "id": "color",
+    "name": "color",
+    "category": "appearance",
+    "summary": "Change accent color (green|blue|purple|orange|cyan)"
+  },
+  {
+    "id": "uname",
+    "name": "uname",
+    "category": "util",
+    "summary": "System info",
+    "man": "Print operating system name",
+    "path": "/usr/bin/uname"
+  },
+  {
+    "id": "date",
+    "name": "date",
+    "category": "util",
+    "summary": "Current date",
+    "man": "Display or set date and time",
+    "path": "/bin/date"
+  },
+  {
+    "id": "uptime",
+    "name": "uptime",
+    "category": "util",
+    "summary": "System uptime"
+  },
+  {
+    "id": "ping",
+    "name": "ping",
+    "category": "util",
+    "summary": "Ping a host"
+  },
+  {
+    "id": "man",
+    "name": "man",
+    "category": "util",
+    "summary": "Manual page",
+    "man": "Format and display manual pages",
+    "path": "/usr/bin/man"
+  },
+  {
+    "id": "which",
+    "name": "which",
+    "category": "util",
+    "summary": "Locate command",
+    "path": "/usr/bin/which"
+  },
+  {
+    "id": "print",
+    "name": "print",
+    "category": "util",
+    "summary": "Open resume PDF for printing"
+  },
+  {
+    "id": "grep",
+    "name": "grep",
+    "category": "util",
+    "summary": "Search files for text  (-i -n -v -c)",
+    "man": "Print lines that match patterns",
+    "path": "/usr/bin/grep",
+    "aliases": [
+      "egrep",
+      "fgrep"
+    ]
+  },
+  {
+    "id": "wc",
+    "name": "wc",
+    "category": "util",
+    "summary": "Count lines / words / bytes  (-l -w -c)",
+    "man": "Print newline, word, and byte counts",
+    "path": "/usr/bin/wc"
+  },
+  {
+    "id": "head",
+    "name": "head",
+    "category": "util",
+    "summary": "First lines of a file  (-n N)",
+    "man": "Output the first part of files",
+    "path": "/usr/bin/head"
+  },
+  {
+    "id": "tail",
+    "name": "tail",
+    "category": "util",
+    "summary": "Last lines of a file  (-n N)",
+    "man": "Output the last part of files",
+    "path": "/usr/bin/tail"
+  },
+  {
+    "id": "sort",
+    "name": "sort",
+    "category": "util",
+    "summary": "Sort file lines  (-r -u -f)",
+    "man": "Sort lines of text files",
+    "path": "/usr/bin/sort"
+  },
+  {
+    "id": "uniq",
+    "name": "uniq",
+    "category": "util",
+    "summary": "Collapse adjacent duplicate lines  (-c -d -i)",
+    "man": "Report or omit repeated lines",
+    "path": "/usr/bin/uniq"
+  },
+  {
+    "id": "diff",
+    "name": "diff",
+    "category": "util",
+    "summary": "Compare two files",
+    "man": "Compare files line by line",
+    "path": "/usr/bin/diff"
+  },
+  {
+    "id": "cal",
+    "name": "cal",
+    "category": "util",
+    "summary": "Display a calendar",
+    "man": "Display a calendar",
+    "path": "/usr/bin/cal"
+  },
+  {
+    "id": "seq",
+    "name": "seq",
+    "category": "util",
+    "summary": "Print a sequence of numbers",
+    "man": "Print a sequence of numbers",
+    "path": "/usr/bin/seq"
+  },
+  {
+    "id": "expr",
+    "name": "expr",
+    "category": "util",
+    "summary": "Evaluate one integer expression",
+    "man": "Evaluate expressions",
+    "path": "/usr/bin/expr"
+  },
+  {
+    "id": "bc",
+    "name": "bc",
+    "category": "util",
+    "summary": "Calculator (with precedence)",
+    "man": "An arbitrary precision calculator language",
+    "path": "/usr/bin/bc"
+  },
+  {
+    "id": "env",
+    "name": "env",
+    "category": "util",
+    "summary": "Print environment variables",
+    "man": "Run a program in a modified environment",
+    "path": "/usr/bin/env",
+    "aliases": [
+      "printenv"
+    ]
+  },
+  {
+    "id": "basename",
+    "name": "basename",
+    "category": "util",
+    "summary": "Strip directory from a path",
+    "man": "Strip directory and suffix from filenames",
+    "path": "/usr/bin/basename"
+  },
+  {
+    "id": "dirname",
+    "name": "dirname",
+    "category": "util",
+    "summary": "Strip last component from a path",
+    "man": "Strip last component from file name",
+    "path": "/usr/bin/dirname"
+  },
+  {
+    "id": "id",
+    "name": "id",
+    "category": "util",
+    "summary": "Print user / group identity",
+    "man": "Print real and effective user and group IDs",
+    "path": "/usr/bin/id",
+    "aliases": [
+      "groups"
+    ]
+  },
+  {
+    "id": "less",
+    "name": "less",
+    "category": "util",
+    "summary": "Pager (use cat here)",
+    "man": "Opposite of more",
+    "path": "/usr/bin/less",
+    "aliases": [
+      "more"
+    ]
+  },
+  {
+    "id": "yes",
+    "name": "yes",
+    "category": "util",
+    "summary": "Repeat a string (capped)",
+    "man": "Output a string repeatedly until killed",
+    "path": "/usr/bin/yes"
+  },
+  {
+    "id": "sleep",
+    "name": "sleep",
+    "category": "util",
+    "summary": "Wait (simulated)",
+    "man": "Delay for a specified amount of time",
+    "path": "/usr/bin/sleep"
+  },
+  {
+    "id": "seventeen",
+    "name": "seventeen",
+    "category": "fun",
+    "summary": "A little easter egg",
+    "aliases": [
+      "svt"
+    ]
+  },
+  {
+    "id": "neofetch",
+    "name": "neofetch",
+    "category": "fun",
+    "summary": "System info + ASCII logo",
+    "aliases": [
+      "screenfetch"
+    ]
+  },
+  {
+    "id": "cowsay",
+    "name": "cowsay",
+    "category": "fun",
+    "summary": "An ASCII cow says something",
+    "aliases": [
+      "cowthink"
+    ]
+  },
+  {
+    "id": "figlet",
+    "name": "figlet",
+    "category": "fun",
+    "summary": "Big ASCII letters",
+    "aliases": [
+      "banner",
+      "toilet"
+    ]
+  },
+  {
+    "id": "fortune",
+    "name": "fortune",
+    "category": "fun",
+    "summary": "A random adage"
+  },
+  {
+    "id": "vim",
+    "name": "vim",
+    "category": "fun",
+    "summary": "How do I exit this thing?",
+    "aliases": [
+      "vi",
+      "emacs",
+      "nano"
+    ]
+  },
+  {
+    "id": "lolcat",
+    "name": "lolcat",
+    "category": "fun",
+    "summary": "Rainbow-colored text",
+    "aliases": [
+      "rainbow"
+    ]
+  },
+  {
+    "id": "sl",
+    "name": "sl",
+    "category": "fun",
+    "summary": "Steam locomotive (the ls typo)",
+    "aliases": [
+      "choochoo"
+    ]
+  },
+  {
+    "id": "matrix",
+    "name": "matrix",
+    "category": "fun",
+    "summary": "Green digital rain",
+    "aliases": [
+      "cmatrix"
+    ]
+  },
+  {
+    "id": "weather",
+    "name": "weather",
+    "category": "fun",
+    "summary": "Canned offline forecast",
+    "aliases": [
+      "wttr"
+    ]
+  },
+  {
+    "id": "htop",
+    "name": "htop",
+    "category": "fun",
+    "summary": "Fake process monitor",
+    "aliases": [
+      "top"
+    ]
+  },
+  {
+    "id": "please",
+    "name": "please",
+    "category": "fun",
+    "summary": "Ask politely (re-runs a command)",
+    "aliases": [
+      "thanks",
+      "thx"
+    ]
+  },
+  {
+    "id": "sandwich",
+    "name": "sandwich",
+    "category": "fun",
+    "summary": "xkcd 149"
+  },
+  {
+    "id": "telnet",
+    "name": "telnet",
+    "category": "fun",
+    "summary": "Connect somewhere fun"
+  },
+  {
+    "id": "aafire",
+    "name": "aafire",
+    "category": "fun",
+    "summary": "ASCII flames",
+    "aliases": [
+      "fire"
+    ]
+  },
+  {
+    "id": "coffee",
+    "name": "coffee",
+    "category": "fun",
+    "summary": "Brew a beverage",
+    "aliases": [
+      "brew",
+      "tea"
+    ]
+  },
+  {
+    "id": "ascii",
+    "name": "ascii",
+    "category": "fun",
+    "summary": "Branded ASCII wordmark",
+    "aliases": [
+      "logo"
+    ]
+  },
+  {
+    "id": "hollywood",
+    "name": "hollywood",
+    "category": "fun",
+    "summary": "Hack the mainframe",
+    "aliases": [
+      "hacker"
+    ]
+  },
+  {
+    "id": "claude",
+    "name": "claude",
+    "category": "fun",
+    "summary": "Say hi to Claude (built this terminal)",
+    "aliases": [
+      "anthropic",
+      "ask"
+    ]
+  }
+]

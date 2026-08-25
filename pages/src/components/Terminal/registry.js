@@ -28,6 +28,7 @@
 //   run        required (ctx) => result
 // ============================================================================
 
+import commandsData from '@assets/data/terminal/commands.json';
 import { handleSudo, isDestructiveRm } from './handlers/sudo';
 import { txt } from './handlers/shared';
 import { completeChildren } from './data/filesystem';
@@ -58,7 +59,26 @@ import {
 // of the directory the user has typed so far (see completions.js).
 const pathCompleter = (ctx) => completeChildren(ctx.cwd, ctx.dirPart);
 
-export const COMMANDS = [
+// ── Editable metadata from assets/data/commands.json ─────────────────────
+const metadataByName = Object.fromEntries(commandsData.map((c) => [c.name, c]));
+
+function mergeCommandMetadata(cmd) {
+  const meta = metadataByName[cmd.name];
+  if (!meta) return cmd;
+  return {
+    ...cmd,
+    name: meta.name,
+    category: meta.category,
+    summary: meta.summary !== undefined ? meta.summary : cmd.summary,
+    man: meta.man !== undefined ? meta.man : cmd.man,
+    path: meta.path !== undefined ? meta.path : cmd.path,
+    aliases: meta.aliases !== undefined ? meta.aliases : cmd.aliases,
+    hidden: meta.hidden !== undefined ? meta.hidden : cmd.hidden,
+  };
+}
+
+// Raw descriptors; COMMANDS below overrides their metadata from commands.json.
+const COMMAND_LIST = [
   // ── core ──────────────────────────────────────────────────────────────
   { name: 'help', category: 'core', summary: 'List available commands',
     run: (ctx) => cmdHelp(visibleCommands(), ctx.args[0], getCommand) },
@@ -258,6 +278,8 @@ export const COMMANDS = [
   { name: 'claude', aliases: ['anthropic', 'ask'], category: 'fun', summary: 'Say hi to Claude (built this terminal)',
     run: (ctx) => cmdClaude(ctx.args) },
 ];
+
+export const COMMANDS = COMMAND_LIST.map(mergeCommandMetadata);
 
 // ── Derived structures (built once at module load) ────────────────────────
 

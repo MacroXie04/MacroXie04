@@ -1,0 +1,35 @@
+{
+  "terminal": {
+    "windowTitle": "visitor@hongzhe:~ — Portfolio Terminal",
+    "bombOverlay": {
+      "title": "PERMISSION DENIED",
+      "body": "nice try — you don't have sudo privileges here"
+    },
+    "settingsPanel": {
+      "fontSize": "Font Size",
+      "background": "Background",
+      "accentColor": "Accent Color"
+    }
+  },
+  "headings": {
+    "experience": "Work Experience",
+    "skills": "Technical Skills",
+    "projects": "Projects",
+    "education": "Education",
+    "coursework": "Selected coursework:",
+    "stack": "Toolbox"
+  },
+  "tips": {
+    "helpFooter": "Tab completes commands and paths · 'man <cmd>' for details · 'help <cmd>' for one command",
+    "projects": "Tip: 'projects <name>' for detail, 'projects --links' for clickable links.",
+    "education": "Tip: 'education -v' for focus, 'education --courses' for coursework.",
+    "stack": "Tip: 'stack --flat' for a one-line view, or 'skills' for proficiency bars."
+  },
+  "cms": {
+    "error": "Something went wrong loading this page.",
+    "notFoundTitle": "404",
+    "notFound": "Page not found.",
+    "back": "Back to terminal",
+    "footerBack": "← back to terminal"
+  }
+}

@@ -2,6 +2,7 @@ import { txt } from './handlers/shared';
 import { PROFILE } from './data/profile';
 import { byName } from './registry';
 import { cmdSandwich } from './handlers/funCommands';
+import terminal from '@assets/data/terminal/terminal.json';
 export { getCompletions } from './utils/completions';
 
 function levenshtein(a, b) {
@@ -87,9 +88,9 @@ export function getWelcomeOutput() {
     txt(''),
     PROFILE,
     txt(''),
-    txt("Welcome! Type 'help' to see available commands.", 't-dim'),
+    txt(terminal.welcomeMessage, 't-dim'),
     txt(''),
   ];
 }
 
-export const QUICK_COMMANDS = ['help', 'about', 'experience', 'skills', 'contact', 'ls', 'github', 'resume', 'clear'];
+export const QUICK_COMMANDS = terminal.quickCommands;

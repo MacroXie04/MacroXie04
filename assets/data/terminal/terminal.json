@@ -1,0 +1,51 @@
+{
+  "hostname": "visitor@hongzhe:~$",
+  "welcomeMessage": "Welcome! Type 'help' to see available commands.",
+  "quickCommands": [
+    "help",
+    "about",
+    "experience",
+    "skills",
+    "contact",
+    "ls",
+    "github",
+    "resume",
+    "clear"
+  ],
+  "helpSections": [
+    [
+      "info",
+      "About"
+    ],
+    [
+      "fs",
+      "Filesystem"
+    ],
+    [
+      "util",
+      "Utilities"
+    ],
+    [
+      "appearance",
+      "Appearance"
+    ],
+    [
+      "fun",
+      "Fun"
+    ],
+    [
+      "core",
+      "Shell"
+    ]
+  ],
+  "motd": [
+    "Welcome to hongzhe-portfolio (GNU/Linux 6.8.0)",
+    "",
+    " * Documentation:  type 'help'",
+    " * Source code:    type 'github'",
+    " * Resume:         type 'cv'",
+    "",
+    "Last login: just now from a curious browser",
+    ""
+  ]
+}

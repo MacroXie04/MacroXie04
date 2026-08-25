@@ -1,48 +1,41 @@
 [
   {
-    "slug": "portfolio",
-    "name": "Portfolio Terminal",
+    "slug": "mobileid",
+    "name": "MobileID",
+    "date": "2025 - 2026",
     "tech": [
-      "React",
-      "Vite",
-      "JavaScript"
+      "Python",
+      "Django",
+      "Vue",
+      "PostgreSQL",
+      "DynamoDB",
+      "Docker",
+      "GitHub Actions"
     ],
-    "role": "Creator",
-    "date": "2026",
-    "status": "live",
-    "desc": "This site — a terminal/CLI-style resume with a virtual filesystem, tab completion, theming, and 60+ shell commands. Hooks-first, zero runtime deps for the shell.",
-    "repo": "https://github.com/MacroXie04/MacroXie04",
-    "demo": "https://macroxie04.github.io/MacroXie04/"
+    "desc": "Developed a Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions backed by PostgreSQL and DynamoDB.",
+    "highlights": [
+      "Implemented defense-in-depth authentication with HTTP-only cookie JWTs, CSRF validation, refresh-token rotation and blacklisting, immediate session revocation, Argon2 hashing, and scoped credential-stuffing controls.",
+      "Enforced Bandit, Safety, Trivy, and dependency-audit gates alongside Django tests with a 70% coverage threshold, Playwright E2E tests, and Docker/Vite build validation."
+    ],
+    "repo": "https://github.com/MacroXie04/MobileID"
   },
   {
-    "slug": "backend",
-    "name": "Django REST Backend",
+    "slug": "tokenrouter",
+    "name": "TokenRouter",
+    "date": "2026",
     "tech": [
-      "Django",
-      "DRF",
-      "DynamoDB",
+      "Go",
+      "React",
+      "OpenAI/Claude/Gemini APIs",
+      "GORM",
+      "Redis",
+      "Casbin",
       "Docker"
     ],
-    "role": "Full-Stack Engineer",
-    "date": "2025",
-    "status": "production",
-    "desc": "Production web systems for UC Merced Innovate to Grow: JWT auth with email login, a block-based CMS, a SQLite/DynamoDB data split, and CI/CD to AWS.",
-    "repo": "https://github.com/MacroXie04",
-    "demo": null
-  },
-  {
-    "slug": "adk-agents",
-    "name": "AI Agent Systems",
-    "tech": [
-      "Google ADK",
-      "Python",
-      "LLM"
+    "desc": "Engineered an OpenAI-compatible LLM gateway with cross-provider protocol conversion, priority/weighted routing, failure-aware retries, and concurrency-safe reservation and settlement of token quotas.",
+    "highlights": [
+      "Protected relay and control planes with SSRF-safe outbound dialing, JWT refresh rotation and replay detection, Casbin RBAC, WebAuthn/TOTP, step-up verification, rate limits, and race-tested quota logic."
     ],
-    "role": "Engineer",
-    "date": "2025",
-    "status": "active",
-    "desc": "Autonomous multi-agent workflows on the Google Agent Development Kit — tool use, shared memory, structured outputs, automated evals, and trace-level observability.",
-    "repo": null,
-    "demo": null
+    "repo": "https://github.com/MacroXie04/TokenRouter"
   }
 ]

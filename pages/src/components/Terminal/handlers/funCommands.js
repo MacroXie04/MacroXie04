@@ -24,8 +24,6 @@ function rainbow(str, offset = 0) {
 function topSkills(n) {
   return SKILL_GROUPS
     .flatMap((g) => g.skills)
-    .slice()
-    .sort((a, b) => b.proficiency - a.proficiency)
     .slice(0, n)
     .map((s) => s.name);
 }
@@ -77,7 +75,7 @@ export function cmdNeofetch() {
 // cowsay / cowthink — a cow with a speech (or thought) bubble.
 export function cmdCowsay(args = [], name = 'cowsay') {
   const think = name === 'cowthink';
-  const text = args && args.length ? args.join(' ') : PROFILE.tagline;
+  const text = args && args.length ? args.join(' ') : (PROFILE.tagline || PROFILE.role);
   const border = '-'.repeat(text.length + 2);
   const cow = think
     ? [
@@ -128,9 +126,8 @@ export function cmdLolcat(args = []) {
 
 // fortune — a random adage; some interpolate real portfolio data.
 export function cmdFortune() {
-  const py = (SKILL_GROUPS[0].skills.find((s) => s.name === 'Python') || {}).years || 7;
   const exp = EXPERIENCE_ITEMS[0];
-  const vars = { pythonYears: py, expTitle: exp.title, expOrg: exp.org };
+  const vars = { expTitle: exp.title, expOrg: exp.org };
   const fortunes = fun.fortune.quotes.map((q) => fill(q, vars));
   const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
   return { output: [txt(''), txt(pick, 't-green'), txt('')] };
@@ -309,34 +306,6 @@ export function cmdAscii() {
   return {
     output: [txt(''), ...rows.map((r) => html(`<span style="${GREEN}">${escapeHtml(r)}</span>`)),
       txt(''), txt(fun.ascii.caption, 't-dim'), txt('')],
-  };
-}
-
-// claude / anthropic / ask — a nod to how this terminal was built. No network:
-// `claude <question>` gets a canned reply (this is a static page).
-export function cmdClaude(args = []) {
-  const q = (args || []).join(' ').trim();
-  if (q) {
-    return {
-      output: [
-        txt(''),
-        txt(`you:    ${q}`, 't-dim'),
-        ...fun.claude.answer.map((l) => txt(l)),
-        txt(''),
-      ],
-    };
-  }
-  const rows = renderFiglet('CLAUDE');
-  return {
-    output: [
-      txt(''),
-      ...rows.map((r) => html(`<span style="color:#D97757">${escapeHtml(r)}</span>`)),
-      txt(''),
-      txt(fun.claude.title, 't-green'),
-      txt(fun.claude.subtitle, 't-dim'),
-      txt(fun.claude.hint, 't-dim'),
-      txt(''),
-    ],
   };
 }
 

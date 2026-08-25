@@ -1,5 +1,8 @@
-import { COMMANDS, byName, ALL_NAMES, getCommand, visibleCommands } from '../registry';
+import {
+  COMMANDS, byName, ALL_NAMES, getCommand, visibleCommands, validateTerminalConfig,
+} from '../registry';
 import { escapeHtml } from '../handlers/shared';
+import terminal from '@assets/data/terminal/terminal.json';
 
 describe('registry integrity', () => {
   test('every descriptor has a unique name and a run()', () => {
@@ -34,6 +37,7 @@ describe('registry integrity', () => {
   test('ALL_NAMES excludes hidden commands but includes their non-hidden peers', () => {
     expect(ALL_NAMES).not.toContain('quit');
     expect(ALL_NAMES).not.toContain('rm');
+    expect(ALL_NAMES).not.toContain('download');
     expect(ALL_NAMES).toContain('grep');
     expect(ALL_NAMES).toContain('egrep'); // alias included
   });
@@ -46,6 +50,30 @@ describe('registry integrity', () => {
     expect(getCommand('GREP')).toBe(getCommand('grep'));
     expect(getCommand('egrep')).toBe(getCommand('grep'));
     expect(getCommand('definitely-not-a-command')).toBeNull();
+  });
+
+  test('removed aliases are no longer registered or completed', () => {
+    for (const alias of ['work', 'edu', 'school', 'tools', 'tech']) {
+      expect(getCommand(alias)).toBeNull();
+      expect(ALL_NAMES).not.toContain(alias);
+    }
+  });
+
+  test('download is a hidden command with arguments, not a cv alias', () => {
+    expect(getCommand('download')).toEqual(expect.objectContaining({ name: 'download', hidden: true }));
+    expect(getCommand('cv').aliases).toEqual(['resume']);
+  });
+
+  test('quick-command and essential-help configuration resolves cleanly', () => {
+    expect(validateTerminalConfig(terminal)).toBe(true);
+    expect(() => validateTerminalConfig({
+      ...terminal,
+      quickCommands: [...terminal.quickCommands, 'missing-command'],
+    })).toThrow(/unknown quick command 'missing-command'/);
+    expect(() => validateTerminalConfig({
+      ...terminal,
+      helpGroups: [{ label: 'bad', commands: ['resume'] }],
+    })).toThrow(/must use its canonical name/);
   });
 
   test('there are 60+ invokable names (canonical + aliases)', () => {

@@ -1,7 +1,7 @@
 import { txt, html, escapeHtml } from './shared';
-import { renderFileLine } from './fsCommands';
+import { pdfBinaryError, renderFileLine } from './fsCommands';
 import {
-  resolvePath, getNode, readFile, fileContent, walk, stat, isDir,
+  resolvePath, getNode, readFile, fileContent, utf8Size, walk, stat, isDir,
 } from '../data/filesystem';
 
 // Fixed green that survives the accent-color remap (--t-green is overridden by
@@ -49,6 +49,7 @@ export function cmdGrep(args = [], cwd) {
     const node = getNode(resolvePath(cwd, f));
     if (!node) { out.push(notFound('grep', f)); continue; }
     if (isDir(node)) { out.push(isADir('grep', f)); continue; }
+    if (node.pdf) { out.push(pdfBinaryError('grep', f)); continue; }
     const { lines } = readFile(node);
     let count = 0;
     lines.forEach((line, i) => {
@@ -92,10 +93,11 @@ export function cmdWc(args = [], cwd) {
     const node = getNode(resolvePath(cwd, f));
     if (!node) { out.push(notFound('wc', f)); continue; }
     if (isDir(node)) { out.push(isADir('wc', f)); continue; }
+    if (node.pdf) { out.push(pdfBinaryError('wc', f)); continue; }
     const content = fileContent(node);
     const l = (content.match(/\n/g) || []).length;
     const w = content.split(/\s+/).filter(Boolean).length;
-    const c = content.length;
+    const c = utf8Size(content);
     tl += l; tw += w; tc += c; valid++;
     out.push(row(l, w, c, f));
   }
@@ -128,6 +130,7 @@ function headTail(args, cwd, which) {
     const node = getNode(resolvePath(cwd, f));
     if (!node) { out.push(notFound(which, f)); return; }
     if (isDir(node)) { out.push(isADir(which, f)); return; }
+    if (node.pdf) { out.push(pdfBinaryError(which, f)); return; }
     if (multi) { if (idx > 0) out.push(txt('')); out.push(txt(`==> ${f} <==`, 't-dim')); }
     const { lines, lang } = readFile(node);
     const slice = which === 'head' ? lines.slice(0, n) : lines.slice(-n);
@@ -179,8 +182,21 @@ export function cmdFind(args = [], cwd) {
   let startArg = '.';
   let namePat = null, typeFilter = null;
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '-name') namePat = args[++i];
-    else if (args[i] === '-type') typeFilter = args[++i];
+    if (args[i] === '-name') {
+      if (i + 1 >= args.length || args[i + 1].startsWith('-')) {
+        return { output: [txt(''), txt("find: missing argument to '-name'", 't-error'), txt('')] };
+      }
+      namePat = args[++i];
+    }
+    else if (args[i] === '-type') {
+      if (i + 1 >= args.length || args[i + 1].startsWith('-')) {
+        return { output: [txt(''), txt("find: missing argument to '-type'", 't-error'), txt('')] };
+      }
+      typeFilter = args[++i];
+      if (typeFilter !== 'f' && typeFilter !== 'd') {
+        return { output: [txt(''), txt(`find: invalid argument '${typeFilter}' to '-type' (expected f or d)`, 't-error'), txt('')] };
+      }
+    }
     else if (!args[i].startsWith('-') && i === 0) startArg = args[i];
   }
   const abs = resolvePath(cwd, startArg);
@@ -209,12 +225,15 @@ export function cmdStat(args = [], cwd) {
   const abs = resolvePath(cwd, t);
   const s = stat(abs);
   if (!s) return { output: [txt(''), txt(`stat: ${t}: No such file or directory`, 't-error'), txt('')] };
-  const type = s.type === 'dir' ? 'directory' : (s.pdf ? 'PDF document' : 'regular file');
+  const type = s.type === 'dir'
+    ? 'directory'
+    : (s.pdf ? `PDF document${s.pages ? `, ${s.pages} pages` : ''}` : 'regular file');
+  const blocks = Math.ceil(s.bytes / 512);
   return {
     output: [
       txt(''),
       txt(`  File: ${abs}`, 't-dim'),
-      txt(`  Size: ${s.bytes}\tBlocks: 8\t${type}`, 't-dim'),
+      txt(`  Size: ${s.bytes}\tBlocks: ${blocks}\t${type}`, 't-dim'),
       txt(`Access: (${s.perm})\tUid: ( 1000/ visitor)\tGid: ( 1000/  staff)`, 't-dim'),
       txt(`Modify: ${s.mtime}`, 't-dim'),
       txt(''),
@@ -228,12 +247,17 @@ export function cmdFile(args = [], cwd) {
   if (!t) return { output: [txt(''), txt('Usage: file <file>', 't-error'), txt('')] };
   const node = getNode(resolvePath(cwd, t));
   if (!node) return { output: [txt(''), txt(`${t}: cannot open (No such file or directory)`, 't-error'), txt('')] };
-  let desc = 'ASCII text';
+  const encoding = () => (/^[\x00-\x7F]*$/.test(fileContent(node)) ? 'ASCII text' : 'Unicode text, UTF-8');
+  let desc = encoding();
   if (isDir(node)) desc = 'directory';
-  else if (node.pdf) desc = 'PDF document, version 1.7';
-  else if (node.lang === 'python') desc = 'Python script, ASCII text executable';
-  else if (node.lang === 'SQL') desc = 'ASCII text, SQL';
-  else if (node.lang === 'markdown') desc = 'ASCII text, Markdown document';
+  else if (node.pdf) {
+    const version = node.pdfVersion ? `, version ${node.pdfVersion}` : '';
+    const pages = node.pages ? `, ${node.pages} pages` : '';
+    desc = `PDF document${version}${pages}`;
+  }
+  else if (node.lang === 'python') desc = `Python source, ${encoding()}`;
+  else if (node.lang === 'SQL') desc = `${encoding()}, SQL`;
+  else if (node.lang === 'markdown') desc = `${encoding()}, Markdown document`;
   return { output: [txt(''), txt(`${t}: ${desc}`, 't-dim'), txt('')] };
 }
 
@@ -249,6 +273,7 @@ export function cmdSort(args = [], cwd) {
     const node = getNode(resolvePath(cwd, f));
     if (!node) { out.push(notFound('sort', f)); continue; }
     if (isDir(node)) { out.push(isADir('sort', f)); continue; }
+    if (node.pdf) { out.push(pdfBinaryError('sort', f)); continue; }
     lines = lines.concat(readFile(node).lines);
   }
   lines.sort((a, b) => {
@@ -272,6 +297,7 @@ export function cmdUniq(args = [], cwd) {
   const node = getNode(resolvePath(cwd, files[0]));
   if (!node) return { output: [txt(''), notFound('uniq', files[0]), txt('')] };
   if (isDir(node)) return { output: [txt(''), isADir('uniq', files[0]), txt('')] };
+  if (node.pdf) return { output: [txt(''), pdfBinaryError('uniq', files[0]), txt('')] };
   const lines = readFile(node).lines;
   const eq = (a, b) => (ic ? a.toLowerCase() === b.toLowerCase() : a === b);
   const out = [txt('')];
@@ -297,6 +323,8 @@ export function cmdDiff(args = [], cwd) {
   if (!n1) return { output: [txt(''), notFound('diff', files[0]), txt('')] };
   if (!n2) return { output: [txt(''), notFound('diff', files[1]), txt('')] };
   if (isDir(n1) || isDir(n2)) return { output: [txt(''), txt('diff: directories are not supported', 't-error'), txt('')] };
+  if (n1.pdf) return { output: [txt(''), pdfBinaryError('diff', files[0]), txt('')] };
+  if (n2.pdf) return { output: [txt(''), pdfBinaryError('diff', files[1]), txt('')] };
   const a = readFile(n1).lines;
   const b = readFile(n2).lines;
   const out = [txt('')];

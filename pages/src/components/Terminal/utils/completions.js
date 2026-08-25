@@ -1,4 +1,5 @@
 import { ALL_NAMES, getCommand } from '../registry';
+import { tokenizeShell } from './shell';
 
 function commonPrefix(strs) {
   if (!strs.length) return '';
@@ -14,12 +15,14 @@ function commonPrefix(strs) {
 //   { type:'arg', partial, matches, common, prefix }   // prefix = input up to the partial
 //   { type:'none', matches: [] }
 export function getCompletions(input, cwd) {
-  const afterSpace = input.endsWith(' ');
-  const parts = input.split(/\s+/);
-  const cmdToken = parts[0].toLowerCase();
+  const parsed = tokenizeShell(input, { allowIncomplete: true });
+  const tokenValues = parsed.tokens.map((token) => token.value);
+  const afterSpace = parsed.trailingWhitespace;
+  const activeToken = afterSpace ? null : parsed.tokens[parsed.tokens.length - 1];
+  const cmdToken = (tokenValues[0] || '').toLowerCase();
 
   // First word still being typed -> complete the command name.
-  if (parts.length === 1 && !afterSpace) {
+  if (tokenValues.length <= 1 && !afterSpace) {
     const partial = cmdToken;
     const matches = ALL_NAMES.filter((c) => c.startsWith(partial));
     return { type: 'cmd', partial, matches, common: commonPrefix(matches) };
@@ -28,14 +31,29 @@ export function getCompletions(input, cwd) {
   // Argument completion for commands that expose a path completer.
   const desc = getCommand(cmdToken);
   if (desc && desc.completer) {
-    const partialArg = afterSpace ? '' : (parts[parts.length - 1] || '');
+    const args = tokenValues.slice(1);
+    const partialArg = afterSpace ? '' : (activeToken?.value || '');
+    const completedArgs = afterSpace ? args : args.slice(0, -1);
+    const argIndex = completedArgs.length;
     const slash = partialArg.lastIndexOf('/');
     const dirPart = slash >= 0 ? partialArg.slice(0, slash + 1) : '';
     const basePart = slash >= 0 ? partialArg.slice(slash + 1) : partialArg;
-    const candidates = desc.completer({ cwd, dirPart }) || [];
+    const candidates = desc.completer({
+      cwd,
+      input,
+      args,
+      completedArgs,
+      argIndex,
+      partial: partialArg,
+      dirPart,
+      basePart,
+      afterSpace,
+    }) || [];
     const matches = candidates.filter((n) => n.toLowerCase().startsWith(basePart.toLowerCase()));
-    // Everything in the input before the part we're completing.
-    const prefix = input.slice(0, input.length - basePart.length);
+    // Replace the active shell word, which also normalizes an unfinished quote
+    // or escaped path into a directly executable unquoted completion.
+    const tokenStart = afterSpace ? input.length : activeToken.start;
+    const prefix = input.slice(0, tokenStart) + dirPart;
     return { type: 'arg', partial: basePart, matches, common: commonPrefix(matches), prefix };
   }
 

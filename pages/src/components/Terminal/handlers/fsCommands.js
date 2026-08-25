@@ -16,6 +16,13 @@ export function renderFileLine(line, lang) {
   return txt(line);
 }
 
+export function pdfBinaryError(command, path) {
+  return txt(
+    `${command}: ${path}: binary PDF — run \`cv\` or \`download resume\` to download it`,
+    't-error',
+  );
+}
+
 const MTIME = filesystem.mtime;
 
 function longRow(node, displayName) {
@@ -85,7 +92,7 @@ export function cmdCat(args = [], cwd = HOME) {
       continue;
     }
     if (node.pdf) {
-      out.push(txt(`cat: ${f}: binary file — run \`cv\` to download the PDF`, 't-error'));
+      out.push(pdfBinaryError('cat', f));
       continue;
     }
     const { lines, lang } = readFile(node);

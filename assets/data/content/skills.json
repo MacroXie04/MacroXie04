@@ -1,135 +1,94 @@
 [
   {
-    "category": "Full-Stack Web Development",
-    "description": "End-to-end delivery — REST APIs, SPA front-ends, containers, cloud",
+    "category": "Languages",
     "skills": [
-      {
-        "name": "Python",
-        "proficiency": 9,
-        "years": 7.0
-      },
-      {
-        "name": "Django REST Framework",
-        "proficiency": 9,
-        "years": 5.0
-      },
-      {
-        "name": "Vue.js",
-        "proficiency": 8,
-        "years": 2.0
-      },
-      {
-        "name": "MySQL",
-        "proficiency": 8,
-        "years": 4.0
-      },
-      {
-        "name": "Docker & Compose",
-        "proficiency": 9,
-        "years": 3.0
-      },
-      {
-        "name": "GitHub Actions CI/CD",
-        "proficiency": 9,
-        "years": 3.0
-      },
-      {
-        "name": "Linux & SSH Ops",
-        "proficiency": 8,
-        "years": 5.0
-      },
-      {
-        "name": "React & TypeScript",
-        "proficiency": 7,
-        "years": 2.0
-      },
-      {
-        "name": "AWS (EC2 · S3 · RDS)",
-        "proficiency": 8,
-        "years": 1.0
-      },
-      {
-        "name": "Cloud Networking & VPC",
-        "proficiency": 8,
-        "years": 3.0
-      },
-      {
-        "name": "Terraform (IaC)",
-        "proficiency": 7,
-        "years": 3.0
-      }
+      { "name": "Python" },
+      { "name": "C/C++" },
+      { "name": "Go" },
+      { "name": "TypeScript/JavaScript" },
+      { "name": "SQL" }
     ]
   },
   {
-    "category": "AI Agent Systems",
-    "description": "Autonomous agents combining LLM reasoning, memory, and external tools",
+    "category": "AI & Agent Engineering",
     "skills": [
-      {
-        "name": "Google ADK",
-        "proficiency": 9,
-        "years": 1.0
-      },
-      {
-        "name": "Multi-Agent Workflow Design",
-        "proficiency": 8,
-        "years": 3.0
-      },
-      {
-        "name": "Prompt Engineering & CoT",
-        "proficiency": 8,
-        "years": 4.0
-      },
-      {
-        "name": "LLM API Integration",
-        "proficiency": 9,
-        "years": 4.0
-      },
-      {
-        "name": "Evaluation & Observability",
-        "proficiency": 7,
-        "years": 1.0
-      }
+      { "name": "Google ADK" },
+      { "name": "Gemini" },
+      { "name": "Amazon Bedrock" },
+      { "name": "Agent orchestration" },
+      { "name": "Structured tool/API calling" },
+      { "name": "Multimodal pipelines" },
+      { "name": "LLM application security" }
     ]
   },
   {
-    "category": "Cybersecurity",
-    "description": "Secure-by-design architecture, threat modeling, and active hardening",
+    "category": "Application & Identity Security",
     "skills": [
-      {
-        "name": "WebAuthn / FIDO2 Passkeys",
-        "proficiency": 9,
-        "years": 3.0
-      },
-      {
-        "name": "Multi-Factor Authentication",
-        "proficiency": 9,
-        "years": 3.0
-      },
-      {
-        "name": "RBAC & Access Control",
-        "proficiency": 9,
-        "years": 4.0
-      },
-      {
-        "name": "REST & GraphQL Auditing",
-        "proficiency": 8,
-        "years": 3.5
-      },
-      {
-        "name": "Rate Limiting & Abuse Prevention",
-        "proficiency": 8,
-        "years": 3.5
-      },
-      {
-        "name": "Dependency Scanning (CVE)",
-        "proficiency": 8,
-        "years": 3.5
-      },
-      {
-        "name": "API Penetration Testing",
-        "proficiency": 7,
-        "years": 3.0
-      }
+      { "name": "API security" },
+      { "name": "Phishing detection" },
+      { "name": "WebAuthn/FIDO2" },
+      { "name": "TOTP/MFA" },
+      { "name": "JWT/OAuth" },
+      { "name": "RBAC/Casbin" },
+      { "name": "CSRF/XSS/SSRF mitigation" },
+      { "name": "Rate limiting" },
+      { "name": "Audit logging" }
+    ]
+  },
+  {
+    "category": "Security Testing & Tooling",
+    "skills": [
+      { "name": "CodeQL" },
+      { "name": "Bandit" },
+      { "name": "Trivy" },
+      { "name": "Gitleaks" },
+      { "name": "OSV" },
+      { "name": "Safety" },
+      { "name": "Postman" },
+      { "name": "SAST" },
+      { "name": "Dependency scanning" },
+      { "name": "Container scanning" },
+      { "name": "Secret scanning" }
+    ]
+  },
+  {
+    "category": "Backend & Data",
+    "skills": [
+      { "name": "Django/DRF" },
+      { "name": "Celery" },
+      { "name": "Redis" },
+      { "name": "PostgreSQL" },
+      { "name": "MySQL" },
+      { "name": "DynamoDB" },
+      { "name": "GORM" },
+      { "name": "REST APIs" }
+    ]
+  },
+  {
+    "category": "Frontend & Testing",
+    "skills": [
+      { "name": "React" },
+      { "name": "Vue.js" },
+      { "name": "Vite" },
+      { "name": "Playwright" },
+      { "name": "Django testing" },
+      { "name": "End-to-end testing" }
+    ]
+  },
+  {
+    "category": "Cloud & DevOps",
+    "skills": [
+      { "name": "AWS ECS Fargate" },
+      { "name": "Amplify" },
+      { "name": "S3" },
+      { "name": "SES" },
+      { "name": "CloudWatch" },
+      { "name": "GCP" },
+      { "name": "Docker" },
+      { "name": "Nginx" },
+      { "name": "GitHub Actions" },
+      { "name": "CI/CD" },
+      { "name": "SSH" }
     ]
   }
 ]

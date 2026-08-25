@@ -31,7 +31,9 @@
   },
   "scripts": {
     "start": "vite",
+    "prebuild": "npm run verify:resume",
     "build": "vite build",
+    "verify:resume": "node scripts/verify-resume-assets.mjs",
     "test": "jest --watch",
     "test:ci": "jest --watchAll=false --coverage",
     "test:coverage": "jest --coverage --watchAll=false",

@@ -7,6 +7,7 @@ module.exports = {
   
   // Module name mapper for CSS and file imports
   moduleNameMapper: {
+    '^@assets/.*\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
     '^@assets/(.*)$': '<rootDir>/../assets/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js'

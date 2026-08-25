@@ -135,7 +135,12 @@ export default function useTerminal() {
       return;
     }
 
-    setHistory(prev => [...prev, { id: Date.now(), cmd: trimmed, output: result?.output || [] }]);
+    setHistory(prev => [...prev, {
+      id: Date.now(),
+      cmd: trimmed,
+      cwd,
+      output: result?.output || [],
+    }]);
     setCmdHistory(prev => [trimmed, ...prev]);
     setHistoryIdx(-1);
   }, [fontSize, theme, accentColor, cwd, setFontSize, setTheme, setColor, setCwd, cmdHistory]);

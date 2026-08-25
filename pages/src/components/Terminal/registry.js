@@ -2,9 +2,9 @@
 // Command registry — the SINGLE source of truth for the terminal's commands.
 //
 // Every command is one plain-object descriptor in COMMANDS. The dispatcher in
-// commands.js builds a `ctx` and calls descriptor.run(ctx); help, man, which,
-// tab-completion and the "did you mean" Levenshtein search all derive from this
-// one array. Adding a command = add one descriptor here + its handler export.
+// commands.js builds a `ctx` and calls descriptor.run(ctx); detailed help, man,
+// which, tab-completion and spelling suggestions resolve through this registry.
+// The compact global help is an explicitly validated allowlist in terminal.json.
 //
 // Handlers themselves live in handlers/*.js (one file per family) — the registry
 // only references them, so no file regrows into a monolith.
@@ -16,7 +16,8 @@
 // Descriptor fields:
 //   name       required, unique, lowercase canonical
 //   aliases    string[]; each resolves to this same descriptor via byName
-//   category   'core'|'info'|'fs'|'appearance'|'util'|'fun' (groups help output)
+//   category   'core'|'info'|'fs'|'appearance'|'util'|'fun' (metadata/taxonomy;
+//              the intentionally compact global help uses terminal.helpGroups)
 //   summary    one-line help text (omitted for hidden commands)
 //   man        manual text — set ONLY where an entry exists today, so cmdMan
 //              still prints "No manual entry" for the rest
@@ -29,6 +30,7 @@
 // ============================================================================
 
 import commandsData from '@assets/data/terminal/commands.json';
+import terminal from '@assets/data/terminal/terminal.json';
 import { handleSudo, isDestructiveRm } from './handlers/sudo';
 import { txt } from './handlers/shared';
 import { completeChildren } from './data/filesystem';
@@ -52,12 +54,50 @@ import {
 import {
   cmdNeofetch, cmdCowsay, cmdFiglet, cmdFortune, cmdEditorTrap,
   cmdLolcat, cmdSl, cmdMatrix, cmdWeather, cmdHtop, cmdPlease, cmdSandwich,
-  cmdTelnet, cmdAafire, cmdCoffee, cmdAscii, cmdHollywood, cmdClaude,
+  cmdTelnet, cmdAafire, cmdCoffee, cmdAscii, cmdHollywood,
 } from './handlers/funCommands';
 
-// Shared arg-completer for commands that take a path: returns the VFS children
-// of the directory the user has typed so far (see completions.js).
-const pathCompleter = (ctx) => completeChildren(ctx.cwd, ctx.dirPart);
+// Completers receive the parsed argument context from utils/completions.js.
+const pathCompleter = (ctx) => completeChildren(ctx.cwd, ctx.dirPart, {
+  all: ctx.basePart.startsWith('.'),
+});
+const directoryCompleter = (ctx) => completeChildren(ctx.cwd, ctx.dirPart, {
+  all: ctx.basePart.startsWith('.'),
+  directoriesOnly: true,
+});
+const commandCompleter = () => ALL_NAMES;
+const downloadCompleter = () => ['resume', 'resume.pdf', 'cv', 'pdf'];
+
+function headTailCompleter(ctx) {
+  if (ctx.completedArgs[ctx.completedArgs.length - 1] === '-n') return [];
+  return pathCompleter(ctx);
+}
+
+function grepCompleter(ctx) {
+  const hasPattern = ctx.completedArgs.some((arg) => !arg.startsWith('-'));
+  if (!hasPattern || ctx.partial.startsWith('-')) return [];
+  return pathCompleter(ctx);
+}
+
+function findCompleter(ctx) {
+  const previous = ctx.completedArgs[ctx.completedArgs.length - 1];
+  if (previous === '-type') return ['f', 'd'];
+  if (previous === '-name') return [];
+  if (ctx.partial.startsWith('-') || ctx.argIndex > 0) return ['-name', '-type'];
+  return pathCompleter(ctx);
+}
+
+function runDownload(ctx) {
+  const target = ctx.args.length === 1 ? ctx.args[0].toLowerCase() : '';
+  if (['resume', 'resume.pdf', 'cv', 'pdf'].includes(target)) return cmdDownloadCv();
+  return {
+    output: [
+      txt(''),
+      txt('Usage: download <resume|resume.pdf|cv|pdf>', 't-error'),
+      txt(''),
+    ],
+  };
+}
 
 // ── Editable metadata from assets/data/commands.json ─────────────────────
 const metadataByName = Object.fromEntries(commandsData.map((c) => [c.name, c]));
@@ -80,7 +120,7 @@ function mergeCommandMetadata(cmd) {
 // Raw descriptors; COMMANDS below overrides their metadata from commands.json.
 const COMMAND_LIST = [
   // ── core ──────────────────────────────────────────────────────────────
-  { name: 'help', category: 'core', summary: 'List available commands',
+  { name: 'help', category: 'core', summary: 'List essential commands', completer: commandCompleter,
     run: (ctx) => cmdHelp(visibleCommands(), ctx.args[0], getCommand) },
   { name: 'clear', category: 'core', summary: 'Clear terminal',
     man: 'Clear terminal screen', path: '/usr/bin/clear',
@@ -97,8 +137,10 @@ const COMMAND_LIST = [
   { name: 'rm', category: 'core', hidden: true,
     pre: (ctx) => (isDestructiveRm(ctx.args) ? { bomb: true, output: [] } : null),
     run: () => ({ output: [txt(''), txt('rm: permission denied', 't-error'), txt('')] }) },
-  { name: 'cv', aliases: ['resume', 'download'], category: 'core', summary: 'Download resume PDF',
+  { name: 'cv', aliases: ['resume'], category: 'core', summary: 'Download resume PDF',
     run: () => cmdDownloadCv() },
+  { name: 'download', category: 'core', hidden: true, completer: downloadCompleter,
+    run: (ctx) => runDownload(ctx) },
 
   // ── info ──────────────────────────────────────────────────────────────
   { name: 'about', aliases: ['whoami'], category: 'info', summary: 'About me and contact info',
@@ -109,14 +151,14 @@ const COMMAND_LIST = [
     run: () => cmdSkills() },
   { name: 'contact', category: 'info', summary: 'Contact information',
     run: () => cmdContact() },
-  { name: 'projects', aliases: ['work', 'portfolio'], category: 'info',
-    summary: 'Showcase projects  (projects <name>, --links)',
+  { name: 'projects', aliases: ['portfolio'], category: 'info',
+    summary: 'Selected projects  (projects <name>, --links)',
     run: (ctx) => cmdProjects(ctx.args) },
-  { name: 'education', aliases: ['edu', 'school'], category: 'info',
-    summary: 'Academic background  (-v, --courses)',
-    run: (ctx) => cmdEducation(ctx.args) },
-  { name: 'stack', aliases: ['tools', 'tech'], category: 'info',
-    summary: 'Toolbox grouped by domain  (--flat)',
+  { name: 'education', category: 'info',
+    summary: 'Academic background',
+    run: () => cmdEducation() },
+  { name: 'stack', category: 'info',
+    summary: 'Technical skills grouped by domain  (--flat)',
     run: (ctx) => cmdStack(ctx.args) },
 
   // ── fs ────────────────────────────────────────────────────────────────
@@ -127,7 +169,7 @@ const COMMAND_LIST = [
     man: 'Concatenate and print files', path: '/bin/cat', completer: pathCompleter,
     run: (ctx) => ({ output: cmdCat(ctx.args, ctx.cwd) }) },
   { name: 'cd', category: 'fs', summary: 'Change directory',
-    completer: pathCompleter,
+    completer: directoryCompleter,
     run: (ctx) => cmdCd(ctx.args, ctx.cwd) },
   { name: 'pwd', category: 'fs', summary: 'Print working directory',
     man: 'Return working directory name', path: '/bin/pwd',
@@ -142,7 +184,7 @@ const COMMAND_LIST = [
     completer: pathCompleter, run: (ctx) => cmdTree(ctx.args, ctx.cwd) },
   { name: 'find', category: 'fs', summary: 'Search the tree  (-name glob, -type f|d)',
     man: 'Search for files in a directory hierarchy', path: '/usr/bin/find',
-    completer: pathCompleter, run: (ctx) => cmdFind(ctx.args, ctx.cwd) },
+    completer: findCompleter, run: (ctx) => cmdFind(ctx.args, ctx.cwd) },
   { name: 'stat', category: 'fs', summary: 'Show file metadata',
     man: 'Display file or file system status', path: '/usr/bin/stat',
     completer: pathCompleter, run: (ctx) => cmdStat(ctx.args, ctx.cwd) },
@@ -175,26 +217,26 @@ const COMMAND_LIST = [
   { name: 'ping', category: 'util', summary: 'Ping a host',
     run: (ctx) => cmdPing(ctx.args) },
   { name: 'man', category: 'util', summary: 'Manual page',
-    man: 'Format and display manual pages', path: '/usr/bin/man',
+    man: 'Format and display manual pages', path: '/usr/bin/man', completer: commandCompleter,
     run: (ctx) => cmdMan(ctx.args, getCommand) },
   { name: 'which', category: 'util', summary: 'Locate command',
-    path: '/usr/bin/which',
+    path: '/usr/bin/which', completer: commandCompleter,
     run: (ctx) => cmdWhich(ctx.args, getCommand) },
   { name: 'print', category: 'util', summary: 'Open resume PDF for printing',
     run: () => cmdPrint() },
   { name: 'grep', aliases: ['egrep', 'fgrep'], category: 'util',
     summary: 'Search files for text  (-i -n -v -c)',
     man: 'Print lines that match patterns', path: '/usr/bin/grep',
-    completer: pathCompleter, run: (ctx) => cmdGrep(ctx.args, ctx.cwd) },
+    completer: grepCompleter, run: (ctx) => cmdGrep(ctx.args, ctx.cwd) },
   { name: 'wc', category: 'util', summary: 'Count lines / words / bytes  (-l -w -c)',
     man: 'Print newline, word, and byte counts', path: '/usr/bin/wc',
     completer: pathCompleter, run: (ctx) => cmdWc(ctx.args, ctx.cwd) },
   { name: 'head', category: 'util', summary: 'First lines of a file  (-n N)',
     man: 'Output the first part of files', path: '/usr/bin/head',
-    completer: pathCompleter, run: (ctx) => cmdHead(ctx.args, ctx.cwd) },
+    completer: headTailCompleter, run: (ctx) => cmdHead(ctx.args, ctx.cwd) },
   { name: 'tail', category: 'util', summary: 'Last lines of a file  (-n N)',
     man: 'Output the last part of files', path: '/usr/bin/tail',
-    completer: pathCompleter, run: (ctx) => cmdTail(ctx.args, ctx.cwd) },
+    completer: headTailCompleter, run: (ctx) => cmdTail(ctx.args, ctx.cwd) },
   { name: 'sort', category: 'util', summary: 'Sort file lines  (-r -u -f)',
     man: 'Sort lines of text files', path: '/usr/bin/sort',
     completer: pathCompleter, run: (ctx) => cmdSort(ctx.args, ctx.cwd) },
@@ -230,7 +272,7 @@ const COMMAND_LIST = [
     run: (ctx) => cmdId(ctx.name) },
   { name: 'less', aliases: ['more'], category: 'util', summary: 'Pager (use cat here)',
     man: 'Opposite of more', path: '/usr/bin/less',
-    completer: pathCompleter, run: (ctx) => cmdLess(ctx.args, ctx.name) },
+    completer: pathCompleter, run: (ctx) => cmdLess(ctx.args, ctx.name, ctx.cwd) },
   { name: 'yes', category: 'util', summary: 'Repeat a string (capped)',
     man: 'Output a string repeatedly until killed', path: '/usr/bin/yes',
     run: (ctx) => cmdYes(ctx.args) },
@@ -275,9 +317,22 @@ const COMMAND_LIST = [
     run: () => cmdAscii() },
   { name: 'hollywood', aliases: ['hacker'], category: 'fun', summary: 'Hack the mainframe',
     run: () => cmdHollywood() },
-  { name: 'claude', aliases: ['anthropic', 'ask'], category: 'fun', summary: 'Say hi to Claude (built this terminal)',
-    run: (ctx) => cmdClaude(ctx.args) },
 ];
+
+// Keep the editable metadata file and executable descriptors in exact parity.
+// A stale JSON-only entry (or a handler without metadata) should fail loudly at
+// startup instead of silently disappearing from help/completion.
+(() => {
+  const descriptorNames = COMMAND_LIST.map((command) => command.name);
+  const metadataNames = commandsData.map((command) => command.name);
+  const duplicateMetadataNames = metadataNames.filter((name, index) => metadataNames.indexOf(name) !== index);
+  const invalidIds = commandsData.filter((command) => command.id !== command.name);
+  if (duplicateMetadataNames.length || invalidIds.length
+      || descriptorNames.length !== metadataNames.length
+      || descriptorNames.some((name, index) => name !== metadataNames[index])) {
+    throw new Error('registry: commands.json must match COMMAND_LIST names, ids, and order');
+  }
+})();
 
 export const COMMANDS = COMMAND_LIST.map(mergeCommandMetadata);
 
@@ -320,3 +375,33 @@ export function getCommand(name) {
 export function visibleCommands() {
   return COMMANDS.filter((c) => !c.hidden);
 }
+
+export function validateTerminalConfig(config = terminal) {
+  const errors = [];
+  const quickSeen = new Set();
+  for (const name of config.quickCommands || []) {
+    const command = getCommand(name);
+    if (quickSeen.has(name)) errors.push(`duplicate quick command '${name}'`);
+    quickSeen.add(name);
+    if (!command) errors.push(`unknown quick command '${name}'`);
+    else if (command.hidden) errors.push(`hidden quick command '${name}'`);
+  }
+
+  const helpSeen = new Set();
+  for (const group of config.helpGroups || []) {
+    for (const name of group.commands || []) {
+      const command = getCommand(name);
+      if (helpSeen.has(name)) errors.push(`duplicate help command '${name}'`);
+      helpSeen.add(name);
+      if (!command) errors.push(`unknown help command '${name}'`);
+      else if (command.name !== name) errors.push(`help command '${name}' must use its canonical name`);
+      else if (command.hidden) errors.push(`hidden help command '${name}'`);
+      else if (!command.summary) errors.push(`help command '${name}' has no summary`);
+    }
+  }
+
+  if (errors.length) throw new Error(`terminal config: ${errors.join('; ')}`);
+  return true;
+}
+
+validateTerminalConfig();

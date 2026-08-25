@@ -1,13 +1,24 @@
 {
   "home": "/home/visitor",
-  "mtime": "Feb 22 10:30",
+  "mtime": "Aug 25 18:00",
+  "resumePdf": {
+    "filename": "Hongzhe_CV.pdf",
+    "source": "Hongzhe_CV.tex",
+    "aliases": [
+      "resume.pdf"
+    ],
+    "bytes": 40719,
+    "version": "1.5",
+    "pages": 2,
+    "mtime": "Aug 25 19:44",
+    "sha256": "879577ce17f3150b8776d651bfe61039c7f57ecce4019143b22bf8b1358bf7f1",
+    "sourceSha256": "a439b5311eeab6caffeff52ba56b075afeefa184da071ce9c9785eba443cdf1e"
+  },
   "files": {
     "about.txt": [
       "{name}",
       "{role}",
       "{education}",
-      "",
-      "\"{tagline}\"",
       "",
       "Type 'about' for the full profile card, or 'help' to explore.",
       ""
@@ -22,7 +33,6 @@
       "# ~/.profile — sourced at login",
       "export EDITOR=vim",
       "export PS1='visitor@hongzhe:\\w$ '",
-      "alias ll='ls -la'",
       "",
       "# tip: try 'neofetch', 'cowsay hello', or 'fortune'",
       ""
@@ -35,36 +45,30 @@
       "  {email}",
       ""
     ],
-    "projects/portfolio.md": [
-      "# Portfolio Terminal",
+    "projects/mobileid.md": [
+      "# MobileID",
       "",
-      "This site — a terminal/CLI-style resume.",
+      "Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions.",
       "",
-      "- **Stack:** React + Vite, hooks-first, zero runtime deps for the shell",
-      "- **Features:** virtual filesystem, tab completion, theming, 60+ commands",
-      "- **Deploy:** GitHub Pages + AWS Amplify",
+      "- **Dates:** 2025 - 2026",
+      "- **Stack:** Python, Django, Vue, PostgreSQL, DynamoDB, Docker, GitHub Actions",
+      "- **Security:** HTTP-only cookie JWTs, CSRF validation, refresh rotation and blacklisting, immediate session revocation, Argon2, credential-stuffing controls",
+      "- **Quality:** Bandit, Safety, Trivy, dependency audits, 70% Django coverage threshold, Playwright E2E, Docker/Vite build validation",
       "",
-      "Run `github` to see the source.",
+      "Repository: https://github.com/MacroXie04/MobileID",
       ""
     ],
-    "projects/backend.md": [
-      "# Django REST Backend",
+    "projects/tokenrouter.md": [
+      "# TokenRouter",
       "",
-      "Production web systems for UC Merced Innovate to Grow.",
+      "OpenAI-compatible LLM gateway with cross-provider protocol conversion and secure quota routing.",
       "",
-      "- **Stack:** Django 5, DRF, JWT auth (email login), DynamoDB + SQLite split",
-      "- **CMS:** block-based content, server-side bleach sanitization",
-      "- **Infra:** Docker, GitHub Actions CI/CD, AWS (EC2 · S3 · RDS)",
-      ""
-    ],
-    "projects/adk-agents.md": [
-      "# AI Agent Systems",
+      "- **Date:** 2026",
+      "- **Stack:** Go, React, OpenAI/Claude/Gemini APIs, GORM, Redis, Casbin, Docker",
+      "- **Routing:** priority and weighted selection, failure-aware retries, concurrency-safe token quota reservation and settlement",
+      "- **Security:** SSRF-safe outbound dialing, JWT rotation and replay detection, Casbin RBAC, WebAuthn/TOTP, step-up verification, rate limits, race-tested quota logic",
       "",
-      "Autonomous agents built on the Google Agent Development Kit (ADK).",
-      "",
-      "- **Design:** multi-agent workflows, shared context stores, tool use",
-      "- **LLM:** streaming, function calling, structured outputs",
-      "- **Quality:** automated evals and trace-level observability",
+      "Repository: https://github.com/MacroXie04/TokenRouter",
       ""
     ]
   },
@@ -82,11 +86,11 @@
         ".profile": "@file:.profile",
         ".secret": "@file:.secret",
         "projects": {
-          "portfolio.md": "@file:projects/portfolio.md:markdown",
-          "backend.md": "@file:projects/backend.md:markdown",
-          "adk-agents.md": "@file:projects/adk-agents.md:markdown"
+          "mobileid.md": "@file:projects/mobileid.md:markdown",
+          "tokenrouter.md": "@file:projects/tokenrouter.md:markdown"
         },
         "resume": {
+          "Hongzhe_CV.pdf": "@pdf",
           "resume.pdf": "@pdf"
         }
       }

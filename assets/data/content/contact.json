@@ -2,21 +2,19 @@
   "title": "Contact Information",
   "items": [
     {
-      "icon": "✉",
-      "text": "  ✉  xiehongzhe04@gmail.com",
-      "href": "mailto:xiehongzhe04@gmail.com",
+      "text": "  Email   index@hongzhexie.com",
+      "href": "mailto:index@hongzhexie.com",
       "type": "link"
     },
     {
-      "icon": "■",
-      "text": "  ■  github.com/MacroXie04",
+      "text": "  GitHub  github.com/MacroXie04",
       "href": "https://github.com/MacroXie04",
       "type": "link"
     },
     {
-      "icon": "☎",
-      "text": "  ☎  +1 (206) 333-8881",
-      "type": "text"
+      "text": "  Phone   +1 (206) 333-8881",
+      "href": "tel:+12063338881",
+      "type": "link"
     }
   ]
 }

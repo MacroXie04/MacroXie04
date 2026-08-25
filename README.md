@@ -9,4 +9,4 @@ Full-Stack & Cloud Engineer
 
 > Open to collaborating on identity, agents, and secure APIs.
 
-![Banner](assets/index.jpeg)
+![Banner](assets/images/index.jpeg)

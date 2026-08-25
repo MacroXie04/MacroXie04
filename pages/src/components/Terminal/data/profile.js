@@ -1,6 +1,6 @@
 export const PROFILE = {
   type: 'profile',
-  imgSrc: '/profile_img.jpeg',
+  imgSrc: '/images/profile_img.jpeg',
   name: 'Hongzhe Xie',
   role: 'Full Stack & Cloud Engineer',
   education: 'UC Merced · CS&E · Class of 2028',

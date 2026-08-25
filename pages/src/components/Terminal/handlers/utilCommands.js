@@ -1,6 +1,6 @@
 import { txt, html, escapeHtml } from './shared';
 
-const PDF_FILENAME = 'Hongzhe_CV_Feb2026.pdf';
+const PDF_FILENAME = 'resume/Hongzhe_CV_Feb2026.pdf';
 
 export function getPdfUrl() {
   return new URL(PDF_FILENAME, document.baseURI).href;

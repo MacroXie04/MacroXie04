@@ -364,6 +364,7 @@
 .t-profile-links {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 3px;
   margin-top: 8px;
   font-size: 13px;

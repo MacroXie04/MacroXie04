@@ -1,8 +1,6 @@
-import profileImg from '../../../assets/profile_img.jpeg';
-
 export const PROFILE = {
   type: 'profile',
-  imgSrc: profileImg,
+  imgSrc: '/profile_img.jpeg',
   name: 'Hongzhe Xie',
   role: 'Full Stack & Cloud Engineer',
   education: 'UC Merced · CS&E · Class of 2028',

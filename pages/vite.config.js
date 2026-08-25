@@ -9,6 +9,7 @@ export default defineConfig(() => {
   return {
   plugins: [react()],
   base: isGitHubPages ? '/MacroXie04/' : '/',
+  publicDir: '../assets',
   build: {
     outDir: 'build',
   },

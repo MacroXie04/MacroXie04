@@ -3,13 +3,13 @@
     "defaultText": "HELLO"
   },
   "lolcat": {
-    "defaultText": "Dream it. Chase it. Code it."
+    "defaultText": "Full-Stack Software Engineer"
   },
   "fortune": {
     "quotes": [
-      "Dream it. Chase it. Code it.",
+      "Secure by design. Reliable in production.",
       "A SELECT statement a day keeps the bugs away.",
-      "{pythonYears} years of Python and still reading the docs.",
+      "Python, Go, and TypeScript: pick the right tool for the job.",
       "Currently shipping: {expTitle} @ {expOrg}.",
       "There are 10 kinds of people: those who read binary and those who don't.",
       "git commit -m \"final FINAL v3 (for real this time)\"",
@@ -47,7 +47,7 @@
     "caption": "Wake up, Neo… (a static frame — type clear to dismiss)"
   },
   "weather": {
-    "title": "Weather report: Merced, CA",
+    "title": "Weather report: Davis, CA",
     "condition": "Sunny",
     "temp": "72 °F",
     "wind": "↗ 6 mph",
@@ -93,17 +93,7 @@
     "body": "The server refuses to brew {drink}, because it is — permanently — a teapot. ☕"
   },
   "ascii": {
-    "caption": "Hongzhe Xie · Full Stack & Cloud Engineer"
-  },
-  "claude": {
-    "title": "Claude — Anthropic's AI assistant.",
-    "subtitle": "This CLI portfolio was built with Claude Code.",
-    "hint": "Ask away:  claude <your question>",
-    "answer": [
-      "claude: Can't reach the API from a static portfolio — but for the record,",
-      "        this whole terminal (and its ~70 commands) was built with Claude Code. 🤖",
-      "        For the real thing, visit claude.ai."
-    ]
+    "caption": "Hongzhe Xie · Full-Stack Software Engineer"
   },
   "hollywood": {
     "lines": [

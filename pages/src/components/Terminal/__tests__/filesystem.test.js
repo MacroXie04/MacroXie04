@@ -1,5 +1,6 @@
 import {
-  HOME, ROOT, resolvePath, getNode, listDir, readFile, stat, walk, isDir, isFile,
+  HOME, ROOT, resolvePath, getNode, listDir, readFile, rawSize, utf8Size,
+  stat, walk, completeChildren, isDir, isFile,
 } from '../data/filesystem';
 
 describe('resolvePath', () => {
@@ -39,6 +40,8 @@ describe('getNode', () => {
     expect(isDir(getNode(HOME))).toBe(true);
     expect(isFile(getNode('/home/visitor/README.md'))).toBe(true);
     expect(isDir(getNode('/home/visitor/projects'))).toBe(true);
+    expect(isFile(getNode('/home/visitor/resume/Hongzhe_CV.pdf'))).toBe(true);
+    expect(isFile(getNode('/home/visitor/resume/resume.pdf'))).toBe(true);
   });
 
   test('missing paths return null', () => {
@@ -49,6 +52,19 @@ describe('getNode', () => {
   test('segment match is case-insensitive', () => {
     expect(getNode('/home/visitor/readme.md')).toBe(getNode('/home/visitor/README.md'));
     expect(getNode('/home/visitor/EXPERIENCE.PY')).toBe(getNode('/home/visitor/experience.py'));
+  });
+});
+
+describe('completeChildren', () => {
+  test('can restrict results to directories without changing the default', () => {
+    expect(completeChildren(HOME, '')).toContain('README.md');
+    expect(completeChildren(HOME, '', { directoriesOnly: true })).toEqual(['projects/', 'resume/']);
+  });
+
+  test('can include hidden entries explicitly', () => {
+    expect(completeChildren(HOME, '')).not.toContain('.profile');
+    expect(completeChildren(HOME, '', { all: true })).toContain('.profile');
+    expect(completeChildren(HOME, '.')).toContain('.profile');
   });
 });
 
@@ -83,15 +99,27 @@ describe('readFile / stat / walk', () => {
     const s = stat(HOME);
     expect(s.type).toBe('dir');
     expect(s.perm).toBe('drwxr-xr-x');
-    const f = stat('/home/visitor/resume/resume.pdf');
+    const f = stat('/home/visitor/resume/Hongzhe_CV.pdf');
     expect(f.type).toBe('file');
     expect(f.pdf).toBe(true);
+    expect(f.bytes).toBe(40719);
+    expect(f.pdfVersion).toBe('1.5');
+    expect(f.pages).toBe(2);
+    expect(stat('/home/visitor/resume/resume.pdf')).toEqual(expect.objectContaining({ bytes: 40719 }));
+  });
+
+  test('text sizes are UTF-8 bytes, not UTF-16 code units', () => {
+    expect(utf8Size('ASCII')).toBe(5);
+    expect(utf8Size('🎉')).toBe(4);
+    expect(rawSize(getNode('/home/visitor/.secret'))).toBe(166);
   });
 
   test('walk yields the subtree', () => {
     const paths = walk(HOME).map(([p]) => p);
     expect(paths).toContain(HOME);
-    expect(paths).toContain('/home/visitor/projects/portfolio.md');
+    expect(paths).toContain('/home/visitor/projects/mobileid.md');
+    expect(paths).toContain('/home/visitor/projects/tokenrouter.md');
+    expect(paths).toContain('/home/visitor/resume/Hongzhe_CV.pdf');
     expect(paths).toContain('/home/visitor/.secret');
   });
 });

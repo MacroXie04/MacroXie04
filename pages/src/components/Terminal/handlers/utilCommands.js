@@ -1,9 +1,12 @@
 import { txt, html, escapeHtml } from './shared';
+import { pdfBinaryError } from './fsCommands';
+import { HOME, resolvePath, getNode, isDir } from '../data/filesystem';
 
-const PDF_FILENAME = 'resume/Hongzhe_CV_Feb2026.pdf';
+const PDF_PATH = 'resume/Hongzhe_CV.pdf';
+const PDF_DOWNLOAD_FILENAME = 'Hongzhe_CV.pdf';
 
 export function getPdfUrl() {
-  return new URL(PDF_FILENAME, document.baseURI).href;
+  return new URL(PDF_PATH, document.baseURI).href;
 }
 
 export function cmdPrint() {
@@ -16,8 +19,8 @@ export function cmdPrint() {
 export function cmdDownloadCv() {
   return {
     downloadUrl: getPdfUrl(),
-    downloadFilename: PDF_FILENAME,
-    output: [txt(''), txt(`Downloading ${PDF_FILENAME}...`, 't-green'), txt('')],
+    downloadFilename: PDF_DOWNLOAD_FILENAME,
+    output: [txt(''), txt(`Downloading ${PDF_DOWNLOAD_FILENAME}...`, 't-green'), txt('')],
   };
 }
 
@@ -280,7 +283,7 @@ export function cmdSeq(args = []) {
 export function cmdExpr(args = []) {
   if (args.length < 3) return { output: [txt(''), txt('Usage: expr N op N', 't-error'), txt('')] };
   const a = Number(args[0]); const op = args[1]; const b = Number(args[2]);
-  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+  if (!Number.isInteger(a) || !Number.isInteger(b)) {
     return { output: [txt(''), txt('expr: non-integer argument', 't-error'), txt('')] };
   }
   let r;
@@ -353,7 +356,7 @@ export function cmdEnv(cwd = '/home/visitor') {
   const vars = [
     'USER=visitor', 'HOME=/home/visitor', 'SHELL=/bin/hsh', 'TERM=xterm-256color',
     'PATH=/usr/local/bin:/usr/bin:/bin', 'LANG=en_US.UTF-8', 'EDITOR=vim',
-    `PWD=${cwd}`, 'HOSTNAME=hongzhe.dev', 'ROLE=Full Stack & Cloud Engineer',
+    `PWD=${cwd}`, 'HOSTNAME=hongzhe.dev', 'ROLE=Full-Stack Software Engineer',
   ];
   return { output: [txt(''), ...vars.map((v) => txt(v, 't-dim')), txt('')] };
 }
@@ -378,12 +381,33 @@ export function cmdId(name = 'id') {
   return { output: [txt(''), txt('uid=1000(visitor) gid=1000(staff) groups=1000(staff),100(visitors)', 't-dim'), txt('')] };
 }
 
-export function cmdLess(args = [], name = 'less') {
+export function cmdLess(args = [], name = 'less', cwd = HOME) {
   const f = args.find((a) => !a.startsWith('-'));
+  if (!f) {
+    return { output: [txt(''), txt(`Usage: ${name} FILE`, 't-error'), txt('')] };
+  }
+
+  const node = getNode(resolvePath(cwd, f));
+  if (!node) {
+    return { output: [txt(''), txt(`${name}: ${f}: No such file or directory`, 't-error'), txt('')] };
+  }
+  if (isDir(node)) {
+    return { output: [txt(''), txt(`${name}: ${f}: Is a directory`, 't-error'), txt('')] };
+  }
+  if (node.pdf) {
+    return {
+      output: [
+        txt(''),
+        pdfBinaryError(name, f),
+        txt(''),
+      ],
+    };
+  }
+
   return {
     output: [
       txt(''),
-      txt(`${name}: paging isn't available here — use 'cat${f ? ' ' + f : ''}' (or head/tail).`, 't-dim'),
+      txt(`${name}: paging isn't available here — use 'cat ${f}', 'head ${f}', or 'tail ${f}'.`, 't-dim'),
       txt(''),
     ],
   };

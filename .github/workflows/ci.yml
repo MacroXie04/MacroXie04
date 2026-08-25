@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: pages/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify resume artifact
+        run: npm run verify:resume
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci -- --runInBand
+
+      - name: Build
+        run: npm run build

@@ -19,16 +19,8 @@ export function handleSudo(parts) {
     return {
       output: [
         txt(''),
-        txt('usage: sudo -h | -K | -k | -V', 't-dim'),
-        txt('usage: sudo -v [-ABkNnS] [-g group] [-h host] [-p prompt] [-u user]', 't-dim'),
-        txt('usage: sudo -l [-ABkNnS] [-g group] [-h host] [-p prompt] [-U user]', 't-dim'),
-        txt('            [-u user] [command [arg ...]]', 't-dim'),
-        txt('usage: sudo [-ABbEHkNnPS] [-C num] [-D directory]', 't-dim'),
-        txt('            [-g group] [-h host] [-p prompt] [-R directory] [-T timeout]', 't-dim'),
-        txt('            [-u user] [VAR=value] [-i | -s] [command [arg ...]]', 't-dim'),
-        txt('usage: sudo -e [-ABkNnS] [-C num] [-D directory]', 't-dim'),
-        txt('            [-g group] [-h host] [-p prompt] [-R directory] [-T timeout]', 't-dim'),
-        txt('            [-u user] file ...', 't-dim'),
+        txt('sudo: administrative access is disabled in this portfolio.', 't-error'),
+        txt('Try: sudo make me a sandwich', 't-dim'),
         txt(''),
       ],
     };

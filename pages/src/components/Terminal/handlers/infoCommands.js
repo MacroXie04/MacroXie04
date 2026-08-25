@@ -9,14 +9,14 @@ import terminal from '@assets/data/terminal/terminal.json';
 import ui from '@assets/data/ui.json';
 import fun from '@assets/data/terminal/fun.json';
 
-const HELP_SECTIONS = terminal.helpSections;
+const HELP_GROUPS = terminal.helpGroups;
 
 // Derived entirely from the registry. `commands` is the visible descriptor list;
 // when `query`/`lookup` are given, show one command's detail (help <cmd>).
 export function cmdHelp(commands = [], query = null, lookup = null) {
   if (query) {
     const d = lookup ? lookup(query) : null;
-    if (!d) {
+    if (!d || d.hidden) {
       return { output: [txt(''), txt(`help: no command '${query}'`, 't-error'), txt('')] };
     }
     const out = [
@@ -31,12 +31,14 @@ export function cmdHelp(commands = [], query = null, lookup = null) {
   }
 
   const out = [txt('')];
-  for (const [cat, label] of HELP_SECTIONS) {
-    const inCat = commands.filter((c) => c.category === cat && c.summary);
-    if (!inCat.length) continue;
-    out.push(txt(label, 't-title'));
+  for (const group of HELP_GROUPS) {
+    const entries = group.commands
+      .map(name => commands.find(command => command.name === name))
+      .filter(command => command?.summary);
+    if (!entries.length) continue;
+    out.push(txt(group.label, 't-title'));
     out.push(txt(''));
-    for (const c of inCat) {
+    for (const c of entries) {
       const names = [c.name, ...(c.aliases || [])].join(', ');
       out.push(txt('  ' + names.padEnd(24) + c.summary, 't-dim'));
     }
@@ -52,21 +54,25 @@ export function cmdAbout() {
 }
 
 export function cmdExperience() {
-  return {
-    output: [
-      txt(''),
-      txt(ui.headings.experience, 't-title'),
-      txt(''),
-      ...EXPERIENCE_ITEMS.flatMap((item, i) => [
-        txt(`  ${item.title}`, 't-green'),
-        txt(`  @ ${item.org}`, 't-blue'),
-        txt(''),
-        txt(`  ${item.desc}`, 't-dim'),
-        ...(i < EXPERIENCE_ITEMS.length - 1 ? [txt('')] : []),
-      ]),
-      txt(''),
-    ],
-  };
+  const out = [txt('')];
+  let activeGroup = null;
+
+  EXPERIENCE_ITEMS.forEach((item) => {
+    if (item.group !== activeGroup) {
+      if (activeGroup !== null) out.push(txt(''));
+      activeGroup = item.group;
+      out.push(txt(activeGroup, 't-title'), txt(''));
+    }
+
+    out.push(txt(`  ${item.title}`, 't-green'));
+    out.push(txt(`  @ ${item.org}`, 't-blue'));
+    out.push(txt(`  ${item.date} · ${item.location}`, 't-dim'));
+    out.push(txt(''));
+    item.highlights.forEach((highlight) => out.push(txt(`    - ${highlight}`, 't-dim')));
+    out.push(txt(''));
+  });
+
+  return { output: out };
 }
 
 export function cmdSkills() {
@@ -77,13 +83,7 @@ export function cmdSkills() {
       txt(''),
       ...SKILL_GROUPS.flatMap(group => [
         txt(`  ${group.category.toUpperCase()}`, 't-green'),
-        txt(`  ${group.description}`, 't-dim'),
-        txt('  ' + '─'.repeat(48), 't-dim'),
-        ...group.skills.map(({ name, proficiency, years }) => {
-          const bar = '█'.repeat(proficiency) + '░'.repeat(10 - proficiency);
-          const label = name.padEnd(34);
-          return txt(`    › ${label}  ${bar}  ${proficiency}/10  ${years}yr`, 't-dim');
-        }),
+        txt(`    ${group.skills.map(({ name }) => name).join(' · ')}`, 't-dim'),
         txt(''),
       ]),
     ],
@@ -111,7 +111,7 @@ export function cmdContact() {
   const out = [txt(''), txt(contact.title, 't-title'), txt('')];
   for (const item of contact.items) {
     if (item.type === 'link') {
-      out.push({ type: 'link', text: item.text, href: item.href });
+      out.push({ type: 'link', text: item.text, href: item.href, cls: 't-contact-link' });
     } else {
       out.push(txt(item.text, 't-dim'));
     }
@@ -139,14 +139,14 @@ export function cmdProjects(args = []) {
     const out = [
       txt(''),
       txt(`  ${p.name}`, 't-title'),
-      txt(`  ${p.role} · ${p.date} · ${p.status}`, 't-dim'),
+      txt(`  ${p.date}`, 't-dim'),
       txt(''),
       txt(`  ${p.desc}`, 't-dim'),
+      ...p.highlights.map((highlight) => txt(`    - ${highlight}`, 't-dim')),
       txt(''),
       txt(`  Tech: ${p.tech.join(' · ')}`, 't-green'),
     ];
     if (p.repo) out.push({ type: 'link', text: `  repo: ${p.repo}`, href: p.repo });
-    if (p.demo) out.push({ type: 'link', text: `  demo: ${p.demo}`, href: p.demo });
     out.push(txt(''));
     return { output: out };
   }
@@ -154,10 +154,9 @@ export function cmdProjects(args = []) {
   const out = [txt(''), txt(ui.headings.projects, 't-title'), txt('')];
   PROJECTS.forEach((p) => {
     out.push(txt(`  ${p.name}  (${p.slug})`, 't-green'));
-    out.push(txt(`    ${p.tech.join(' · ')}`, 't-blue'));
+    out.push(txt(`    ${p.date} · ${p.tech.join(' · ')}`, 't-blue'));
     out.push(txt(`    ${p.desc}`, 't-dim'));
     if (showLinks && p.repo) out.push({ type: 'link', text: `    ${p.repo}`, href: p.repo });
-    if (p.demo) out.push({ type: 'link', text: `    ${p.demo}`, href: p.demo });
     out.push(txt(''));
   });
   out.push(txt(ui.tips.projects, 't-dim'));
@@ -165,32 +164,16 @@ export function cmdProjects(args = []) {
   return { output: out };
 }
 
-export function cmdEducation(args = []) {
-  const verbose = args.includes('-v') || args.includes('--verbose');
-  const courses = args.includes('--courses');
-  const out = [
+export function cmdEducation() {
+  return { output: [
     txt(''),
     txt(ui.headings.education, 't-title'),
     txt(''),
     txt(`  ${education.school}`, 't-green'),
-    txt(`  ${education.degree}`, 't-blue'),
-    txt(`  ${education.class}`, 't-dim'),
+    txt(`  ${education.expected}`, 't-blue'),
+    txt(`  ${education.location}`, 't-dim'),
     txt(''),
-  ];
-  if (verbose) {
-    out.push(txt(`  Focus: ${education.focus}`, 't-dim'));
-    out.push(txt(''));
-  }
-  if (courses) {
-    out.push(txt(`  ${ui.headings.coursework}`, 't-dim'));
-    education.courses.forEach((c) => out.push(txt(`    › ${c}`, 't-dim')));
-    out.push(txt(''));
-  }
-  if (!verbose && !courses) {
-    out.push(txt(ui.tips.education, 't-dim'));
-    out.push(txt(''));
-  }
-  return { output: out };
+  ] };
 }
 
 export function cmdStack(args = []) {

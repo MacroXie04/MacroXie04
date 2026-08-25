@@ -82,7 +82,7 @@
   color: var(--t-text);
   font-family: var(--t-font);
   font-size: 17px;
-  line-height: 1.2;
+  line-height: 1.1;
   overflow: hidden;
   cursor: text;
 }
@@ -122,7 +122,7 @@
 .t-dot-green  { background: #28CA41; }
 
 .t-titlebar-title {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--t-dim);
   letter-spacing: 0.02em;
   flex: 1;
@@ -135,7 +135,7 @@
   border: 1px solid var(--t-border);
   color: var(--t-dim);
   font-family: var(--t-font);
-  font-size: 13px;
+  font-size: 14px;
   padding: 0 12px;
   height: 34px;
   border-radius: 6px;
@@ -270,9 +270,13 @@
 
 .t-line {
   padding: 0;
-  min-height: 1.2em;
+  min-height: 1.1em;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.t-line:empty {
+  min-height: 0.45em;
 }
 
 /* Text color helpers */
@@ -303,6 +307,11 @@
 .t-link:hover {
   color: var(--t-green);
   border-color: var(--t-green);
+}
+
+.t-contact-link {
+  color: var(--t-dim);
+  border-bottom: none;
 }
 
 /* ============================================================
@@ -438,10 +447,205 @@
 }
 
 .t-quick-btn:hover,
-.t-quick-btn:active {
+.t-quick-btn:active,
+.t-icp-trigger:focus-visible {
   color: var(--t-green);
   border-color: var(--t-green);
   background: color-mix(in srgb, var(--t-green) 7%, transparent);
+}
+
+.t-icp-trigger {
+  margin-left: auto;
+  gap: 8px;
+}
+
+.t-icp-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.t-icp-trigger:focus-visible {
+  outline: 1px solid var(--t-green);
+  outline-offset: 4px;
+}
+
+/* ============================================================
+   ICP Information Dialog
+   ============================================================ */
+.t-icp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgb(0 0 0 / 72%);
+  backdrop-filter: blur(4px);
+  cursor: default;
+  animation: t-icp-overlay-in 0.16s ease-out;
+}
+
+.t-icp-dialog {
+  position: relative;
+  width: min(100%, 580px);
+  max-height: calc(100dvh - 48px);
+  padding: 28px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--t-text);
+  background: var(--t-bg-card);
+  border: 1px solid color-mix(in srgb, var(--t-green) 55%, var(--t-border));
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 55%);
+  cursor: default;
+  animation: t-icp-dialog-in 0.18s ease-out;
+}
+
+.t-icp-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--t-dim);
+  font-family: var(--t-font);
+  font-size: 22px;
+  line-height: 1;
+  background: transparent;
+  border: 1px solid var(--t-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.t-icp-close:hover {
+  color: var(--t-green);
+  border-color: var(--t-green);
+}
+
+.t-icp-close:focus-visible {
+  color: var(--t-green);
+  border-color: var(--t-green);
+  outline: 2px solid var(--t-green);
+  outline-offset: 2px;
+}
+
+.t-icp-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 44px;
+}
+
+.t-icp-dialog-logo-wrap {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  background: #FFFFFF;
+  border: 1px solid var(--t-border);
+  border-radius: 9px;
+}
+
+.t-icp-dialog-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.t-icp-eyebrow {
+  margin-bottom: 4px;
+  color: var(--t-green);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+.t-icp-dialog h2 {
+  margin: 0;
+  color: var(--t-text);
+  font-family: var(--t-font);
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.t-icp-details {
+  margin: 24px 0 0;
+  background: color-mix(in srgb, var(--t-bg) 60%, transparent);
+  border: 1px solid var(--t-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.t-icp-detail-row {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+}
+
+.t-icp-detail-row + .t-icp-detail-row {
+  border-top: 1px solid var(--t-border);
+}
+
+.t-icp-detail-row dt {
+  color: var(--t-dim);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.t-icp-detail-row dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--t-text);
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+
+.t-icp-detail-row .t-icp-record {
+  color: var(--t-green);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.t-icp-record-link,
+.t-icp-record-link:visited {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--t-green) 55%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.t-icp-record-link:hover {
+  color: var(--t-text);
+  text-decoration-color: currentColor;
+}
+
+.t-icp-record-link:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--t-green);
+  outline-offset: 3px;
+}
+
+@keyframes t-icp-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes t-icp-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ============================================================
@@ -534,7 +738,7 @@
   }
 
   .t-titlebar-title {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .t-output {
@@ -576,12 +780,51 @@
   .t-settings-btn {
     height: 40px;
     padding: 0 12px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .t-settings-panel {
     right: 8px;
     min-width: calc(100vw - 16px);
+  }
+
+  .t-icp-overlay {
+    padding: 12px;
+  }
+
+  .t-icp-dialog {
+    max-height: calc(100dvh - 24px);
+    padding: 22px 16px 18px;
+  }
+
+  .t-icp-detail-row {
+    gap: 6px;
+    padding: 12px 14px;
+  }
+
+  .t-icp-dialog-header {
+    gap: 12px;
+  }
+
+  .t-icp-dialog-logo-wrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .t-icp-dialog-logo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .t-icp-dialog h2 {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-icp-overlay,
+  .t-icp-dialog {
+    animation: none;
   }
 }
 

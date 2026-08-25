@@ -1,12 +1,28 @@
-# Hi, I'm Hongzhe
+# Hi, I'm Hongzhe Xie
 
-**Dream it. Chase it. Code it.**
+Full-Stack Software Engineer focused on secure web platforms, identity systems, AI agents, and cloud delivery.
 
-Full-Stack & Cloud Engineer
+## Education
 
-- Pages: https://macroxie04.github.io/MacroXie04/
-- LinkedIn: https://www.linkedin.com/in/hongzhexie/
+University of California, Davis — Expected May 2028
 
-> Open to collaborating on identity, agents, and secure APIs.
+## Selected Projects
+
+- [MobileID](https://github.com/MacroXie04/MobileID) — Django/Vue identity platform with PDF417 barcodes and defense-in-depth authentication
+- [TokenRouter](https://github.com/MacroXie04/TokenRouter) — OpenAI-compatible multi-provider LLM gateway with secure routing and quota controls
+
+## Technical Focus
+
+- Python, C/C++, Go, TypeScript/JavaScript, and SQL
+- Django/DRF, React, Vue.js, PostgreSQL, Redis, and DynamoDB
+- WebAuthn/FIDO2, TOTP/MFA, JWT/OAuth, RBAC/Casbin, and application security
+- Google ADK, Gemini, Amazon Bedrock, and structured tool calling
+- AWS ECS Fargate, Amplify, Docker, Nginx, GitHub Actions, and CI/CD
+
+## Contact
+
+- Email: [index@hongzhexie.com](mailto:index@hongzhexie.com)
+- GitHub: [github.com/MacroXie04](https://github.com/MacroXie04)
+- Phone: [+1 (206) 333-8881](tel:+12063338881)
 
 ![Banner](assets/images/index.jpeg)

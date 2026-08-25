@@ -9,11 +9,11 @@
 // excluded from coverage collection.
 //
 // Tree structure and authored file contents are editable in
-// assets/data/filesystem.json. Node spec strings:
+// assets/data/terminal/filesystem.json. Node spec strings:
 //   "@motd"                    → /etc/motd content from terminal.json motd
 //   "@section:<key>:<lang>"    → ref to data/sections/<key> (readme/experience/skills)
 //   "@file:<key>[:<lang>]"     → content from filesystem.json files[key]
-//   "@pdf"                     → empty file with the pdf flag (resume.pdf)
+//   "@pdf"                     → resume PDF metadata from resumePdf
 // `{name}` / `{email}` / ... placeholders in file contents are filled from PROFILE.
 // ============================================================================
 
@@ -26,6 +26,7 @@ import { PROFILE } from './profile';
 
 export const HOME = filesystem.home;
 const MTIME = filesystem.mtime;
+const RESUME_PDF = filesystem.resumePdf || {};
 
 const SECTIONS = { readme, experience, skills };
 
@@ -45,7 +46,16 @@ function build(name, spec) {
     return dir(name, children);
   }
   const s = String(spec);
-  if (s === '@pdf') return file(name, null, '', { pdf: true });
+  if (s === '@pdf') {
+    return file(name, null, '', {
+      pdf: true,
+      bytes: RESUME_PDF.bytes,
+      pdfVersion: RESUME_PDF.version,
+      pages: RESUME_PDF.pages,
+      mtime: RESUME_PDF.mtime,
+      downloadName: RESUME_PDF.filename,
+    });
+  }
   if (s === '@motd') return file(name, null, terminal.motd.join('\n'));
   if (s.startsWith('@section:')) {
     const [, key, lang] = s.split(':');
@@ -126,10 +136,22 @@ export function listDir(node, opts = {}) {
   return children.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+// Count the bytes a string occupies when encoded as UTF-8. String#length
+// counts UTF-16 code units, which under-reports emoji and most non-ASCII text.
+export function utf8Size(value) {
+  let bytes = 0;
+  for (const char of String(value ?? '')) {
+    const cp = char.codePointAt(0);
+    bytes += cp <= 0x7f ? 1 : cp <= 0x7ff ? 2 : cp <= 0xffff ? 3 : 4;
+  }
+  return bytes;
+}
+
 export function rawSize(node) {
   if (!node) return 0;
   if (node.type === 'dir') return Object.keys(node.children).length * 64 + 64;
-  return fileContent(node).length;
+  if (Number.isFinite(node.bytes)) return node.bytes;
+  return utf8Size(fileContent(node));
 }
 
 export function humanSize(bytes) {
@@ -150,6 +172,8 @@ export function stat(absPath) {
     mtime: node.mtime || MTIME,
     lang: node.lang || null,
     pdf: !!node.pdf,
+    pdfVersion: node.pdfVersion || null,
+    pages: Number.isFinite(node.pages) ? node.pages : null,
   };
 }
 
@@ -177,8 +201,12 @@ export function walk(absPath) {
 
 // Candidate names for tab-completion of a path argument, given the current cwd
 // and the directory portion the user has typed so far (e.g. 'projects/').
-export function completeChildren(cwd, dirPart) {
+export function completeChildren(cwd, dirPart, opts = {}) {
   const node = getNode(resolvePath(cwd, dirPart || '.'));
   if (!isDir(node)) return [];
-  return listDir(node, {}).map((n) => (isDir(n) ? n.name + '/' : n.name));
+  const lastDirSegment = splitPath(dirPart).slice(-1)[0] || '';
+  const includeHidden = !!opts.all || lastDirSegment.startsWith('.');
+  return listDir(node, { all: includeHidden })
+    .filter((n) => !opts.directoriesOnly || isDir(n))
+    .map((n) => (isDir(n) ? n.name + '/' : n.name));
 }

@@ -16,6 +16,8 @@ test('extract commands', () => {
     if (cmd.completer?.name) out.completer = cmd.completer.name;
     return out;
   });
+  // This test is also a machine-readable registry export consumed by tooling.
+  // eslint-disable-next-line no-console
   console.log('__JSON_START__' + JSON.stringify(meta) + '__JSON_END__');
   expect(true).toBe(true);
 });

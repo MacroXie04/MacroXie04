@@ -9,21 +9,27 @@
       "fontSize": "Font Size",
       "background": "Background",
       "accentColor": "Accent Color"
+    },
+    "icp": {
+      "label": "京ICP备2026040481号",
+      "url": "https://beian.miit.gov.cn/",
+      "dialogTitle": "ICP Filing Information",
+      "recordLabel": "Filing Number",
+      "queryLabel": "Query Website",
+      "systemName": "MIIT ICP/IP Address/Domain Name Filing Management System",
+      "closeLabel": "Close ICP filing information dialog"
     }
   },
   "headings": {
-    "experience": "Work Experience",
     "skills": "Technical Skills",
-    "projects": "Projects",
+    "projects": "Selected Projects",
     "education": "Education",
-    "coursework": "Selected coursework:",
-    "stack": "Toolbox"
+    "stack": "Technology Stack"
   },
   "tips": {
-    "helpFooter": "Tab completes commands and paths · 'man <cmd>' for details · 'help <cmd>' for one command",
+    "helpFooter": "Type 'help <command>' for details.",
     "projects": "Tip: 'projects <name>' for detail, 'projects --links' for clickable links.",
-    "education": "Tip: 'education -v' for focus, 'education --courses' for coursework.",
-    "stack": "Tip: 'stack --flat' for a one-line view, or 'skills' for proficiency bars."
+    "stack": "Tip: 'stack --flat' for a one-line view."
   },
   "cms": {
     "error": "Something went wrong loading this page.",

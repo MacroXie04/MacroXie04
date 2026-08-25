@@ -36,6 +36,10 @@ describe('VFS-backed text utilities', () => {
     expect(r.output.some((l) => /\d+\s+\d+\s+\d+ experience\.py/.test(l.text || ''))).toBe(true);
   });
 
+  test('wc -c counts UTF-8 bytes', () => {
+    expect(texts(run('wc -c .secret'))).toMatch(/166 \.secret/);
+  });
+
   test('head -n 3 returns 3 content lines plus padding', () => {
     const r = run('head -n 3 README.md');
     // [blank, 3 lines, blank]
@@ -50,13 +54,21 @@ describe('VFS-backed text utilities', () => {
   test('tree walks the real VFS (shows projects/ and a nested file)', () => {
     const body = texts(run('tree'));
     expect(body).toContain('projects/');
-    expect(body).toContain('portfolio.md');
+    expect(body).toContain('mobileid.md');
+    expect(body).toContain('tokenrouter.md');
   });
 
   test('find -name matches by glob', () => {
     const body = texts(run('find -name *.md'));
     expect(body).toContain('/home/visitor/README.md');
-    expect(body).toContain('/home/visitor/projects/portfolio.md');
+    expect(body).toContain('/home/visitor/projects/mobileid.md');
+    expect(body).toContain('/home/visitor/projects/tokenrouter.md');
+  });
+
+  test('find validates missing and invalid filter arguments', () => {
+    expect(texts(run('find . -name'))).toContain("missing argument to '-name'");
+    expect(texts(run('find . -type'))).toContain("missing argument to '-type'");
+    expect(texts(run('find . -type x'))).toContain("invalid argument 'x'");
   });
 
   test('stat reports metadata', () => {
@@ -65,8 +77,46 @@ describe('VFS-backed text utilities', () => {
   });
 
   test('file identifies type by language', () => {
-    expect(texts(run('file experience.py'))).toContain('Python');
-    expect(texts(run('file resume/resume.pdf'))).toContain('PDF');
+    const python = texts(run('file experience.py'));
+    expect(python).toContain('Python source');
+    expect(python).not.toContain('executable');
+    expect(texts(run('file .secret'))).toContain('Unicode text, UTF-8');
+    expect(texts(run('file resume/Hongzhe_CV.pdf'))).toContain('PDF document, version 1.5, 2 pages');
+  });
+
+  test('cat on the resume PDF points to executable download commands', () => {
+    const body = texts(run('cat resume/Hongzhe_CV.pdf'));
+    expect(body).toContain('`cv`');
+    expect(body).toContain('`download resume`');
+    expect(texts(run('cat resume/resume.pdf'))).toContain('binary PDF');
+  });
+
+  test('resume PDF metadata is consistent across ls/stat/file', () => {
+    expect(texts(run('ls -l resume'))).toContain('39.8K');
+    const metadata = texts(run('stat resume/Hongzhe_CV.pdf'));
+    expect(metadata).toContain('Size: 40719');
+    expect(metadata).toContain('Blocks: 80');
+    expect(metadata).toContain('PDF document, 2 pages');
+  });
+
+  test.each([
+    'grep PDF resume/Hongzhe_CV.pdf',
+    'wc resume/Hongzhe_CV.pdf',
+    'head resume/Hongzhe_CV.pdf',
+    'tail resume/Hongzhe_CV.pdf',
+    'sort resume/Hongzhe_CV.pdf',
+    'uniq resume/Hongzhe_CV.pdf',
+    'diff resume/Hongzhe_CV.pdf README.md',
+  ])('%s rejects binary PDF content with the download hint', command => {
+    const body = texts(run(command));
+    expect(body).toContain('binary PDF');
+    expect(body).toContain('`cv`');
+  });
+
+  test('the virtual profile only advertises commands that actually run', () => {
+    const body = texts(run('cat .profile'));
+    expect(body).not.toContain("alias ll='ls -la'");
+    expect(body).toContain("try 'neofetch', 'cowsay hello', or 'fortune'");
   });
 });
 
@@ -101,26 +151,58 @@ describe('fun commands', () => {
 });
 
 describe('content commands', () => {
+  test('about reflects the current role, education, and email', () => {
+    const profile = run('about').output.find((item) => item.type === 'profile');
+    expect(profile).toEqual(expect.objectContaining({
+      role: 'Full-Stack Software Engineer',
+      education: 'UC Davis · Expected May 2028',
+      email: 'index@hongzhexie.com',
+    }));
+  });
   test('projects lists all with slugs', () => {
     const body = texts(run('projects'));
-    expect(body).toContain('Portfolio Terminal');
-    expect(body).toContain('(backend)');
+    expect(body).toContain('MobileID');
+    expect(body).toContain('(tokenrouter)');
   });
   test('projects <slug> shows detail with a clickable repo link', () => {
-    const r = run('projects portfolio');
-    expect(texts(r)).toContain('Portfolio Terminal');
+    const r = run('projects mobileid');
+    expect(texts(r)).toContain('PDF417 barcode generation');
     expect(r.output.some((l) => l.type === 'link')).toBe(true);
   });
-  test('projects work/portfolio aliases resolve', () => {
-    expect(run('work')).toEqual(run('projects'));
+  test('projects portfolio alias resolves', () => {
+    expect(run('portfolio')).toEqual(run('projects'));
   });
-  test('education --courses lists coursework', () => {
-    expect(texts(run('education --courses'))).toContain('Operating Systems');
+  test('education reflects the current resume', () => {
+    const body = texts(run('education'));
+    expect(body).toContain('University of California, Davis');
+    expect(body).toContain('Expected May 2028');
+  });
+  test('experience includes work and professional development', () => {
+    const body = texts(run('experience'));
+    expect(body).toContain('Computer Vision / AI Engineering Intern');
+    expect(body).toContain('Professional Development');
+    expect(body).toContain('Google Cloud Next 2026');
+  });
+  test('skills come from resume categories without invented ratings', () => {
+    const body = texts(run('skills'));
+    expect(body).toContain('APPLICATION & IDENTITY SECURITY');
+    expect(body).toContain('WebAuthn/FIDO2');
+    expect(body).not.toContain('/10');
   });
   test('stack --flat is a single line', () => {
     const r = run('stack --flat');
     expect(r.output.length).toBe(3);
     expect(texts(r)).toContain('Python');
+  });
+  test('cv downloads the current stable resume filename', () => {
+    const r = run('cv');
+    expect(r.downloadUrl).toContain('/resume/Hongzhe_CV.pdf');
+    expect(r.downloadFilename).toBe('Hongzhe_CV.pdf');
+  });
+  test('hidden download command accepts explicit resume targets', () => {
+    expect(run('download resume')).toEqual(run('cv'));
+    expect(run('download resume.pdf')).toEqual(run('cv'));
+    expect(texts(run('download'))).toContain('Usage: download');
   });
 });
 
@@ -134,6 +216,7 @@ describe('phase-7 deterministic utilities', () => {
     expect(texts(run('expr 6 + 7'))).toContain('13');
     expect(texts(run('expr 10 / 3'))).toContain('3');
     expect(texts(run('expr 5 % 0'))).toContain('division by zero');
+    expect(texts(run('expr 1.5 + 2'))).toContain('non-integer argument');
   });
 
   test('bc respects precedence and parentheses (no eval)', () => {
@@ -175,8 +258,21 @@ describe('phase-7 deterministic utilities', () => {
     expect(texts(run('mv a b'))).toContain('Read-only file system');
   });
 
-  test('less/more hint to use cat', () => {
-    expect(texts(run('less README.md'))).toContain('cat');
+  test('less/more validate files and provide complete executable alternatives', () => {
+    const hint = texts(run('less README.md'));
+    expect(hint).toContain("'cat README.md'");
+    expect(hint).toContain("'head README.md'");
+    expect(hint).toContain("'tail README.md'");
+    expect(texts(run('more'))).toContain('Usage: more FILE');
+    expect(texts(run('less missing.txt'))).toContain('No such file or directory');
+    expect(texts(run('less resume'))).toContain('Is a directory');
+    expect(texts(run('less resume/resume.pdf'))).toContain('binary PDF');
+  });
+
+  test('less resolves relative files from the current working directory', () => {
+    const body = texts(run('less mobileid.md', { cwd: '/home/visitor/projects' }));
+    expect(body).toContain("'cat mobileid.md'");
+    expect(body).not.toContain('No such file or directory');
   });
 });
 
@@ -187,8 +283,8 @@ describe('phase-7 fun commands (structural — non-deterministic output)', () =>
   test('htop shows joke processes', () => {
     expect(texts(run('htop'))).toContain('node portfolio');
   });
-  test('weather is offline and mentions Merced', () => {
-    expect(texts(run('weather'))).toContain('Merced');
+  test('weather is offline and mentions Davis', () => {
+    expect(texts(run('weather'))).toContain('Davis');
   });
   test('sl is the train', () => {
     expect(texts(run('sl'))).toContain('choo');
@@ -210,19 +306,21 @@ describe('phase-7 fun commands (structural — non-deterministic output)', () =>
   test('hollywood ends in ACCESS GRANTED', () => {
     expect(texts(run('hollywood'))).toContain('ACCESS GRANTED');
   });
-  test('claude shows a wordmark, and claude <q> gives a canned reply', () => {
-    expect(texts(run('claude'))).toContain('Claude Code');
-    const r = run('claude how do I reach you');
-    expect(texts(r)).toContain('you:    how do I reach you');
-    expect(texts(r)).toContain('claude:');
-  });
-  test('claude aliases (anthropic, ask) resolve', () => {
-    expect(run('anthropic')).toEqual(run('claude'));
-    expect(run('ask')).toEqual(run('claude'));
+  test('AI assistant commands are not registered', () => {
+    for (const command of ['claude', 'anthropic', 'ask']) {
+      expect(texts(run(command))).toContain(`Unknown command: '${command}'`);
+    }
   });
 });
 
 describe('phrase hooks and please', () => {
+  test('sudo without arguments advertises only the supported easter egg', () => {
+    const body = texts(run('sudo'));
+    expect(body).toContain('administrative access is disabled');
+    expect(body).toContain('sudo make me a sandwich');
+    expect(body).not.toContain('sudo -h');
+  });
+
   test('"make me a sandwich" needs sudo', () => {
     expect(texts(run('make me a sandwich'))).toContain('Make it yourself');
     expect(texts(run('sudo make me a sandwich'))).toContain('🥪');

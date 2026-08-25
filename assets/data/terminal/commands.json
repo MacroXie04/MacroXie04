@@ -3,7 +3,7 @@
     "id": "help",
     "name": "help",
     "category": "core",
-    "summary": "List available commands"
+    "summary": "List essential commands"
   },
   {
     "id": "clear",
@@ -23,7 +23,7 @@
     "id": "exit",
     "name": "exit",
     "category": "core",
-    "summary": "Exit terminal"
+    "summary": "Simulate terminal logout"
   },
   {
     "id": "history",
@@ -35,8 +35,8 @@
     "id": "sudo",
     "name": "sudo",
     "category": "core",
-    "summary": "Execute a command as another user",
-    "man": "Execute a command as another user",
+    "summary": "Simulate restricted administrative access",
+    "man": "Simulate restricted administrative access",
     "path": "/usr/bin/sudo"
   },
   {
@@ -51,9 +51,14 @@
     "category": "core",
     "summary": "Download resume PDF",
     "aliases": [
-      "resume",
-      "download"
+      "resume"
     ]
+  },
+  {
+    "id": "download",
+    "name": "download",
+    "category": "core",
+    "hidden": true
   },
   {
     "id": "about",
@@ -86,9 +91,8 @@
     "id": "projects",
     "name": "projects",
     "category": "info",
-    "summary": "Showcase projects  (projects <name>, --links)",
+    "summary": "Selected projects  (projects <name>, --links)",
     "aliases": [
-      "work",
       "portfolio"
     ]
   },
@@ -96,21 +100,13 @@
     "id": "education",
     "name": "education",
     "category": "info",
-    "summary": "Academic background  (-v, --courses)",
-    "aliases": [
-      "edu",
-      "school"
-    ]
+    "summary": "Academic background"
   },
   {
     "id": "stack",
     "name": "stack",
     "category": "info",
-    "summary": "Toolbox grouped by domain  (--flat)",
-    "aliases": [
-      "tools",
-      "tech"
-    ]
+    "summary": "Technical skills grouped by domain  (--flat)"
   },
   {
     "id": "ls",
@@ -237,7 +233,7 @@
     "name": "date",
     "category": "util",
     "summary": "Current date",
-    "man": "Display or set date and time",
+    "man": "Display the current date and time",
     "path": "/bin/date"
   },
   {
@@ -370,7 +366,7 @@
     "name": "env",
     "category": "util",
     "summary": "Print environment variables",
-    "man": "Run a program in a modified environment",
+    "man": "Print environment variables",
     "path": "/usr/bin/env",
     "aliases": [
       "printenv"
@@ -407,8 +403,8 @@
     "id": "less",
     "name": "less",
     "category": "util",
-    "summary": "Pager (use cat here)",
-    "man": "Opposite of more",
+    "summary": "Validate a text file and suggest available readers",
+    "man": "Suggest cat, head, or tail for a text file",
     "path": "/usr/bin/less",
     "aliases": [
       "more"
@@ -586,16 +582,6 @@
     "summary": "Hack the mainframe",
     "aliases": [
       "hacker"
-    ]
-  },
-  {
-    "id": "claude",
-    "name": "claude",
-    "category": "fun",
-    "summary": "Say hi to Claude (built this terminal)",
-    "aliases": [
-      "anthropic",
-      "ask"
     ]
   }
 ]

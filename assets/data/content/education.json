@@ -1,14 +1,5 @@
 {
-  "school": "University of California, Merced",
-  "degree": "B.S. Computer Science & Engineering",
-  "class": "Class of 2028",
-  "focus": "full-stack web development, AI agent systems, and cybersecurity.",
-  "courses": [
-    "Data Structures & Algorithms",
-    "Computer Architecture",
-    "Operating Systems",
-    "Databases",
-    "Computer Networks",
-    "Software Engineering"
-  ]
+  "school": "University of California, Davis",
+  "location": "Davis, CA",
+  "expected": "Expected May 2028"
 }

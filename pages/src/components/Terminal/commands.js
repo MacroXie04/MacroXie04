@@ -1,7 +1,8 @@
 import { txt } from './handlers/shared';
 import { PROFILE } from './data/profile';
-import { byName } from './registry';
+import { ALL_NAMES, byName } from './registry';
 import { cmdSandwich } from './handlers/funCommands';
+import { tokenizeShell } from './utils/shell';
 import terminal from '@assets/data/terminal/terminal.json';
 export { getCompletions } from './utils/completions';
 
@@ -19,9 +20,8 @@ function levenshtein(a, b) {
 
 function findClosestCommand(cmd) {
   let best = null, bestDist = Infinity;
-  // Suggest any dispatchable name (canonical + aliases, including hidden like
-  // rm/quit) — anything the user could legitimately have typed.
-  for (const c of byName.keys()) {
+  // Hidden commands are intentionally omitted from discovery surfaces.
+  for (const c of ALL_NAMES) {
     const d = levenshtein(cmd, c);
     if (d < bestDist) { bestDist = d; best = c; }
   }
@@ -29,25 +29,36 @@ function findClosestCommand(cmd) {
   return bestDist <= threshold ? best : null;
 }
 
-// Multi-token "commands" that can't be a single-token descriptor are matched
-// here, before tokenized lookup. Each entry: { test(lowercasedTrimmed) -> bool, run(ctx) }.
+// Multi-token easter eggs that cannot be represented by one descriptor.
 const PHRASES = [
   { test: (s) => /^(sudo\s+)?make me a sandwich$/.test(s), run: (ctx) => cmdSandwich(ctx) },
 ];
 
-function resolvePhrase(trimmed) {
-  const lower = trimmed.toLowerCase();
+function resolvePhrase(words) {
+  const lower = words.map((word) => word.toLowerCase()).join(' ');
   return PHRASES.find((p) => p.test(lower)) || null;
 }
 
 export function processCommand(input, settings = {}, cmdHistory = []) {
   const { fontSize, theme, accentColor, cwd } = settings;
-  const trimmed = input.trim();
-  if (!trimmed) return null;
+  const source = String(input ?? '');
+  if (!source.trim()) return null;
 
-  const parts = trimmed.split(/\s+/);
+  const parsed = tokenizeShell(source);
+  if (parsed.error) {
+    return {
+      output: [
+        txt(''),
+        txt(`Shell parse error: ${parsed.error}.`, 't-error'),
+        txt(''),
+      ],
+    };
+  }
+
+  const parts = parsed.tokens.map((token) => token.value);
   const name = parts[0].toLowerCase();
   const args = parts.slice(1);
+  const trimmed = source.trim();
 
   const ctx = {
     args,
@@ -61,7 +72,7 @@ export function processCommand(input, settings = {}, cmdHistory = []) {
     dispatch: (line) => processCommand(line, settings, cmdHistory),
   };
 
-  const phrase = resolvePhrase(trimmed);
+  const phrase = resolvePhrase(parts);
   if (phrase) return phrase.run(ctx);
 
   const cmd = byName.get(name);
@@ -77,7 +88,7 @@ export function processCommand(input, settings = {}, cmdHistory = []) {
   return {
     output: [
       txt(''),
-      txt(`Unknown command: '${name}'.${suggestion ? ` Did you mean '${suggestion}'?` : " Type 'help' for available commands."}`, 't-error'),
+      txt(`Unknown command: '${name}'.${suggestion ? ` Did you mean '${suggestion}'?` : " Type 'help' for essential commands."}`, 't-error'),
       txt(''),
     ],
   };

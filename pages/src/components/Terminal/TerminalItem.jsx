@@ -7,13 +7,13 @@ export default function TerminalItem({ item, idx }) {
           <div className="t-profile-name">{item.name}</div>
           <div className="t-profile-role">{item.role}</div>
           <div className="t-profile-edu">{item.education}</div>
-          <div className="t-profile-tagline">&quot;{item.tagline}&quot;</div>
+          {item.tagline && <div className="t-profile-tagline">&quot;{item.tagline}&quot;</div>}
           <div className="t-profile-links">
             <a href={`mailto:${item.email}`} className="t-link">{item.email}</a>
             <a href={item.github} target="_blank" rel="noopener noreferrer" className="t-link">
               {item.github.replace('https://', '')}
             </a>
-            <span className="t-dim">{item.phone}</span>
+            <a href={`tel:${item.phone.replace(/[^\d+]/g, '')}`} className="t-link">{item.phone}</a>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function TerminalItem({ item, idx }) {
           href={item.href}
           target={isExternal ? '_blank' : undefined}
           rel={isExternal ? 'noopener noreferrer' : undefined}
-          className="t-link"
+          className={`t-link ${item.cls || ''}`}
           onClick={e => e.stopPropagation()}
         >
           {item.text}

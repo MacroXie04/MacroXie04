@@ -1,0 +1,183 @@
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage[margin=0.62in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{tabularx}
+
+\ifdefined\pdfgentounicode
+  \input{glyphtounicode}
+  \pdfgentounicode=1
+\fi
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{0pt}
+\urlstyle{same}
+\raggedright
+\hypersetup{
+  pdftitle={Hongzhe Xie Resume},
+  pdfauthor={Hongzhe Xie},
+}
+
+\definecolor{accent}{HTML}{17365D}
+\definecolor{ACCENT}{HTML}{17365D}
+\titleformat{\section}
+  {\normalsize\bfseries\color{accent}\uppercase}
+  {}{0pt}{}[\vspace{-2pt}\color{accent}\titlerule]
+\titlespacing*{\section}{0pt}{7pt}{4pt}
+
+\setlist[itemize]{
+  leftmargin=1.25em,
+  label=\textbullet,
+  itemsep=1.5pt,
+  parsep=0pt,
+  topsep=2pt,
+  partopsep=0pt
+}
+
+\newcommand{\resumeEntry}[4]{%
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{#1} & \textbf{#2} \\
+    \textit{#3} & \textit{#4}
+  \end{tabular*}\vspace{-2pt}
+}
+
+\newcommand{\projectEntry}[4]{%
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{#1} \;|\; \href{#3}{\underline{GitHub}} & \textbf{#2} \\
+    \multicolumn{2}{l}{\textit{#4}}
+  \end{tabular*}\vspace{-2pt}
+}
+
+\begin{document}
+
+% ---------- Header ----------
+\begin{center}
+  {\fontsize{20}{22}\selectfont\textbf{HONGZHE XIE}}\\[-1pt]
+  {\small
+    +1 (206) 333-8881 \;|\;
+    \href{mailto:index@hongzhexie.com}{index@hongzhexie.com} \;|\;
+    \href{https://github.com/MacroXie04}{github.com/MacroXie04}
+  }
+\end{center}
+\vspace{-7pt}
+
+% ---------- Education ----------
+\section{Education}
+\resumeEntry
+  {University of California, Davis}
+  {Expected May 2028}
+  {}
+  {Davis, CA}
+
+% ---------- Experience ----------
+\section{Experience}
+\resumeEntry
+  {Full-Stack Software Engineer}
+  {Oct 2025--Present}
+  {School of Engineering, University of California, Merced}
+  {Merced, CA}
+\begin{itemize}
+  \item Independently architected and built, and now operate, the official production platform for a program serving all campus use; a block-based Content Management System, delivered registration, barcode ticketing and check-in, and traceable administrative workflows with Django REST Framework and React/TypeScript.
+  \item Developed an AI-assisted phishing detector combining SPF/DKIM/DMARC and sender-alignment validation, punycode, typosquat, and URL heuristics, plus optional Amazon Bedrock review with a rules-only fallback.
+  \item Built a guarded dual-tier agentic workflow enabling admin management while providing safe, read-only public event queries, secured by strict RBAC, bounded context, IP-based token budgets, and anti-privilege escalation guardrails.
+  \item Hardened authentication and delivery with rotating JWTs, RSA-encrypted password transport, one-time email/SMS challenges, endpoint throttling, CSP/CSRF/ HTS, CodeQL, Bandit, Trivy, Gitleaks and approval-gated deployments to AWS ECS Fargate and Amplify.
+\end{itemize}
+
+\resumeEntry
+  {Computer Vision / AI Engineering Intern}
+  {Jul 2023--Oct 2023}
+  {China Academy of Building Research}
+  {Shanghai, China}
+\begin{itemize}
+  \item Developed a Python-based semantic-segmentation pipeline to identify deployable rooftop photovoltaic areas in aerial imagery of rural villages.
+  \item Prepared and annotated image datasets, trained deep-learning models, and supported estimates of potential solar-energy generation from segmented rooftop areas.
+\end{itemize}
+
+\resumeEntry
+  {Financial Investment Analysis Trainee}
+  {Jul 2023}
+  {Citigroup Inc.}
+  {Shanghai, China}
+\begin{itemize}
+  \item Selected for Citi's Financial Investment Analysis Training Program; completed intensive training in financial markets, banking operations, company fundamentals, and investment analysis.
+  \item Applied Excel and Python to financial modeling and KPI analysis, translating company-performance data into concise dashboards and investor-oriented findings.
+\end{itemize}
+
+% ---------- Projects ----------
+\section{Selected Projects}
+
+\projectEntry
+  {MobileID}
+  {2025--2026}
+  {https://github.com/MacroXie04/MobileID}
+  {Python, Django, Vue, PostgreSQL, DynamoDB, Docker, GitHub Actions}
+\begin{itemize}
+  \item Developed a Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions backed by PostgreSQL and DynamoDB.
+  \item Implemented defense-in-depth authentication with HTTP-only cookie JWTs, CSRF validation, refresh-token rotation and blacklisting, immediate session revocation, Argon2 hashing, and scoped credential-stuffing controls.
+  \item Enforced Bandit, Safety, Trivy, and dependency-audit gates alongside Django tests with a 70\% coverage threshold, Playwright E2E tests, and Docker/Vite build validation.
+\end{itemize}
+
+\projectEntry
+  {TokenRouter}
+  {2026}
+  {https://github.com/MacroXie04/TokenRouter}
+  {Go, React, OpenAI/Claude/Gemini APIs, GORM, Redis, Casbin, Docker}
+\begin{itemize}
+  \item Engineered an OpenAI-compatible LLM gateway with cross-provider protocol conversion, priority/weighted routing, failure-aware retries, and concurrency-safe reservation and settlement of token quotas.
+  \item Protected relay and control planes with SSRF-safe outbound dialing, JWT refresh rotation and replay detection, Casbin RBAC, WebAuthn/TOTP, step-up verification, rate limits, and race-tested quota logic.
+\end{itemize}
+
+% ---------- Professional Development ----------
+\newpage
+\section{Professional Development}
+
+\resumeEntry
+  {Google Cloud Next 2026}
+  {Apr 2026}
+  {Technical Conference Attendee}
+  {AI Security \& Agentic Systems}
+\begin{itemize}
+  \item Engaged in technical deep dives on enterprise agentic architectures, focused on multi-agent orchestration, Vertex AI Agent Builder, and AgentOps lifecycle management.
+  \item Explored AI security, model governance, and runtime defense using Model Armor, Security Command Center (SCC) for GenAI, and Bedrock/Vertex-level guardrail frameworks.
+  \item Evaluated modern GenAI data/compute infrastructures, including BigQuery vector search integration, Hypercomputer scaling (A3/TPU v5p), and secure Tool Calling/ADK patterns.
+\end{itemize}
+
+\resumeEntry
+  {Google I/O 2025}
+  {May 2025}
+  {Developer Conference Attendee -- Google}
+  {AI Agents \& Web Engineering}
+\begin{itemize}
+  \item Attended keynote and developer sessions on Gemini, Android, web technologies, multimodal systems, and the architecture of AI-native applications.
+  \item Participated in hands-on Google ADK workshops focused on structured tool calls, agent orchestration, modular task flows, and web-performance optimization.
+\end{itemize}
+
+\resumeEntry
+  {Microsoft AI Day 2024}
+  {2024}
+  {Technical Program Participant -- Microsoft}
+  {Enterprise \& Responsible AI}
+\begin{itemize}
+  \item Engaged with Microsoft AI practitioners on emerging model capabilities, responsible deployment practices, and production use cases across enterprise environments.
+  \item Studied integration tradeoffs involving security, governance, reliability, human oversight, and organizational adoption of AI-enabled systems.
+\end{itemize}
+
+% ---------- Skills ----------
+\section{Technical Skills}
+{\small
+\textbf{Languages:} Python, C/C++, Go, TypeScript/JavaScript, SQL \\
+\textbf{AI \& Agent Engineering:} Google ADK, Gemini, Amazon Bedrock, agent orchestration, structured tool/API calling, multimodal pipelines, LLM application security \\
+\textbf{Application \& Identity Security:} API security, phishing detection, WebAuthn/FIDO2, TOTP/MFA, JWT/OAuth, RBAC/Casbin, CSRF/XSS/SSRF mitigation, rate limiting, audit logging \\
+\textbf{Security Testing \& Tooling:} CodeQL, Bandit, Trivy, Gitleaks, OSV, Safety, Postman, SAST, dependency, container, and secret scanning \\
+\textbf{Backend \& Data:} Django/DRF, Celery, Redis, PostgreSQL, MySQL, DynamoDB, GORM, REST APIs \\
+\textbf{Frontend \& Testing:} React, Vue.js, Vite, Playwright, Django testing, end-to-end testing \\
+\textbf{Cloud \& DevOps:} AWS ECS Fargate, Amplify, S3, SES, CloudWatch, GCP, Docker, Nginx, GitHub Actions, CI/CD, SSH
+}
+
+\end{document}

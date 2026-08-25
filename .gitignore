@@ -165,3 +165,4 @@ vite.config.ts.timestamp-*
 
 # claude code
 CLAUDE.md
+.claude/

@@ -4,17 +4,17 @@
 cd pages
 
 # Run linting
-echo "🔍 Running ESLint..."
+echo "Running ESLint..."
 npm run lint || {
-    echo "❌ ESLint failed. Please fix linting errors before committing."
+    echo "ESLint failed. Please fix linting errors before committing."
     exit 1
 }
 
 # Run tests
 echo "🧪 Running tests..."
 npm run test:ci || {
-    echo "❌ Tests failed. Please fix failing tests before committing."
+    echo "Tests failed. Please fix failing tests before committing."
     exit 1
 }
 
-echo "✅ Pre-commit checks passed!"
+echo "Pre-commit checks passed!"

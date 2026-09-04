@@ -3,7 +3,7 @@
 set -euo pipefail
 
 readonly max_attempts=3
-readonly timeout_seconds=60
+readonly timeout_seconds=180
 last_status=1
 
 for ((attempt = 1; attempt <= max_attempts; attempt += 1)); do

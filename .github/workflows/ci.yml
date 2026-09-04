@@ -18,7 +18,7 @@ jobs:
   quality:
     name: CI
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: pages
@@ -47,7 +47,7 @@ jobs:
           fail-on-severity: high
 
       - name: Audit dependencies
-        timeout-minutes: 10
+        timeout-minutes: 16
         run: bash ../.github/scripts/npm-audit-retry.sh
 
       - name: Lint with zero warnings

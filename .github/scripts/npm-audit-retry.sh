@@ -61,4 +61,4 @@ for ((attempt = 1; attempt <= max_attempts; attempt += 1)); do
 done
 
 echo "npm audit failed after ${max_attempts} bounded attempts" >&2
-exit "${last_status}"
+exit 1

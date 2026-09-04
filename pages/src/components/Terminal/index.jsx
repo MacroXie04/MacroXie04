@@ -31,7 +31,7 @@ export default function Terminal() {
     cwd,
     settingsOpen, setSettingsOpen,
     bombing,
-    bottomRef, inputRef,
+    rootRef, bottomRef, inputRef,
     handleRootClick, handleKeyDown, handleQuickCmd,
   } = useTerminal();
 
@@ -75,6 +75,7 @@ export default function Terminal() {
 
   return (
     <div
+      ref={rootRef}
       className="t-root"
       style={{ fontSize: FONT_SIZES[fontSize] }}
       data-theme={theme}
@@ -271,7 +272,7 @@ export default function Terminal() {
 
         {/* Current input line */}
         <div className="t-input-wrapper">
-          <span className="t-prompt">{formatPrompt(cwd)}</span>&nbsp;
+          <span className="t-prompt">{formatPrompt(cwd)}</span>
           <input
             ref={inputRef}
             className="t-input"
@@ -284,6 +285,7 @@ export default function Terminal() {
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
+            enterKeyHint="send"
             aria-label="Terminal input"
           />
         </div>

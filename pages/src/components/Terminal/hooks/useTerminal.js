@@ -42,8 +42,13 @@ export default function useTerminal() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bombing, setBombing] = useState(false);
   const [tabHint, setTabHint] = useState(null);
+  const rootRef = useRef(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+
+  const scrollToBottom = useCallback((behavior = 'smooth') => {
+    bottomRef.current?.scrollIntoView?.({ behavior, block: 'nearest' });
+  }, []);
 
   const setFontSize = useCallback((size) => {
     setFontSizeState(size);
@@ -70,8 +75,57 @@ export default function useTerminal() {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' });
-  }, [history]);
+    const behavior = document.activeElement === inputRef.current ? 'auto' : 'smooth';
+    scrollToBottom(behavior);
+  }, [history, scrollToBottom]);
+
+  useEffect(() => {
+    let animationFrame = null;
+    const root = rootRef.current;
+    const viewport = window.visualViewport;
+
+    const syncVisualViewport = () => {
+      if (!root || !viewport || viewport.scale !== 1) return;
+
+      root.style.setProperty('--t-viewport-height', `${viewport.height}px`);
+      root.style.setProperty('--t-viewport-offset-top', `${viewport.offsetTop}px`);
+    };
+
+    const handleViewportChange = () => {
+      syncVisualViewport();
+      if (document.activeElement !== inputRef.current) return;
+
+      const revealInput = () => {
+        animationFrame = null;
+        scrollToBottom('auto');
+      };
+
+      if (typeof window.requestAnimationFrame === 'function') {
+        if (animationFrame !== null && typeof window.cancelAnimationFrame === 'function') {
+          window.cancelAnimationFrame(animationFrame);
+        }
+        animationFrame = window.requestAnimationFrame(revealInput);
+      } else {
+        revealInput();
+      }
+    };
+
+    syncVisualViewport();
+    window.addEventListener('resize', handleViewportChange);
+    viewport?.addEventListener('resize', handleViewportChange);
+    viewport?.addEventListener('scroll', handleViewportChange);
+
+    return () => {
+      window.removeEventListener('resize', handleViewportChange);
+      viewport?.removeEventListener('resize', handleViewportChange);
+      viewport?.removeEventListener('scroll', handleViewportChange);
+      if (animationFrame !== null && typeof window.cancelAnimationFrame === 'function') {
+        window.cancelAnimationFrame(animationFrame);
+      }
+      root?.style.removeProperty('--t-viewport-height');
+      root?.style.removeProperty('--t-viewport-offset-top');
+    };
+  }, [scrollToBottom]);
 
   useEffect(() => {
     const handleBeforePrint = () => {
@@ -174,6 +228,8 @@ export default function useTerminal() {
   }, []);
 
   const handleKeyDown = useCallback((e) => {
+    if (e.nativeEvent?.isComposing || e.isComposing || e.keyCode === 229) return;
+
     if (e.key === 'Tab') {
       e.preventDefault();
       handleTab(inputValue);
@@ -212,7 +268,7 @@ export default function useTerminal() {
     cwd,
     settingsOpen, setSettingsOpen,
     bombing,
-    bottomRef, inputRef,
+    rootRef, bottomRef, inputRef,
     handleRootClick, handleKeyDown, handleQuickCmd,
   };
 }

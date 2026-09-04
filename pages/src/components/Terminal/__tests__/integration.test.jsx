@@ -81,4 +81,101 @@ describe('Terminal UI integration', () => {
     type(input, 'clear');
     expect(screen.queryByText('before-clear')).not.toBeInTheDocument();
   });
+
+  test('profile links do not refocus the terminal input', () => {
+    const { container } = render(<Terminal />);
+    const settingsButton = screen.getByRole('button', { name: 'Settings' });
+    settingsButton.focus();
+
+    fireEvent.click(container.querySelector('.t-profile-links'));
+
+    expect(settingsButton).toHaveFocus();
+  });
+
+  test('does not submit a command while an IME composition is active', () => {
+    render(<Terminal />);
+    const input = screen.getByLabelText('Terminal input');
+    fireEvent.change(input, { target: { value: 'echo 你好' } });
+
+    fireEvent.keyDown(input, { key: 'Enter', keyCode: 229, isComposing: true });
+
+    expect(input).toHaveValue('echo 你好');
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(input).toHaveValue('');
+    expect(screen.getByText('你好')).toBeInTheDocument();
+  });
+
+  test('tracks the visual viewport while a software keyboard is open', () => {
+    const originalVisualViewport = Object.getOwnPropertyDescriptor(window, 'visualViewport');
+    const listeners = {};
+    const visualViewport = {
+      height: 430,
+      offsetTop: 12,
+      scale: 1,
+      addEventListener: jest.fn((event, callback) => { listeners[event] = callback; }),
+      removeEventListener: jest.fn(),
+    };
+    let rendered;
+
+    Object.defineProperty(window, 'visualViewport', {
+      configurable: true,
+      value: visualViewport,
+    });
+
+    try {
+      rendered = render(<Terminal />);
+      const root = rendered.container.querySelector('.t-root');
+      expect(root.style.getPropertyValue('--t-viewport-height')).toBe('430px');
+      expect(root.style.getPropertyValue('--t-viewport-offset-top')).toBe('12px');
+
+      visualViewport.height = 390;
+      visualViewport.offsetTop = 8;
+      listeners.resize();
+
+      expect(root.style.getPropertyValue('--t-viewport-height')).toBe('390px');
+      expect(root.style.getPropertyValue('--t-viewport-offset-top')).toBe('8px');
+      rendered.unmount();
+      rendered = null;
+      expect(visualViewport.removeEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
+      expect(visualViewport.removeEventListener).toHaveBeenCalledWith('scroll', expect.any(Function));
+    } finally {
+      rendered?.unmount();
+      if (originalVisualViewport) {
+        Object.defineProperty(window, 'visualViewport', originalVisualViewport);
+      } else {
+        delete window.visualViewport;
+      }
+    }
+  });
+
+  test('scrolls the focused input into view when the viewport resizes', () => {
+    const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    const scrollIntoView = jest.fn();
+
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    window.requestAnimationFrame = callback => {
+      callback();
+      return 1;
+    };
+
+    try {
+      render(<Terminal />);
+      const input = screen.getByLabelText('Terminal input');
+      expect(input).toHaveFocus();
+      expect(input).toHaveAttribute('enterkeyhint', 'send');
+      scrollIntoView.mockClear();
+
+      type(input, 'help');
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'nearest' });
+      scrollIntoView.mockClear();
+
+      fireEvent(window, new Event('resize'));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'nearest' });
+    } finally {
+      HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+      window.requestAnimationFrame = originalRequestAnimationFrame;
+    }
+  });
 });

@@ -8,7 +8,7 @@ export default function TerminalItem({ item, idx }) {
           <div className="t-profile-role">{item.role}</div>
           <div className="t-profile-edu">{item.education}</div>
           {item.tagline && <div className="t-profile-tagline">&quot;{item.tagline}&quot;</div>}
-          <div className="t-profile-links">
+          <div className="t-profile-links" onClick={event => event.stopPropagation()}>
             <a href={`mailto:${item.email}`} className="t-link">{item.email}</a>
             <a href={item.github} target="_blank" rel="noopener noreferrer" className="t-link">
               {item.github.replace('https://', '')}

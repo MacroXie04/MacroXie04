@@ -7,9 +7,9 @@ export function html(content) {
 }
 
 // Escape text before interpolating it into an html() line. TerminalItem renders
-// html items via dangerouslySetInnerHTML with NO sanitizer (DOMPurify is CMS-only),
-// so any command that echoes user/file text into spans (cowsay, lolcat, figlet,
-// grep, diff, ...) MUST run it through this first to avoid self-XSS.
+// html items via dangerouslySetInnerHTML without a sanitizer, so any command
+// that echoes user/file text into spans (cowsay, lolcat, figlet, grep, diff, ...)
+// MUST run it through this first to avoid self-XSS.
 export function escapeHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')

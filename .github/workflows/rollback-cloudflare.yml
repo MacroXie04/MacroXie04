@@ -1,0 +1,141 @@
+name: Roll back Cloudflare Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: Successful production deployment UUID to restore
+        required: true
+        type: string
+      confirmation:
+        description: Type ROLLBACK dev to confirm the production rollback
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Validate, roll back, and verify production
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      inputs.confirmation == 'ROLLBACK dev'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: cloudflare-pages-production
+      url: ${{ vars.PRODUCTION_URL }}
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+      TARGET_DEPLOYMENT_ID: ${{ inputs.deployment_id }}
+    steps:
+      - name: Check out trusted rollback helpers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Validate rollback configuration
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[0-9a-f]{32}$ ]]; then
+            echo "CLOUDFLARE_ACCOUNT_ID is missing or malformed." >&2
+            exit 1
+          fi
+          if [[ ! "$CLOUDFLARE_PAGES_PROJECT" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            echo "CLOUDFLARE_PAGES_PROJECT is missing or malformed." >&2
+            exit 1
+          fi
+          config_project=$(jq -er '.name' pages/wrangler.jsonc)
+          if [[ "$config_project" != "$CLOUDFLARE_PAGES_PROJECT" ]]; then
+            echo "CLOUDFLARE_PAGES_PROJECT does not match pages/wrangler.jsonc." >&2
+            exit 1
+          fi
+          if [[ ! "$PRODUCTION_URL" =~ ^https://[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; then
+            echo "PRODUCTION_URL must be a canonical HTTPS origin without a trailing slash." >&2
+            exit 1
+          fi
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "CLOUDFLARE_API_TOKEN is not configured in the production environment." >&2
+            exit 1
+          fi
+
+      - name: Validate the rollback target
+        id: target
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          target_json=$(scripts/deployment/cloudflare-pages-api.sh validate-rollback-target "$TARGET_DEPLOYMENT_ID")
+          target_url=$(jq -er '.url' <<<"$target_json")
+          target_sha=$(jq -er '.commit' <<<"$target_json")
+          current_id=$(scripts/deployment/cloudflare-pages-api.sh current-production-id)
+
+          if [[ "$current_id" == "$TARGET_DEPLOYMENT_ID" ]]; then
+            echo "The requested deployment is already serving production." >&2
+            exit 1
+          fi
+          if [[ ! "$target_url" =~ ^https://[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; then
+            echo "Cloudflare returned an unsafe rollback target URL." >&2
+            exit 1
+          fi
+
+          echo "url=$target_url" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=$target_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "Current production deployment: $current_id"
+            echo "Validated rollback target: $TARGET_DEPLOYMENT_ID"
+            echo "Target commit: $target_sha"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preflight smoke-test the rollback target
+        env:
+          EXPECTED_SHA: ${{ steps.target.outputs.commit_sha }}
+          TARGET_URL: ${{ steps.target.outputs.url }}
+        run: >-
+          scripts/deployment/smoke-pages.sh
+          "$TARGET_URL" "$EXPECTED_SHA" - production 4 3 optional
+
+      - name: Roll back production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          EXPECTED_SHA: ${{ steps.target.outputs.commit_sha }}
+        run: scripts/deployment/cloudflare-pages-api.sh rollback "$TARGET_DEPLOYMENT_ID" "$EXPECTED_SHA"
+
+      - name: Wait for the production pointer
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: scripts/deployment/cloudflare-pages-api.sh wait-for-production "$TARGET_DEPLOYMENT_ID" 12 5
+
+      - name: Smoke-test the immutable rollback target
+        env:
+          EXPECTED_SHA: ${{ steps.target.outputs.commit_sha }}
+          TARGET_URL: ${{ steps.target.outputs.url }}
+        run: >-
+          scripts/deployment/smoke-pages.sh
+          "$TARGET_URL" "$EXPECTED_SHA" - production 4 3 optional
+
+      - name: Smoke-test the restored production URL
+        env:
+          EXPECTED_SHA: ${{ steps.target.outputs.commit_sha }}
+        run: >-
+          scripts/deployment/smoke-pages.sh
+          "$PRODUCTION_URL" "$EXPECTED_SHA" - production 12 5 optional
+
+      - name: Record completed rollback
+        env:
+          EXPECTED_SHA: ${{ steps.target.outputs.commit_sha }}
+        run: |
+          {
+            echo "Rolled production back to: $TARGET_DEPLOYMENT_ID"
+            echo "Restored commit: $EXPECTED_SHA"
+            echo "Verified production URL: $PRODUCTION_URL"
+          } >> "$GITHUB_STEP_SUMMARY"

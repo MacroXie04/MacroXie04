@@ -3,3 +3,53 @@
   width: 100vw;
   overflow: hidden;
 }
+
+.app-not-found {
+  align-items: center;
+  background: #0c0c0c;
+  color: #e5e5e5;
+  display: flex;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  justify-content: center;
+  min-height: 100%;
+  padding: 24px;
+}
+
+.app-not-found__content {
+  max-width: 520px;
+  text-align: center;
+}
+
+.app-not-found__status {
+  color: #ff6b6b;
+  font-size: clamp(3rem, 12vw, 6rem);
+  font-weight: 600;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+.app-not-found h1 {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  margin-bottom: 12px;
+}
+
+.app-not-found p:not(.app-not-found__status) {
+  color: #888;
+  margin-bottom: 28px;
+}
+
+.app-not-found a {
+  border: 1px solid #39d353;
+  border-radius: 4px;
+  color: #39d353;
+  display: inline-block;
+  padding: 10px 16px;
+  text-decoration: none;
+}
+
+.app-not-found a:hover,
+.app-not-found a:focus-visible {
+  background: #39d353;
+  color: #0c0c0c;
+  outline: none;
+}

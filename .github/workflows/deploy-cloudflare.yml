@@ -1,0 +1,325 @@
+name: Deploy Cloudflare Pages
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: false
+
+env:
+  ARTIFACT_NAME: pages-build-${{ github.event.workflow_run.head_sha }}
+  CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+  EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+  PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+  UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id }}
+
+jobs:
+  preflight:
+    name: Check release eligibility
+    if: >-
+      vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      deploy_required: ${{ steps.release.outputs.deploy_required }}
+    steps:
+      - name: Check main freshness
+        id: preflight_freshness
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ ! "$PRODUCTION_URL" =~ ^https://[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; then
+            echo "PRODUCTION_URL must be a canonical HTTPS origin without a trailing slash." >&2
+            exit 1
+          fi
+          latest_sha=$(
+            curl --silent --show-error --fail-with-body --retry 3 \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+              | jq -er '.object.sha'
+          )
+          if [[ "$latest_sha" != "$EXPECTED_SHA" ]]; then
+            echo "is_latest=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "Skipped superseded commit: $EXPECTED_SHA"
+              echo "Current main commit: $latest_sha"
+              echo "No candidate or production upload was created."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "is_latest=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check whether this commit is already in production
+        id: release
+        if: steps.preflight_freshness.outputs.is_latest == 'true'
+        run: |
+          metadata_file="$RUNNER_TEMP/production-deploy-meta.json"
+          http_code=$(
+            curl --silent --show-error --location \
+              --connect-timeout 10 --max-time 30 \
+              --retry 3 --retry-all-errors --retry-delay 2 \
+              --header "Cache-Control: no-cache" \
+              --output "$metadata_file" --write-out '%{http_code}' \
+              "$PRODUCTION_URL/deploy-meta.json?deploy-check=$EXPECTED_SHA"
+          )
+          if [[ "$http_code" != "200" && "$http_code" != "404" ]]; then
+            echo "Production metadata preflight returned HTTP $http_code." >&2
+            exit 1
+          fi
+
+          if [[ "$http_code" == "200" ]] && jq -e --arg sha "$EXPECTED_SHA" '
+            type == "object" and
+            (keys | sort) == ["commitSha", "runId"] and
+            .commitSha == $sha and
+            (.runId | type) == "string" and
+            (.runId | test("^[1-9][0-9]*$"))
+          ' "$metadata_file" >/dev/null; then
+            deployed_run_id=$(jq -r '.runId' "$metadata_file")
+            echo "deploy_required=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "Production already serves commit $EXPECTED_SHA."
+              echo "Original CI run: $deployed_run_id"
+              echo "No candidate or production upload was created."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "deploy_required=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    name: Deploy and verify production
+    needs: preflight
+    if: needs.preflight.outputs.deploy_required == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+      deployments: write
+    environment:
+      name: cloudflare-pages-production
+      url: ${{ vars.PRODUCTION_URL }}
+    steps:
+      - name: Check out trusted deployment helpers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+          persist-credentials: false
+
+      - name: Validate deployment configuration
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[0-9a-f]{32}$ ]]; then
+            echo "CLOUDFLARE_ACCOUNT_ID is missing or malformed." >&2
+            exit 1
+          fi
+          if [[ ! "$CLOUDFLARE_PAGES_PROJECT" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            echo "CLOUDFLARE_PAGES_PROJECT is missing or malformed." >&2
+            exit 1
+          fi
+          config_project=$(jq -er '.name' pages/wrangler.jsonc)
+          if [[ "$config_project" != "$CLOUDFLARE_PAGES_PROJECT" ]]; then
+            echo "CLOUDFLARE_PAGES_PROJECT does not match pages/wrangler.jsonc." >&2
+            exit 1
+          fi
+          jq -e '.pages_build_output_dir == "./build"' pages/wrangler.jsonc >/dev/null || {
+            echo "pages/wrangler.jsonc must deploy ./build." >&2
+            exit 1
+          }
+          if [[ ! "$PRODUCTION_URL" =~ ^https://[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; then
+            echo "PRODUCTION_URL must be a canonical HTTPS origin without a trailing slash." >&2
+            exit 1
+          fi
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "CLOUDFLARE_API_TOKEN is not configured in the production environment." >&2
+            exit 1
+          fi
+
+      - name: Recheck main before artifact download
+        id: deploy_freshness
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_sha=$(
+            curl --silent --show-error --fail-with-body --retry 3 \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+              | jq -er '.object.sha'
+          )
+          if [[ "$latest_sha" != "$EXPECTED_SHA" ]]; then
+            echo "deploy_current=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "Skipped superseded commit before artifact download: $EXPECTED_SHA"
+              echo "Current main commit: $latest_sha"
+              echo "No candidate or production upload was created."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "deploy_current=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download the CI build artifact
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: pages/build
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.UPSTREAM_RUN_ID }}
+
+      - name: Verify and freeze the CI artifact
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        run: |
+          scripts/deployment/verify-pages-artifact.sh pages/build "$EXPECTED_SHA" "$UPSTREAM_RUN_ID"
+          chmod -R a-w pages/build
+
+      - name: Capture the current production deployment
+        id: previous
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          deployment_id=$(scripts/deployment/cloudflare-pages-api.sh current-production-id)
+          echo "deployment_id=$deployment_id" >> "$GITHUB_OUTPUT"
+          echo "Previous production deployment: $deployment_id" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the production candidate
+        id: candidate
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: pages
+          wranglerVersion: 4.129.0
+          command: >-
+            pages deploy build
+            --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT }}
+            --branch=production-candidate
+            --commit-hash=${{ env.EXPECTED_SHA }}
+
+      - name: Validate and smoke-test the candidate
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        env:
+          DEPLOYMENT_ENVIRONMENT: ${{ steps.candidate.outputs.pages-environment }}
+          DEPLOYMENT_ID: ${{ steps.candidate.outputs.pages-deployment-id }}
+          DEPLOYMENT_URL: ${{ steps.candidate.outputs.deployment-url }}
+        run: |
+          if [[ "$DEPLOYMENT_ENVIRONMENT" != "preview" ]]; then
+            echo "Candidate upload did not create a preview deployment." >&2
+            exit 1
+          fi
+          if [[ ! "$DEPLOYMENT_ID" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]]; then
+            echo "Candidate deployment ID is missing or malformed." >&2
+            exit 1
+          fi
+          scripts/deployment/smoke-pages.sh \
+            "$DEPLOYMENT_URL" "$EXPECTED_SHA" "$UPSTREAM_RUN_ID" preview 8 5 required
+
+      - name: Reverify the candidate artifact bytes
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        run: scripts/deployment/verify-pages-artifact.sh pages/build "$EXPECTED_SHA" "$UPSTREAM_RUN_ID"
+
+      - name: Recheck main before production promotion
+        id: promotion
+        if: steps.deploy_freshness.outputs.deploy_current == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_sha=$(
+            curl --silent --show-error --fail-with-body --retry 3 \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+              | jq -er '.object.sha'
+          )
+          if [[ "$latest_sha" != "$EXPECTED_SHA" ]]; then
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "Candidate passed, but main advanced to $latest_sha."
+              echo "Skipped production promotion of superseded commit $EXPECTED_SHA."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "promote=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload production from the same frozen artifact
+        id: production
+        if: steps.promotion.outputs.promote == 'true'
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: pages
+          wranglerVersion: 4.129.0
+          command: >-
+            pages deploy build
+            --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT }}
+            --branch=main
+            --commit-hash=${{ env.EXPECTED_SHA }}
+
+      - name: Validate and smoke-test the production deployment
+        if: steps.promotion.outputs.promote == 'true'
+        env:
+          DEPLOYMENT_ENVIRONMENT: ${{ steps.production.outputs.pages-environment }}
+          DEPLOYMENT_ID: ${{ steps.production.outputs.pages-deployment-id }}
+          DEPLOYMENT_URL: ${{ steps.production.outputs.deployment-url }}
+        run: |
+          if [[ "$DEPLOYMENT_ENVIRONMENT" != "production" ]]; then
+            echo "Main upload did not create a production deployment." >&2
+            exit 1
+          fi
+          if [[ ! "$DEPLOYMENT_ID" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]]; then
+            echo "Production deployment ID is missing or malformed." >&2
+            exit 1
+          fi
+          scripts/deployment/smoke-pages.sh \
+            "$DEPLOYMENT_URL" "$EXPECTED_SHA" "$UPSTREAM_RUN_ID" production 8 5 required
+
+      - name: Wait for and smoke-test the production URL
+        if: steps.promotion.outputs.promote == 'true'
+        run: >-
+          scripts/deployment/smoke-pages.sh
+          "$PRODUCTION_URL" "$EXPECTED_SHA" "$UPSTREAM_RUN_ID" production 12 5 required
+
+      - name: Record successful release
+        if: steps.promotion.outputs.promote == 'true'
+        env:
+          DEPLOYMENT_ID: ${{ steps.production.outputs.pages-deployment-id }}
+          DEPLOYMENT_URL: ${{ steps.production.outputs.deployment-url }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ steps.previous.outputs.deployment_id }}
+        run: |
+          {
+            echo "Deployed commit: $EXPECTED_SHA"
+            echo "Cloudflare deployment: $DEPLOYMENT_ID"
+            echo "Immutable URL: $DEPLOYMENT_URL"
+            echo "Production URL: $PRODUCTION_URL"
+            echo "Rollback target: $PREVIOUS_DEPLOYMENT_ID"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve rollback target after a failed release
+        if: failure() && steps.previous.outputs.deployment_id != ''
+        env:
+          PREVIOUS_DEPLOYMENT_ID: ${{ steps.previous.outputs.deployment_id }}
+        run: |
+          {
+            echo "Production release did not complete verification."
+            echo "Previous deployment available for manual rollback: $PREVIOUS_DEPLOYMENT_ID"
+          } >> "$GITHUB_STEP_SUMMARY"

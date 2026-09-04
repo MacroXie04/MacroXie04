@@ -15,8 +15,36 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  quality:
-    name: CI
+  policy:
+    name: Pipeline policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.1
+
+      - name: Test CI policy scripts
+        run: node --test .github/scripts/dependency-review.test.mjs
+
+      - name: Validate repository scripts
+        run: |
+          for script in .github/scripts/*.mjs pages/scripts/*.mjs; do
+            node --check "$script"
+          done
+          for script in .github/scripts/*.sh scripts/deployment/*.sh; do
+            bash -n "$script"
+          done
+
+  supply_chain:
+    name: Supply chain
+    needs: policy
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
@@ -42,16 +70,81 @@ jobs:
 
       - name: Review dependency changes
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
-        with:
-          fail-on-severity: high
+        env:
+          DEPENDENCY_REVIEW_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          DEPENDENCY_REVIEW_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node ../.github/scripts/dependency-review.mjs
 
       - name: Audit dependencies
         timeout-minutes: 16
         run: bash ../.github/scripts/npm-audit-retry.sh
 
+      - name: Generate CycloneDX SBOM
+        run: npm run sbom
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom-${{ github.sha }}
+          path: pages/sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 30
+
+  lint:
+    name: Lint
+    needs: supply_chain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: pages
+    env:
+      CI: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.1
+          cache: npm
+          cache-dependency-path: pages/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
       - name: Lint with zero warnings
         run: npm run lint -- --max-warnings=0
+
+  tests:
+    name: Tests and coverage
+    needs: supply_chain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: pages
+    env:
+      CI: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.1
+          cache: npm
+          cache-dependency-path: pages/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Test with full coverage
         run: |
@@ -67,15 +160,6 @@ jobs:
             --coverageReporters=lcov \
             --coverageReporters=json-summary
 
-      - name: Build
-        run: npm run build
-
-      - name: Verify build and write deployment metadata
-        run: node ../.github/scripts/verify-build.mjs build
-
-      - name: Generate CycloneDX SBOM
-        run: npm run sbom
-
       - name: Upload coverage report
         if: ${{ always() && !cancelled() && hashFiles('pages/coverage/**') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -85,8 +169,39 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  build:
+    name: Build and package
+    needs: [lint, tests]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: pages
+    env:
+      CI: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.1
+          cache: npm
+          cache-dependency-path: pages/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify build and write deployment metadata
+        run: node ../.github/scripts/verify-build.mjs build
+
       - name: Upload build artifact
-        if: ${{ always() && !cancelled() && hashFiles('pages/build/deploy-meta.json') != '' && hashFiles('pages/build/SHA256SUMS') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pages-build-${{ github.sha }}
@@ -94,11 +209,43 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload SBOM
-        if: ${{ always() && !cancelled() && hashFiles('pages/sbom.cdx.json') != '' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: sbom-${{ github.sha }}
-          path: pages/sbom.cdx.json
-          if-no-files-found: error
-          retention-days: 30
+  gate:
+    name: CI
+    if: ${{ always() }}
+    needs: [policy, supply_chain, lint, tests, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Enforce required pipeline stages
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          LINT_RESULT: ${{ needs.lint.result }}
+          POLICY_RESULT: ${{ needs.policy.result }}
+          SUPPLY_CHAIN_RESULT: ${{ needs.supply_chain.result }}
+          TESTS_RESULT: ${{ needs.tests.result }}
+        run: |
+          {
+            echo "## CI pipeline"
+            echo
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Pipeline policy | $POLICY_RESULT |"
+            echo "| Supply chain | $SUPPLY_CHAIN_RESULT |"
+            echo "| Lint | $LINT_RESULT |"
+            echo "| Tests and coverage | $TESTS_RESULT |"
+            echo "| Build and package | $BUILD_RESULT |"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "$POLICY_RESULT" != "success" ||
+                "$SUPPLY_CHAIN_RESULT" != "success" ||
+                "$LINT_RESULT" != "success" ||
+                "$TESTS_RESULT" != "success" ||
+                "$BUILD_RESULT" != "success" ]]; then
+            echo "Result: Failed" >> "$GITHUB_STEP_SUMMARY"
+            echo "One or more required CI stages did not complete successfully." >&2
+            exit 1
+          fi
+
+          echo "Result: Passed" >> "$GITHUB_STEP_SUMMARY"

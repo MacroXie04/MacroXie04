@@ -20,17 +20,18 @@ module.exports = {
     '!src/reportWebVitals.js',
     '!src/setupTests.js',
     '!src/**/*.test.{js,jsx}',
-    '!src/**/*.spec.{js,jsx}',
-    '!src/components/Terminal/**'
+    '!src/**/*.spec.{js,jsx}'
   ],
 
-  // Coverage thresholds (reflect current baseline; raise as more tests are added)
+  coverageReporters: ['text', 'lcov', 'json-summary'],
+
+  // Enforce the measured full-source baseline, including the terminal UI.
   coverageThreshold: {
     global: {
-      branches: 35,
-      functions: 45,
-      lines: 50,
-      statements: 50
+      branches: 60,
+      functions: 80,
+      lines: 80,
+      statements: 80
     }
   },
   

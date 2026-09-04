@@ -31,11 +31,10 @@
     "projects": "Tip: 'projects <name>' for detail, 'projects --links' for clickable links.",
     "stack": "Tip: 'stack --flat' for a one-line view."
   },
-  "cms": {
-    "error": "Something went wrong loading this page.",
-    "notFoundTitle": "404",
-    "notFound": "Page not found.",
-    "back": "Back to terminal",
-    "footerBack": "← back to terminal"
+  "notFound": {
+    "status": "404",
+    "title": "Page not found",
+    "description": "This portfolio only serves the terminal experience.",
+    "back": "Back to terminal"
   }
 }

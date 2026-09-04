@@ -6,11 +6,6 @@ Full-Stack Software Engineer focused on secure web platforms, identity systems, 
 
 University of California, Davis — Expected May 2028
 
-## Selected Projects
-
-- [MobileID](https://github.com/MacroXie04/MobileID) — Django/Vue identity platform with PDF417 barcodes and defense-in-depth authentication
-- [TokenRouter](https://github.com/MacroXie04/TokenRouter) — OpenAI-compatible multi-provider LLM gateway with secure routing and quota controls
-
 ## Technical Focus
 
 - Python, C/C++, Go, TypeScript/JavaScript, and SQL

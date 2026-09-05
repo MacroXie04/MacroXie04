@@ -21,6 +21,11 @@ updates:
       time: "06:15"
       timezone: Asia/Shanghai
     open-pull-requests-limit: 5
+    ignore:
+      # Babel 8 is incompatible with Babel 7 plugins still used by Jest.
+      - dependency-name: "@babel/*"
+        versions:
+          - "8.x"
     groups:
       npm-minor-and-patch:
         update-types:

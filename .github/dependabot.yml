@@ -26,3 +26,23 @@ updates:
         update-types:
           - minor
           - patch
+      vite-majors:
+        patterns:
+          - "vite"
+          - "@vitejs/plugin-react"
+        update-types:
+          - major
+      babel-jest-majors:
+        patterns:
+          - "@babel/*"
+          - "babel-jest"
+          - "jest"
+          - "jest-*"
+        update-types:
+          - major
+      eslint-majors:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+        update-types:
+          - major

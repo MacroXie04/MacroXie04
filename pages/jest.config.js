@@ -17,7 +17,6 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
     '!src/index.jsx',
-    '!src/reportWebVitals.js',
     '!src/setupTests.js',
     '!src/**/*.test.{js,jsx}',
     '!src/**/*.spec.{js,jsx}'

@@ -151,7 +151,6 @@ jobs:
           npm run test:ci -- --runInBand \
             --collectCoverageFrom='src/**/*.{js,jsx}' \
             --collectCoverageFrom='!src/index.jsx' \
-            --collectCoverageFrom='!src/reportWebVitals.js' \
             --collectCoverageFrom='!src/setupTests.js' \
             --collectCoverageFrom='!src/**/*.test.{js,jsx}' \
             --collectCoverageFrom='!src/**/*.spec.{js,jsx}' \

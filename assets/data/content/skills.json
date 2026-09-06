@@ -2,93 +2,149 @@
   {
     "category": "Languages",
     "skills": [
-      { "name": "Python" },
-      { "name": "C/C++" },
-      { "name": "Go" },
-      { "name": "TypeScript/JavaScript" },
-      { "name": "SQL" }
+      {
+        "name": "Python"
+      },
+      {
+        "name": "Go"
+      },
+      {
+        "name": "C/C++"
+      },
+      {
+        "name": "TypeScript/JavaScript"
+      },
+      {
+        "name": "SQL"
+      }
     ]
   },
   {
-    "category": "AI & Agent Engineering",
+    "category": "Web & Data",
     "skills": [
-      { "name": "Google ADK" },
-      { "name": "Gemini" },
-      { "name": "Amazon Bedrock" },
-      { "name": "Agent orchestration" },
-      { "name": "Structured tool/API calling" },
-      { "name": "Multimodal pipelines" },
-      { "name": "LLM application security" }
+      {
+        "name": "Django REST Framework"
+      },
+      {
+        "name": "React"
+      },
+      {
+        "name": "Vue"
+      },
+      {
+        "name": "Vite"
+      },
+      {
+        "name": "PostgreSQL"
+      },
+      {
+        "name": "MySQL"
+      },
+      {
+        "name": "DynamoDB"
+      },
+      {
+        "name": "Redis"
+      }
     ]
   },
   {
-    "category": "Application & Identity Security",
+    "category": "AI & Agents",
     "skills": [
-      { "name": "API security" },
-      { "name": "Phishing detection" },
-      { "name": "WebAuthn/FIDO2" },
-      { "name": "TOTP/MFA" },
-      { "name": "JWT/OAuth" },
-      { "name": "RBAC/Casbin" },
-      { "name": "CSRF/XSS/SSRF mitigation" },
-      { "name": "Rate limiting" },
-      { "name": "Audit logging" }
+      {
+        "name": "Google ADK"
+      },
+      {
+        "name": "Gemini"
+      },
+      {
+        "name": "Amazon Bedrock"
+      },
+      {
+        "name": "Agent orchestration"
+      },
+      {
+        "name": "Structured tool calling"
+      },
+      {
+        "name": "LLM application security"
+      }
     ]
   },
   {
-    "category": "Security Testing & Tooling",
+    "category": "Security",
     "skills": [
-      { "name": "CodeQL" },
-      { "name": "Bandit" },
-      { "name": "Trivy" },
-      { "name": "Gitleaks" },
-      { "name": "OSV" },
-      { "name": "Safety" },
-      { "name": "Postman" },
-      { "name": "SAST" },
-      { "name": "Dependency scanning" },
-      { "name": "Container scanning" },
-      { "name": "Secret scanning" }
+      {
+        "name": "WebAuthn/FIDO2"
+      },
+      {
+        "name": "TOTP/MFA"
+      },
+      {
+        "name": "JWT/OAuth"
+      },
+      {
+        "name": "RBAC (Casbin)"
+      },
+      {
+        "name": "CSRF/XSS/SSRF mitigation"
+      },
+      {
+        "name": "Rate limiting"
+      },
+      {
+        "name": "Audit logging"
+      },
+      {
+        "name": "CodeQL"
+      },
+      {
+        "name": "Bandit"
+      },
+      {
+        "name": "Trivy"
+      },
+      {
+        "name": "Gitleaks"
+      }
     ]
   },
   {
-    "category": "Backend & Data",
+    "category": "Cloud, DevOps & Testing",
     "skills": [
-      { "name": "Django/DRF" },
-      { "name": "Celery" },
-      { "name": "Redis" },
-      { "name": "PostgreSQL" },
-      { "name": "MySQL" },
-      { "name": "DynamoDB" },
-      { "name": "GORM" },
-      { "name": "REST APIs" }
-    ]
-  },
-  {
-    "category": "Frontend & Testing",
-    "skills": [
-      { "name": "React" },
-      { "name": "Vue.js" },
-      { "name": "Vite" },
-      { "name": "Playwright" },
-      { "name": "Django testing" },
-      { "name": "End-to-end testing" }
-    ]
-  },
-  {
-    "category": "Cloud & DevOps",
-    "skills": [
-      { "name": "AWS ECS Fargate" },
-      { "name": "Amplify" },
-      { "name": "S3" },
-      { "name": "SES" },
-      { "name": "CloudWatch" },
-      { "name": "GCP" },
-      { "name": "Docker" },
-      { "name": "Nginx" },
-      { "name": "GitHub Actions" },
-      { "name": "CI/CD" },
-      { "name": "SSH" }
+      {
+        "name": "AWS ECS Fargate"
+      },
+      {
+        "name": "Amplify"
+      },
+      {
+        "name": "S3"
+      },
+      {
+        "name": "SES"
+      },
+      {
+        "name": "CloudWatch"
+      },
+      {
+        "name": "GCP"
+      },
+      {
+        "name": "Docker"
+      },
+      {
+        "name": "Nginx"
+      },
+      {
+        "name": "GitHub Actions"
+      },
+      {
+        "name": "CI/CD"
+      },
+      {
+        "name": "Playwright"
+      }
     ]
   }
 ]

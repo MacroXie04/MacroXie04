@@ -1,0 +1,15 @@
+{
+  "programs": [
+    {
+      "name": "Citigroup Financial Investment Analysis Training Program",
+      "date": "Jul 2023",
+      "location": "Shanghai",
+      "description": "Selective cohort; built Excel and Python models for company-performance analysis."
+    }
+  ],
+  "conferences": [
+    "Google Cloud Next 2026",
+    "Google I/O 2025",
+    "Microsoft AI Day 2024"
+  ]
+}

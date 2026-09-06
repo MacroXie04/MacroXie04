@@ -102,10 +102,10 @@ describe('readFile / stat / walk', () => {
     const f = stat('/home/visitor/resume/Hongzhe_CV.pdf');
     expect(f.type).toBe('file');
     expect(f.pdf).toBe(true);
-    expect(f.bytes).toBe(40719);
+    expect(f.bytes).toBe(179077);
     expect(f.pdfVersion).toBe('1.5');
-    expect(f.pages).toBe(2);
-    expect(stat('/home/visitor/resume/resume.pdf')).toEqual(expect.objectContaining({ bytes: 40719 }));
+    expect(f.pages).toBe(1);
+    expect(stat('/home/visitor/resume/resume.pdf')).toEqual(expect.objectContaining({ bytes: 179077 }));
   });
 
   test('text sizes are UTF-8 bytes, not UTF-16 code units', () => {

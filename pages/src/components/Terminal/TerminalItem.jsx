@@ -1,19 +1,23 @@
+import { FeaturedProjects } from '../Projects';
+
 export default function TerminalItem({ item, idx }) {
+  if (item.type === 'projects') return <FeaturedProjects />;
   if (item.type === 'profile') {
     return (
       <div key={idx} className="t-profile-card">
         <img src={item.imgSrc} alt={item.name} className="t-profile-img" />
         <div className="t-profile-info">
-          <div className="t-profile-name">{item.name}</div>
+          <h2 className="t-profile-name">{item.name}</h2>
           <div className="t-profile-role">{item.role}</div>
           <div className="t-profile-edu">{item.education}</div>
-          {item.tagline && <div className="t-profile-tagline">&quot;{item.tagline}&quot;</div>}
+          {item.tagline && <p className="t-profile-tagline">{item.tagline}</p>}
           <div className="t-profile-links" onClick={event => event.stopPropagation()}>
             <a href={`mailto:${item.email}`} className="t-link">{item.email}</a>
             <a href={item.github} target="_blank" rel="noopener noreferrer" className="t-link">
               {item.github.replace('https://', '')}
             </a>
             <a href={`tel:${item.phone.replace(/[^\d+]/g, '')}`} className="t-link">{item.phone}</a>
+            {item.linkedin && <a href={item.linkedin} target="_blank" rel="noopener noreferrer" className="t-link">LinkedIn</a>}
           </div>
         </div>
       </div>

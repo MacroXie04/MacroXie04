@@ -5,6 +5,7 @@ import { SKILL_GROUPS } from '../data/skillsData';
 import { PROJECTS } from '../data/projectsData';
 import contact from '@assets/data/content/contact.json';
 import education from '@assets/data/content/education.json';
+import additional from '@assets/data/content/additional.json';
 import terminal from '@assets/data/terminal/terminal.json';
 import ui from '@assets/data/ui.json';
 import fun from '@assets/data/terminal/fun.json';
@@ -72,6 +73,10 @@ export function cmdExperience() {
     out.push(txt(''));
   });
 
+  out.push(txt('Additional', 't-title'), txt(''));
+  additional.programs.forEach(program => out.push(txt(`  ${program.name} · ${program.location} (${program.date})`, 't-green'), txt(`  ${program.description}`, 't-dim')));
+  out.push(txt(`  Conferences: ${additional.conferences.join('; ')}`, 't-dim'), txt(''));
+
   return { output: out };
 }
 
@@ -121,7 +126,6 @@ export function cmdContact() {
 }
 
 export function cmdProjects(args = []) {
-  const showLinks = args.includes('--links');
   const slug = args.find((a) => !a.startsWith('-'));
 
   if (slug) {
@@ -156,7 +160,8 @@ export function cmdProjects(args = []) {
     out.push(txt(`  ${p.name}  (${p.slug})`, 't-green'));
     out.push(txt(`    ${p.date} · ${p.tech.join(' · ')}`, 't-blue'));
     out.push(txt(`    ${p.desc}`, 't-dim'));
-    if (showLinks && p.repo) out.push({ type: 'link', text: `    ${p.repo}`, href: p.repo });
+    out.push({ type: 'link', text: `    Read ${p.name} case study`, href: `/#/projects/${p.slug}` });
+    if (p.repo) out.push({ type: 'link', text: `    ${p.repo}`, href: p.repo });
     out.push(txt(''));
   });
   out.push(txt(ui.tips.projects, 't-dim'));
@@ -169,10 +174,11 @@ export function cmdEducation() {
     txt(''),
     txt(ui.headings.education, 't-title'),
     txt(''),
-    txt(`  ${education.school}`, 't-green'),
-    txt(`  ${education.expected}`, 't-blue'),
-    txt(`  ${education.location}`, 't-dim'),
-    txt(''),
+    ...education.flatMap(school => [
+      txt(`  ${school.school}`, 't-green'),
+      ...[school.expected, school.program, school.gpa].filter(Boolean).map(text => txt(`  ${text}`, 't-blue')),
+      txt(`  ${school.location}`, 't-dim'), txt(''),
+    ]),
   ] };
 }
 

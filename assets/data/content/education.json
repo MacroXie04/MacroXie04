@@ -1,5 +1,15 @@
-{
-  "school": "University of California, Davis",
-  "location": "Davis, CA",
-  "expected": "Expected May 2028"
-}
+[
+  {
+    "school": "University of California, Davis",
+    "shortName": "UC Davis",
+    "location": "Davis, CA",
+    "expected": "Expected May 2028"
+  },
+  {
+    "school": "University of California, Merced",
+    "shortName": "UC Merced",
+    "location": "Merced, CA",
+    "program": "Computer Science and Engineering",
+    "gpa": "Major GPA 3.992/4.0"
+  }
+]

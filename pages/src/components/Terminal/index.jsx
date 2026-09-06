@@ -9,6 +9,7 @@ import miitLogo from '@assets/images/miit-logo.png';
 import './Terminal.css';
 
 const PROMPT_HOST = terminal.hostname.split(':')[0];
+const PRIMARY_COMMANDS = ['projects', 'resume', 'contact'];
 
 export function formatPrompt(cwd = HOME) {
   const path = cwd === HOME
@@ -22,18 +23,31 @@ export default function Terminal() {
   const icpTriggerRef = useRef(null);
   const icpDialogRef = useRef(null);
   const icpCloseRef = useRef(null);
+  const settingsTriggerRef = useRef(null);
   const {
     history, inputValue, handleInputChange,
-    tabHint,
+    tabHint, announcement,
     fontSize, setFontSize,
     theme, setTheme,
     accentColor, setColor,
     cwd,
     settingsOpen, setSettingsOpen,
     bombing,
-    rootRef, bottomRef, inputRef,
+    rootRef, bottomRef, inputRef, latestEntryRef,
     handleRootClick, handleKeyDown, handleQuickCmd,
   } = useTerminal();
+
+  useEffect(() => {
+    if (!settingsOpen) return undefined;
+    const closeOnEscape = event => {
+      if (event.key === 'Escape') {
+        setSettingsOpen(false);
+        settingsTriggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [settingsOpen, setSettingsOpen]);
 
   useEffect(() => {
     if (!icpOpen) return undefined;
@@ -82,6 +96,10 @@ export default function Terminal() {
       data-color={accentColor}
       onClick={handleRootClick}
     >
+      <a className="t-skip-link" href="#terminal-content" onClick={event => {
+        event.preventDefault();
+        document.getElementById('terminal-content')?.focus();
+      }}>Skip to portfolio</a>
       {bombing && (
         <div className="t-bomb-overlay">
           <div className="t-bomb-message">
@@ -165,15 +183,18 @@ export default function Terminal() {
         </div>
         <div className="t-titlebar-title">{ui.terminal.windowTitle}</div>
         <button
+          ref={settingsTriggerRef}
           className="t-settings-btn"
           onClick={e => { e.stopPropagation(); setSettingsOpen(o => !o); }}
           type="button"
           aria-label="Settings"
+          aria-expanded={settingsOpen}
+          aria-controls="terminal-settings"
         >
           settings
         </button>
         {settingsOpen && (
-          <div className="t-settings-panel" onClick={e => e.stopPropagation()}>
+          <div id="terminal-settings" className="t-settings-panel" aria-label="Display settings" onClick={e => e.stopPropagation()}>
             <div className="t-settings-label">{ui.terminal.settingsPanel.fontSize}</div>
             <div className="t-settings-options">
               {Object.keys(FONT_SIZES).map(size => (
@@ -181,7 +202,8 @@ export default function Terminal() {
                   key={size}
                   type="button"
                   className={`t-settings-opt${fontSize === size ? ' active' : ''}`}
-                  onClick={() => { setFontSize(size); setSettingsOpen(false); }}
+                  aria-pressed={fontSize === size}
+                  onClick={() => setFontSize(size)}
                 >
                   {size}
                 </button>
@@ -195,6 +217,7 @@ export default function Terminal() {
                   key={t.key}
                   type="button"
                   className={`t-settings-opt${theme === t.key ? ' active' : ''}`}
+                  aria-pressed={theme === t.key}
                   onClick={() => setTheme(t.key)}
                 >
                   {t.label}
@@ -209,6 +232,7 @@ export default function Terminal() {
                   key={c.key}
                   type="button"
                   className={`t-settings-opt${accentColor === c.key ? ' active' : ''}`}
+                  aria-pressed={accentColor === c.key}
                   onClick={() => setColor(c.key)}
                 >
                   <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: c.hex, marginRight: 6, verticalAlign: 'middle' }} />
@@ -221,43 +245,51 @@ export default function Terminal() {
       </div>
 
       {/* Quick Command Buttons */}
-      <div className="t-quick-cmds" onClick={e => e.stopPropagation()}>
-        {QUICK_COMMANDS.map(cmd => (
+      <nav className="t-quick-cmds" aria-label="Portfolio commands" onClick={e => e.stopPropagation()}>
+        <div className="t-primary-commands">
+          {PRIMARY_COMMANDS.map(cmd => (
+            <button key={cmd} className="t-quick-btn t-primary-command" onClick={() => handleQuickCmd(cmd)} type="button">{cmd}</button>
+          ))}
+        </div>
+        <div className="t-secondary-commands">
+          {QUICK_COMMANDS.filter(cmd => !PRIMARY_COMMANDS.includes(cmd)).map(cmd => (
+            <button
+              key={cmd}
+              className="t-quick-btn"
+              onClick={() => handleQuickCmd(cmd)}
+              type="button"
+            >
+              {cmd}
+            </button>
+          ))}
           <button
-            key={cmd}
-            className="t-quick-btn"
-            onClick={() => handleQuickCmd(cmd)}
+            ref={icpTriggerRef}
+            className="t-quick-btn t-icp-trigger"
             type="button"
+            aria-haspopup="dialog"
+            aria-expanded={icpOpen}
+            aria-controls="t-icp-dialog"
+            onClick={() => {
+              setSettingsOpen(false);
+              setIcpOpen(true);
+            }}
           >
-            {cmd}
+            <img
+              className="t-icp-logo"
+              src={miitLogo}
+              alt=""
+              aria-hidden="true"
+            />
+            <span>{ui.terminal.icp.label}</span>
           </button>
-        ))}
-        <button
-          ref={icpTriggerRef}
-          className="t-quick-btn t-icp-trigger"
-          type="button"
-          aria-haspopup="dialog"
-          aria-expanded={icpOpen}
-          aria-controls="t-icp-dialog"
-          onClick={() => {
-            setSettingsOpen(false);
-            setIcpOpen(true);
-          }}
-        >
-          <img
-            className="t-icp-logo"
-            src={miitLogo}
-            alt=""
-            aria-hidden="true"
-          />
-          <span>{ui.terminal.icp.label}</span>
-        </button>
-      </div>
+        </div>
+      </nav>
 
       {/* Output + Input Area */}
-      <div className="t-output">
+      <main id="terminal-content" className="t-output" tabIndex={-1} aria-label="Portfolio and terminal output">
+        <h1 className="t-sr-only">Hongzhe Xie — Software engineering portfolio</h1>
         {history.map(entry => (
-          <div key={entry.id} className="t-entry">
+          <div ref={entry === history[history.length - 1] ? latestEntryRef : null} key={entry.id} className="t-entry">
             {entry.cmd && (
               <div className="t-prompt-line">
                 <span className="t-prompt">{formatPrompt(entry.cwd)}</span>
@@ -280,19 +312,21 @@ export default function Terminal() {
             onChange={e => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
             onClick={e => e.stopPropagation()}
-            autoFocus
             spellCheck={false}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
             enterKeyHint="send"
             aria-label="Terminal input"
+            aria-describedby="terminal-input-help"
           />
         </div>
+        <p id="terminal-input-help" className="t-input-help">Type a command or use the buttons above. Ctrl+Space completes; Tab moves between controls.</p>
         {tabHint && <div className="t-line t-dim">{tabHint}</div>}
 
         <div ref={bottomRef} />
-      </div>
+      </main>
+      <div className="t-sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>
   );
 }

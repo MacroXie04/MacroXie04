@@ -7,12 +7,12 @@
     "aliases": [
       "resume.pdf"
     ],
-    "bytes": 40719,
+    "bytes": 179077,
     "version": "1.5",
-    "pages": 2,
-    "mtime": "Aug 25 19:44",
-    "sha256": "879577ce17f3150b8776d651bfe61039c7f57ecce4019143b22bf8b1358bf7f1",
-    "sourceSha256": "a439b5311eeab6caffeff52ba56b075afeefa184da071ce9c9785eba443cdf1e"
+    "pages": 1,
+    "mtime": "Sep 06 06:06",
+    "sha256": "46d035aeedf641d7a8168df75e6e9356d6302da40d361b2ba25322d3b15e8560",
+    "sourceSha256": "2992c1e0a59b91c58e40b75919e14e36b0acc4c791e63917b18750bb3683ab08"
   },
   "files": {
     "about.txt": [

@@ -227,7 +227,7 @@ export function cmdStat(args = [], cwd) {
   if (!s) return { output: [txt(''), txt(`stat: ${t}: No such file or directory`, 't-error'), txt('')] };
   const type = s.type === 'dir'
     ? 'directory'
-    : (s.pdf ? `PDF document${s.pages ? `, ${s.pages} pages` : ''}` : 'regular file');
+    : (s.pdf ? `PDF document${s.pages ? `, ${s.pages} page${s.pages === 1 ? '' : 's'}` : ''}` : 'regular file');
   const blocks = Math.ceil(s.bytes / 512);
   return {
     output: [
@@ -252,7 +252,7 @@ export function cmdFile(args = [], cwd) {
   if (isDir(node)) desc = 'directory';
   else if (node.pdf) {
     const version = node.pdfVersion ? `, version ${node.pdfVersion}` : '';
-    const pages = node.pages ? `, ${node.pages} pages` : '';
+    const pages = node.pages ? `, ${node.pages} page${node.pages === 1 ? '' : 's'}` : '';
     desc = `PDF document${version}${pages}`;
   }
   else if (node.lang === 'python') desc = `Python source, ${encoding()}`;

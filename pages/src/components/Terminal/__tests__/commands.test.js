@@ -81,7 +81,7 @@ describe('VFS-backed text utilities', () => {
     expect(python).toContain('Python source');
     expect(python).not.toContain('executable');
     expect(texts(run('file .secret'))).toContain('Unicode text, UTF-8');
-    expect(texts(run('file resume/Hongzhe_CV.pdf'))).toContain('PDF document, version 1.5, 2 pages');
+    expect(texts(run('file resume/Hongzhe_CV.pdf')).trim()).toBe('resume/Hongzhe_CV.pdf: PDF document, version 1.5, 1 page');
   });
 
   test('cat on the resume PDF points to executable download commands', () => {
@@ -92,11 +92,11 @@ describe('VFS-backed text utilities', () => {
   });
 
   test('resume PDF metadata is consistent across ls/stat/file', () => {
-    expect(texts(run('ls -l resume'))).toContain('39.8K');
+    expect(texts(run('ls -l resume'))).toContain('174.9K');
     const metadata = texts(run('stat resume/Hongzhe_CV.pdf'));
-    expect(metadata).toContain('Size: 40719');
-    expect(metadata).toContain('Blocks: 80');
-    expect(metadata).toContain('PDF document, 2 pages');
+    expect(metadata).toContain('Size: 179077');
+    expect(metadata).toContain('Blocks: 350');
+    expect(metadata.split('\n')).toContain('  Size: 179077\tBlocks: 350\tPDF document, 1 page');
   });
 
   test.each([

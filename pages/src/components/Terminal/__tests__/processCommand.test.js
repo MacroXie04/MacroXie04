@@ -106,19 +106,19 @@ describe('processCommand dispatch + parity', () => {
     expect(out).toEqual(expect.arrayContaining([
       expect.objectContaining({
         type: 'link',
-        text: '  Email   index@hongzhexie.com',
+        text: '  Email    index@hongzhexie.com',
         href: 'mailto:index@hongzhexie.com',
         cls: 't-contact-link',
       }),
       expect.objectContaining({
         type: 'link',
-        text: '  GitHub  github.com/MacroXie04',
+        text: '  GitHub   github.com/MacroXie04',
         href: 'https://github.com/MacroXie04',
         cls: 't-contact-link',
       }),
       expect.objectContaining({
         type: 'link',
-        text: '  Phone   +1 (206) 333-8881',
+        text: '  Phone    +1 (206) 333-8881',
         href: 'tel:+12063338881',
         cls: 't-contact-link',
       }),

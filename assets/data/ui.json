@@ -28,7 +28,7 @@
   },
   "tips": {
     "helpFooter": "Type 'help <command>' for details.",
-    "projects": "Tip: 'projects <name>' for detail, 'projects --links' for clickable links.",
+    "projects": "Open a case study above, or type 'projects <name>' for detail.",
     "stack": "Tip: 'stack --flat' for a one-line view."
   },
   "notFound": {

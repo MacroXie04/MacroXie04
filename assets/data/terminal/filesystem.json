@@ -24,9 +24,10 @@
       ""
     ],
     "contact.txt": [
-      "Email:   {email}",
-      "GitHub:  {github}",
-      "Phone:   {phone}",
+      "Email    index@hongzhexie.com",
+      "GitHub   github.com/MacroXie04",
+      "LinkedIn linkedin.com/in/hongzhexie",
+      "Phone    +1 (206) 333-8881",
       ""
     ],
     ".profile": [
@@ -45,30 +46,52 @@
       "  {email}",
       ""
     ],
-    "projects/mobileid.md": [
-      "# MobileID",
-      "",
-      "Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions.",
-      "",
-      "- **Dates:** 2025 - 2026",
-      "- **Stack:** Python, Django, Vue, PostgreSQL, DynamoDB, Docker, GitHub Actions",
-      "- **Security:** HTTP-only cookie JWTs, CSRF validation, refresh rotation and blacklisting, immediate session revocation, Argon2, credential-stuffing controls",
-      "- **Quality:** Bandit, Safety, Trivy, dependency audits, 70% Django coverage threshold, Playwright E2E, Docker/Vite build validation",
-      "",
-      "Repository: https://github.com/MacroXie04/MobileID",
-      ""
-    ],
     "projects/tokenrouter.md": [
       "# TokenRouter",
       "",
-      "OpenAI-compatible LLM gateway with cross-provider protocol conversion and secure quota routing.",
+      "Built an OpenAI-compatible LLM gateway that converts between provider protocols, routes by priority and weight with failure-aware retries, and reserves and settles token quotas concurrency-safely.",
       "",
-      "- **Date:** 2026",
-      "- **Stack:** Go, React, OpenAI/Claude/Gemini APIs, GORM, Redis, Casbin, Docker",
-      "- **Routing:** priority and weighted selection, failure-aware retries, concurrency-safe token quota reservation and settlement",
-      "- **Security:** SSRF-safe outbound dialing, JWT rotation and replay detection, Casbin RBAC, WebAuthn/TOTP, step-up verification, rate limits, race-tested quota logic",
+      "- **Dates:** 2026",
+      "- **Stack:** Go, React, OpenAI/Anthropic/Google APIs, GORM, Redis, Casbin, Docker",
+      "- Hardened relay and control planes with SSRF-safe outbound dialing, JWT refresh rotation with replay detection, Casbin RBAC, and WebAuthn/TOTP step-up verification; validated quota accounting under race-condition tests.",
+      "",
+      "## Engineering decision",
+      "User and API-token quota holds are paired in one database transaction. Settlement and refunds are idempotent, and durable reservation records keep failed operations available for reconciliation.",
+      "",
+      "## Evidence",
+      "The test suites cover atomic settlement, repeated settlement and refunds, rollback on failure, and concurrent reservations that cannot overspend.",
+      "- [Architecture overview](https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/docs/architecture/README.md)",
+      "- [Quota reservation implementation](https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/relay_quota_reservation.go)",
+      "- [Atomicity and idempotency tests](https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/relay_quota_reservation_test.go)",
+      "- [Concurrent quota tests](https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/quota_settle_test.go)",
       "",
       "Repository: https://github.com/MacroXie04/TokenRouter",
+      "Case study: https://hongzhexie.com/#/projects/tokenrouter",
+      ""
+    ],
+    "projects/mobileid.md": [
+      "# MobileID",
+      "",
+      "Built a Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions on PostgreSQL and DynamoDB.",
+      "",
+      "- **Dates:** 2025 - 2026",
+      "- **Stack:** Python, Django, Vue, PostgreSQL, DynamoDB, Docker, GitHub Actions",
+      "- Layered authentication defenses: HTTP-only cookie JWTs, CSRF validation, refresh-token rotation and blacklisting, immediate session revocation, and Argon2 hashing.",
+      "- Gated CI on Bandit, Safety, Trivy, and dependency audits at a 70% coverage floor, plus Playwright E2E suites and Docker/Vite build validation.",
+      "",
+      "## Engineering decision",
+      "Cookie-based JWT authentication combines refresh-token blacklisting with access-session revocation checks on subsequent API requests. Cookie-authenticated writes also require CSRF validation.",
+      "",
+      "## Evidence",
+      "Tests cover device listing, revoking one or all other devices, rejection of revoked access tokens, and CSRF enforcement. CI configures a 70% backend coverage floor alongside security checks and Playwright suites.",
+      "- [API authentication](https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/authentication.py)",
+      "- [Device revocation implementation](https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/api/webauthn/views/devices/revocation.py)",
+      "- [Device management tests](https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/api/tests/test_device_management.py)",
+      "- [Cookie authentication security tests](https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/tests/security/test_cookie_jwt_middleware.py)",
+      "- [CI quality gates](https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/.github/workflows/ci.yml)",
+      "",
+      "Repository: https://github.com/MacroXie04/MobileID",
+      "Case study: https://hongzhexie.com/#/projects/mobileid",
       ""
     ]
   },
@@ -86,8 +109,8 @@
         ".profile": "@file:.profile",
         ".secret": "@file:.secret",
         "projects": {
-          "mobileid.md": "@file:projects/mobileid.md:markdown",
-          "tokenrouter.md": "@file:projects/tokenrouter.md:markdown"
+          "tokenrouter.md": "@file:projects/tokenrouter.md:markdown",
+          "mobileid.md": "@file:projects/mobileid.md:markdown"
         },
         "resume": {
           "Hongzhe_CV.pdf": "@pdf",

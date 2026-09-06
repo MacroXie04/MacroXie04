@@ -21,6 +21,15 @@
     />
     <meta property="og:url" content="https://hongzhexie.com/" />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://hongzhexie.com/og.png" />
+    <meta property="og:image:width" content="1730" />
+    <meta property="og:image:height" content="909" />
+    <meta property="og:image:alt" content="Hongzhe Xie — Full-Stack Software Engineer. Secure platforms, identity, AI agents." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hongzhe Xie | Full-Stack Software Engineer" />
+    <meta name="twitter:description" content="Secure web platforms, identity systems, AI agents, and cloud engineering projects" />
+    <meta name="twitter:image" content="https://hongzhexie.com/og.png" />
+    <meta name="twitter:image:alt" content="Hongzhe Xie — Full-Stack Software Engineer. Secure platforms, identity, AI agents." />
     <link rel="canonical" href="https://hongzhexie.com/" />
     <meta
       name="google-site-verification"
@@ -28,47 +37,40 @@
     />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.json" />
+    <style>
+      .portfolio-fallback { height: 100vh; height: 100dvh; overflow: auto; background: #0c0c0c; color: #e5e5e5; font: 16px/1.65 "JetBrains Mono", monospace; }
+      .portfolio-fallback main { max-width: 1000px; margin: auto; padding: 40px 24px; }
+      .portfolio-fallback h1 { font-size: clamp(2rem, 6vw, 3rem); }
+      .portfolio-fallback h2, .portfolio-fallback h3 { margin: 24px 0 12px; color: #39d353; }
+      .portfolio-fallback p { margin: 12px 0; }
+      .portfolio-fallback a { color: #58a6ff; }
+      .portfolio-fallback nav { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; }
+      .portfolio-fallback details { border: 1px solid #555; border-radius: 6px; padding: 18px; margin: 18px 0; }
+      .portfolio-fallback summary { cursor: pointer; color: #39d353; font-weight: 600; }
+      .portfolio-fallback ul { padding-left: 24px; }
+      .portfolio-fallback a:focus-visible, .portfolio-fallback summary:focus-visible { outline: 2px solid #58a6ff; outline-offset: 4px; }
+    </style>
   </head>
   <body>
-    <noscript>
-      <div style="text-align: center; padding: 50px; font-family: 'JetBrains Mono', monospace; background-color: #1e1e1e; color: #ffffff; min-height: 100vh;">
-        <h1 style="color: #ff6b6b; margin-bottom: 30px;">JavaScript Required</h1>
-        <p style="font-size: 18px; margin-bottom: 30px;">You need to enable JavaScript to run this app.</p>
-
-        <div style="text-align: left; max-width: 600px; margin: 0 auto; background-color: #2d2d2d; padding: 30px; border-radius: 8px;">
-          <h2 style="color: #4ecdc4; margin-bottom: 20px;">How to Enable JavaScript:</h2>
-
-          <h3 style="color: #ffe66d; margin-top: 25px; margin-bottom: 10px;">Edge:</h3>
-          <ol style="line-height: 1.6;">
-            <li>Click the three dots menu (⋮) in the top right</li>
-            <li>Go to Settings → Privacy and security → JavaScript (under "Allow")</li>
-            <li>Select "Allow sites to run JavaScript"</li>
-          </ol>
-
-          <h3 style="color: #ffe66d; margin-top: 25px; margin-bottom: 10px;">Chrome:</h3>
-          <ol style="line-height: 1.6;">
-            <li>Click the three dots menu (⋮) in the top right</li>
-            <li>Go to Settings → Privacy and security → Site Settings</li>
-            <li>Click on JavaScript</li>
-            <li>Select "Sites can use JavaScript"</li>
-          </ol>
-
-          <h3 style="color: #ffe66d; margin-top: 25px; margin-bottom: 10px;">Safari:</h3>
-          <ol style="line-height: 1.6;">
-            <li>Go to Safari → Preferences</li>
-            <li>Click the Security tab</li>
-            <li>Check "Enable JavaScript"</li>
-          </ol>
-
-          <p style="margin-top: 30px; font-style: italic; color: #a0a0a0;">
-            After enabling JavaScript, please refresh this page.
-          </p>
-        </div>
-      </div>
-    </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- portfolio-fallback:start -->
+<div class="portfolio-fallback"><main>
+<h1>Hongzhe Xie</h1><p>Full-Stack Software Engineer</p><p>I build secure web platforms, identity systems, and AI agents. At UC Merced, I operate a production platform connecting capstone teams with industry sponsors.</p>
+<nav aria-label="Contact and resume"><a href="/resume/Hongzhe_CV.pdf" download>Download resume</a><a href="mailto:index@hongzhexie.com">Email</a><a href="https://github.com/MacroXie04">GitHub</a><a href="https://www.linkedin.com/in/hongzhexie/">LinkedIn</a></nav>
+<h2>Selected work</h2>
+<details><summary>TokenRouter — One gateway for multiple AI providers, with secure routing and concurrency-safe token accounting.</summary><h3>The problem</h3><p>Applications need one gateway for different AI provider protocols, with usage accounting that stays consistent when requests overlap or fail.</p><h3>What I built</h3><p>Built an OpenAI-compatible LLM gateway that converts between provider protocols, routes by priority and weight with failure-aware retries, and reserves and settles token quotas concurrency-safely.</p><h3>An engineering decision</h3><p>User and API-token quota holds are paired in one database transaction. Settlement and refunds are idempotent, and durable reservation records keep failed operations available for reconciliation.</p><h3>Evidence in the code</h3><p>The test suites cover atomic settlement, repeated settlement and refunds, rollback on failure, and concurrent reservations that cannot overspend.</p><ul><li><a href="https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/docs/architecture/README.md">Architecture overview</a></li><li><a href="https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/relay_quota_reservation.go">Quota reservation implementation</a></li><li><a href="https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/relay_quota_reservation_test.go">Atomicity and idempotency tests</a></li><li><a href="https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/quota_settle_test.go">Concurrent quota tests</a></li></ul><p><a href="https://github.com/MacroXie04/TokenRouter">TokenRouter on GitHub</a></p></details>
+<details><summary>MobileID — A Django/Vue identity platform with barcode workflows and control over sessions on other devices.</summary><h3>The problem</h3><p>A mobile identity application needs barcode and profile workflows alongside control over authenticated sessions on other devices.</p><h3>What I built</h3><p>Built a Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions on PostgreSQL and DynamoDB.</p><h3>An engineering decision</h3><p>Cookie-based JWT authentication combines refresh-token blacklisting with access-session revocation checks on subsequent API requests. Cookie-authenticated writes also require CSRF validation.</p><h3>Evidence in the code</h3><p>Tests cover device listing, revoking one or all other devices, rejection of revoked access tokens, and CSRF enforcement. CI configures a 70% backend coverage floor alongside security checks and Playwright suites.</p><ul><li><a href="https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/authentication.py">API authentication</a></li><li><a href="https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/api/webauthn/views/devices/revocation.py">Device revocation implementation</a></li><li><a href="https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/api/tests/test_device_management.py">Device management tests</a></li><li><a href="https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/tests/security/test_cookie_jwt_middleware.py">Cookie authentication security tests</a></li><li><a href="https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/.github/workflows/ci.yml">CI quality gates</a></li></ul><p><a href="https://github.com/MacroXie04/MobileID">MobileID on GitHub</a></p></details>
+<h2>Experience</h2><h3>Full-Stack Software Engineer</h3><p>School of Engineering, University of California, Merced · Oct 2025 - Present</p><ul><li>Architected and now operate the program&#39;s official production platform (Django REST Framework, React 19 + TypeScript + Vite), which runs partner intake, team matching, and milestone tracking for capstone collaborations between industry sponsors and student teams.</li><li>Built the platform&#39;s block-based CMS, registration flow, barcode ticketing, and check-in, giving staff an auditable trail of every administrative action.</li><li>Designed a dual-tier agentic workflow separating authenticated admin operations from read-only public event queries, isolated by RBAC, bounded context, per-IP token budgets, and privilege-escalation guards.</li><li>Built an AI-assisted phishing detector validating SPF/DKIM/DMARC and sender alignment plus punycode, typosquat, and URL heuristics, with Amazon Bedrock review over a deterministic rules-only fallback.</li><li>Mentor undergraduate teams on scoping, system design, and code review, holding student work to production standards for industry sponsors.</li></ul>
+<h3>Computer Vision / AI Engineering Intern</h3><p>China Academy of Building Research · Jul 2023 - Oct 2023</p><ul><li>Built a Python semantic-segmentation pipeline that identifies deployable rooftop photovoltaic area in aerial imagery of rural villages.</li><li>Annotated and curated the training dataset, then converted segmented rooftop area into estimated annual solar generation capacity.</li></ul>
+<h2>Education</h2><h3>University of California, Davis</h3><p>Davis, CA · Expected May 2028</p>
+<h3>University of California, Merced</h3><p>Merced, CA · Computer Science and Engineering · Major GPA 3.992/4.0</p>
+<h2>Additional</h2><p>Citigroup Financial Investment Analysis Training Program · Jul 2023. Selective cohort; built Excel and Python models for company-performance analysis.</p><p>Conferences: Google Cloud Next 2026; Google I/O 2025; Microsoft AI Day 2024</p>
+<noscript><p>The full portfolio is available above. Enable JavaScript to also explore the interactive terminal.</p></noscript>
+</main></div>
+      <!-- portfolio-fallback:end -->
+    </div>
     <script type="module" src="/src/index.jsx"></script>
   </body>
 </html>

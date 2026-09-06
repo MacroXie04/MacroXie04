@@ -3,8 +3,9 @@
   "imgSrc": "/images/profile_img.jpeg",
   "name": "Hongzhe Xie",
   "role": "Full-Stack Software Engineer",
-  "education": "UC Davis · Expected May 2028",
   "email": "index@hongzhexie.com",
   "github": "https://github.com/MacroXie04",
-  "phone": "+1 (206) 333-8881"
+  "phone": "+1 (206) 333-8881",
+  "tagline": "I build secure web platforms, identity systems, and AI agents. At UC Merced, I operate a production platform connecting capstone teams with industry sponsors.",
+  "linkedin": "https://www.linkedin.com/in/hongzhexie/"
 }

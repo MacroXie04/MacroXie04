@@ -2,17 +2,22 @@
   "title": "Contact Information",
   "items": [
     {
-      "text": "  Email   index@hongzhexie.com",
+      "text": "  Email    index@hongzhexie.com",
       "href": "mailto:index@hongzhexie.com",
       "type": "link"
     },
     {
-      "text": "  GitHub  github.com/MacroXie04",
+      "text": "  GitHub   github.com/MacroXie04",
       "href": "https://github.com/MacroXie04",
       "type": "link"
     },
     {
-      "text": "  Phone   +1 (206) 333-8881",
+      "text": "  LinkedIn linkedin.com/in/hongzhexie",
+      "href": "https://www.linkedin.com/in/hongzhexie/",
+      "type": "link"
+    },
+    {
+      "text": "  Phone    +1 (206) 333-8881",
       "href": "tel:+12063338881",
       "type": "link"
     }

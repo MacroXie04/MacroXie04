@@ -1,14 +1,16 @@
 {
   "hostname": "visitor@hongzhe:~$",
-  "welcomeMessage": "Welcome! Type 'help' to see essential commands.",
+  "welcomeMessage": "Explore the projects above, or type a command below. Use Ctrl+Space for completion.",
   "quickCommands": [
-    "help",
-    "about",
-    "experience",
-    "skills",
-    "contact",
-    "github",
+    "projects",
     "resume",
+    "contact",
+    "experience",
+    "education",
+    "skills",
+    "about",
+    "github",
+    "help",
     "clear"
   ],
   "helpGroups": [

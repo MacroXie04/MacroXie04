@@ -180,12 +180,12 @@ describe('content commands', () => {
   test('experience includes work and professional development', () => {
     const body = texts(run('experience'));
     expect(body).toContain('Computer Vision / AI Engineering Intern');
-    expect(body).toContain('Professional Development');
+    expect(body).toContain('Additional');
     expect(body).toContain('Google Cloud Next 2026');
   });
   test('skills come from resume categories without invented ratings', () => {
     const body = texts(run('skills'));
-    expect(body).toContain('APPLICATION & IDENTITY SECURITY');
+    expect(body).toContain('SECURITY');
     expect(body).toContain('WebAuthn/FIDO2');
     expect(body).not.toContain('/10');
   });

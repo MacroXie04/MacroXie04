@@ -31,7 +31,7 @@
   },
   "scripts": {
     "start": "vite",
-    "prebuild": "npm run verify:resume",
+    "prebuild": "npm run verify:content && npm run verify:resume",
     "build": "vite build",
     "verify:resume": "node scripts/verify-resume-assets.mjs",
     "test": "jest --watch",
@@ -41,7 +41,11 @@
     "lint:fix": "eslint src --ext .js,.jsx --fix",
     "pre-commit": "npm run lint && npm run test:ci",
     "sbom": "node ../.github/scripts/generate-sbom.mjs sbom.cdx.json",
-    "analyze": "npx vite-bundle-visualizer"
+    "analyze": "npx vite-bundle-visualizer",
+    "sync:content": "node scripts/sync-content.mjs",
+    "verify:content": "node scripts/sync-content.mjs --check",
+    "prestart": "npm run sync:content",
+    "pretest:ci": "npm run verify:content"
   },
   "browserslist": {
     "production": [

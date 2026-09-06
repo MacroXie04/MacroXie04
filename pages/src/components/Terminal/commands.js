@@ -99,6 +99,8 @@ export function getWelcomeOutput() {
     txt(''),
     PROFILE,
     txt(''),
+    { type: 'projects' },
+    txt(''),
     txt(terminal.welcomeMessage, 't-dim'),
     txt(''),
   ];

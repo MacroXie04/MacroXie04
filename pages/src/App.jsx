@@ -1,6 +1,7 @@
 import { HashRouter, Link, Route, Routes } from 'react-router-dom';
 import ui from '@assets/data/ui.json';
 import Terminal from './components/Terminal';
+import ProjectPage from './components/Projects';
 import './App.css';
 
 function NotFoundPage() {
@@ -22,6 +23,7 @@ function App() {
       <HashRouter>
         <Routes>
           <Route path="/" element={<Terminal />} />
+          <Route path="/projects/:slug" element={<ProjectPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </HashRouter>

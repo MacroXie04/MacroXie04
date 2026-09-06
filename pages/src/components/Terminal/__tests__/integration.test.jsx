@@ -1,4 +1,4 @@
-import { render, fireEvent, screen, within } from '@testing-library/react';
+import { render, fireEvent, createEvent, screen, within } from '@testing-library/react';
 import Terminal from '../index';
 
 function type(input, value) {
@@ -162,6 +162,7 @@ describe('Terminal UI integration', () => {
     try {
       render(<Terminal />);
       const input = screen.getByLabelText('Terminal input');
+      input.focus();
       expect(input).toHaveFocus();
       expect(input).toHaveAttribute('enterkeyhint', 'send');
       scrollIntoView.mockClear();
@@ -177,5 +178,59 @@ describe('Terminal UI integration', () => {
       HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
       window.requestAnimationFrame = originalRequestAnimationFrame;
     }
+  });
+
+  test('keeps normal keyboard navigation and offers explicit completion', () => {
+    render(<Terminal />);
+    const input = screen.getByRole('textbox', { name: 'Terminal input' });
+    expect(input).not.toHaveFocus();
+    input.focus();
+    for (const shiftKey of [false, true]) {
+      const event = createEvent.keyDown(input, { key: 'Tab', shiftKey, cancelable: true });
+      fireEvent(input, event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    fireEvent.change(input, { target: { value: 'proj' } });
+    fireEvent.keyDown(input, { key: ' ', ctrlKey: true });
+    expect(input).toHaveValue('projects ');
+    expect(input).toHaveAttribute('aria-describedby', 'terminal-input-help');
+  });
+
+  test('shortcut actions preserve button focus and announce new output', () => {
+    render(<Terminal />);
+    const button = screen.getByRole('button', { name: 'contact', exact: true });
+    button.focus();
+    fireEvent.click(button);
+    expect(button).toHaveFocus();
+    expect(screen.getByRole('status')).toHaveTextContent('Contact Information');
+    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Hongzhe Xie');
+  });
+
+  test('display settings expose selected values and Escape returns focus', () => {
+    render(<Terminal />);
+    const settings = screen.getByRole('button', { name: 'Settings' });
+    fireEvent.click(settings);
+    expect(settings).toHaveAttribute('aria-expanded', 'true');
+    const nord = screen.getByRole('button', { name: 'nord', exact: true });
+    nord.focus();
+    fireEvent.click(nord);
+    expect(nord).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'large', exact: true }));
+    expect(screen.getByRole('button', { name: 'large', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'cyan', exact: true }));
+    expect(screen.getByRole('button', { name: 'cyan', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(settings).toHaveFocus();
+    expect(settings).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('portfolio links are available on first load and skip link focuses content', () => {
+    render(<Terminal />);
+    expect(screen.getByRole('link', { name: 'Explore TokenRouter' })).toHaveAttribute('href', '/#/projects/tokenrouter');
+    expect(screen.getByRole('link', { name: 'Explore MobileID' })).toHaveAttribute('href', '/#/projects/mobileid');
+    expect(screen.getByRole('link', { name: 'LinkedIn', exact: true })).toHaveAttribute('href', 'https://www.linkedin.com/in/hongzhexie/');
+    fireEvent.click(screen.getByRole('link', { name: 'Skip to portfolio' }));
+    expect(screen.getByRole('main')).toHaveFocus();
   });
 });

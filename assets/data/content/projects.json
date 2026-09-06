@@ -1,5 +1,67 @@
 [
   {
+    "slug": "tokenrouter",
+    "name": "TokenRouter",
+    "date": "2026",
+    "tech": [
+      "Go",
+      "React",
+      "OpenAI/Anthropic/Google APIs",
+      "GORM",
+      "Redis",
+      "Casbin",
+      "Docker"
+    ],
+    "desc": "Built an OpenAI-compatible LLM gateway that converts between provider protocols, routes by priority and weight with failure-aware retries, and reserves and settles token quotas concurrency-safely.",
+    "highlights": [
+      "Hardened relay and control planes with SSRF-safe outbound dialing, JWT refresh rotation with replay detection, Casbin RBAC, and WebAuthn/TOTP step-up verification; validated quota accounting under race-condition tests."
+    ],
+    "repo": "https://github.com/MacroXie04/TokenRouter",
+    "summary": "One gateway for multiple AI providers, with secure routing and concurrency-safe token accounting.",
+    "caseStudy": {
+      "problem": "Applications need one gateway for different AI provider protocols, with usage accounting that stays consistent when requests overlap or fail.",
+      "decision": "User and API-token quota holds are paired in one database transaction. Settlement and refunds are idempotent, and durable reservation records keep failed operations available for reconciliation.",
+      "evidence": "The test suites cover atomic settlement, repeated settlement and refunds, rollback on failure, and concurrent reservations that cannot overspend.",
+      "flowTitle": "A request through TokenRouter",
+      "flow": [
+        {
+          "title": "Accept the request",
+          "description": "An OpenAI-compatible client sends a request to the gateway."
+        },
+        {
+          "title": "Reserve quota",
+          "description": "A database transaction holds the user and API-token quotas together."
+        },
+        {
+          "title": "Route and translate",
+          "description": "Provider adapters translate protocols; routing uses priority, weight, and failure-aware retries."
+        },
+        {
+          "title": "Settle or refund",
+          "description": "Actual usage settles the reservation; unused quota is released. Failed settlement remains available for reconciliation."
+        }
+      ],
+      "links": [
+        {
+          "label": "Architecture overview",
+          "url": "https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/docs/architecture/README.md"
+        },
+        {
+          "label": "Quota reservation implementation",
+          "url": "https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/relay_quota_reservation.go"
+        },
+        {
+          "label": "Atomicity and idempotency tests",
+          "url": "https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/relay_quota_reservation_test.go"
+        },
+        {
+          "label": "Concurrent quota tests",
+          "url": "https://github.com/MacroXie04/TokenRouter/blob/07c00114f32e8075d3d00d042475cf4734008fa4/internal/billing/quota_settle_test.go"
+        }
+      ]
+    }
+  },
+  {
     "slug": "mobileid",
     "name": "MobileID",
     "date": "2025 - 2026",
@@ -12,30 +74,58 @@
       "Docker",
       "GitHub Actions"
     ],
-    "desc": "Developed a Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions backed by PostgreSQL and DynamoDB.",
+    "desc": "Built a Django/Vue identity platform for PDF417 barcode generation, profile management, and device-aware sessions on PostgreSQL and DynamoDB.",
     "highlights": [
-      "Implemented defense-in-depth authentication with HTTP-only cookie JWTs, CSRF validation, refresh-token rotation and blacklisting, immediate session revocation, Argon2 hashing, and scoped credential-stuffing controls.",
-      "Enforced Bandit, Safety, Trivy, and dependency-audit gates alongside Django tests with a 70% coverage threshold, Playwright E2E tests, and Docker/Vite build validation."
+      "Layered authentication defenses: HTTP-only cookie JWTs, CSRF validation, refresh-token rotation and blacklisting, immediate session revocation, and Argon2 hashing.",
+      "Gated CI on Bandit, Safety, Trivy, and dependency audits at a 70% coverage floor, plus Playwright E2E suites and Docker/Vite build validation."
     ],
-    "repo": "https://github.com/MacroXie04/MobileID"
-  },
-  {
-    "slug": "tokenrouter",
-    "name": "TokenRouter",
-    "date": "2026",
-    "tech": [
-      "Go",
-      "React",
-      "OpenAI/Claude/Gemini APIs",
-      "GORM",
-      "Redis",
-      "Casbin",
-      "Docker"
-    ],
-    "desc": "Engineered an OpenAI-compatible LLM gateway with cross-provider protocol conversion, priority/weighted routing, failure-aware retries, and concurrency-safe reservation and settlement of token quotas.",
-    "highlights": [
-      "Protected relay and control planes with SSRF-safe outbound dialing, JWT refresh rotation and replay detection, Casbin RBAC, WebAuthn/TOTP, step-up verification, rate limits, and race-tested quota logic."
-    ],
-    "repo": "https://github.com/MacroXie04/TokenRouter"
+    "repo": "https://github.com/MacroXie04/MobileID",
+    "summary": "A Django/Vue identity platform with barcode workflows and control over sessions on other devices.",
+    "caseStudy": {
+      "problem": "A mobile identity application needs barcode and profile workflows alongside control over authenticated sessions on other devices.",
+      "decision": "Cookie-based JWT authentication combines refresh-token blacklisting with access-session revocation checks on subsequent API requests. Cookie-authenticated writes also require CSRF validation.",
+      "evidence": "Tests cover device listing, revoking one or all other devices, rejection of revoked access tokens, and CSRF enforcement. CI configures a 70% backend coverage floor alongside security checks and Playwright suites.",
+      "flowTitle": "Revoking a device session",
+      "flow": [
+        {
+          "title": "Choose a device",
+          "description": "The signed-in user selects a device from their session list."
+        },
+        {
+          "title": "Revoke session state",
+          "description": "The Django API revokes the selected session and blacklists its refresh token."
+        },
+        {
+          "title": "Check the next request",
+          "description": "API authentication checks the access token against revoked session state."
+        },
+        {
+          "title": "Reject revoked access",
+          "description": "The revoked session cannot continue using that access token or refresh it."
+        }
+      ],
+      "links": [
+        {
+          "label": "API authentication",
+          "url": "https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/authentication.py"
+        },
+        {
+          "label": "Device revocation implementation",
+          "url": "https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/api/webauthn/views/devices/revocation.py"
+        },
+        {
+          "label": "Device management tests",
+          "url": "https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/api/tests/test_device_management.py"
+        },
+        {
+          "label": "Cookie authentication security tests",
+          "url": "https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/src/authn/tests/security/test_cookie_jwt_middleware.py"
+        },
+        {
+          "label": "CI quality gates",
+          "url": "https://github.com/MacroXie04/MobileID/blob/fa2d70c3c721591e8ab139befe94726190ffaa3f/.github/workflows/ci.yml"
+        }
+      ]
+    }
   }
 ]

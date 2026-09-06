@@ -80,10 +80,6 @@ if (!resumeFilename || resumeFilename.includes('/') || resumeFilename.includes('
 requireNonemptyFile(`resume/${resumeFilename}`);
 
 const indexHtml = readFileSync(indexPath, 'utf8');
-if (/\/(?:src)\//.test(indexHtml)) {
-  fail('built index.html still references source files');
-}
-
 const references = [...indexHtml.matchAll(/(?:src|href)=["']([^"']+)["']/g)]
   .map(match => match[1]);
 const localReferences = references.filter(reference =>
@@ -95,6 +91,9 @@ let stylesheetAssets = 0;
 for (const reference of localReferences) {
   const cleanReference = decodeURIComponent(reference.split(/[?#]/, 1)[0]);
   const relativePath = cleanReference.replace(/^\/+/, '');
+  if (/(?:^|\/)src\//.test(relativePath)) {
+    fail('built index.html still references source files');
+  }
   requireNonemptyFile(relativePath);
   if (/\.js$/i.test(relativePath)) javascriptAssets += 1;
   if (/\.css$/i.test(relativePath)) stylesheetAssets += 1;

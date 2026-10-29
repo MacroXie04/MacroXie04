@@ -31,7 +31,7 @@ jobs:
           node-version: 24.18.1
 
       - name: Test CI policy scripts
-        run: node --test .github/scripts/dependency-review.test.mjs
+        run: node --test .github/scripts/*.test.mjs
 
       - name: Validate repository scripts
         run: |

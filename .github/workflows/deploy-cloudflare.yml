@@ -108,7 +108,7 @@ jobs:
       contents: read
       deployments: write
     environment:
-      name: cloudflare-pages-production
+      name: production
       url: ${{ vars.PRODUCTION_URL }}
     steps:
       - name: Check out trusted deployment helpers

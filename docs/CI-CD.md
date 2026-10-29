@@ -7,7 +7,7 @@ This repository builds the static portfolio once in GitHub Actions and promotes 
 1. Pull requests to `main` run `CI` and CodeQL. Inside the required `CI` check, the dependency review runs before the audit; CI then lints with zero warnings, runs the coverage-gated test suite, verifies the resume, builds and validates `pages/build`, and generates an SBOM.
 2. A successful `CI` run from a push or manual dispatch on this repository's `main` branch uploads `pages-build-<commit-sha>`. The artifact includes `deploy-meta.json` and `SHA256SUMS`; deployment verifies both against the trusted CI run and commit.
 3. `Deploy Cloudflare Pages` runs only when the repository kill switch is enabled. A Cloudflare-credential-free preflight accepts only a successful `CI` run from this repository's current `main`, and skips deployment idempotently when production metadata already identifies that commit.
-4. Its single deploy job uses the `production` environment. It downloads, verifies, and freezes the artifact once; deploys it to the `production-candidate` branch; and checks the candidate's immutable URL and `noindex` header before continuing.
+4. Its single deploy job uses the `Cloudflare Production` environment. It downloads, verifies, and freezes the artifact once; deploys it to the `production-candidate` branch; and checks the candidate's immutable URL and `noindex` header before continuing.
 5. In the same job, production records the current Cloudflare deployment as the rollback target, uploads the identical frozen artifact to branch `main`, and verifies both the immutable deployment URL and `https://hongzhexie.com` against the expected commit SHA. There is no approval pause between candidate and production.
 6. `Roll back Cloudflare Pages` is manual and serialized with production deployments. It validates a prior successful production deployment and its exact commit before moving the production pointer.
 
@@ -22,7 +22,7 @@ Use these names and scopes exactly:
 | Repository | Actions variable | `CLOUDFLARE_DEPLOY_ENABLED` | `false` during setup or an incident; `true` only when automated deployment is armed |
 | Repository | Actions variable | `CLOUDFLARE_PAGES_PROJECT` | `dev` |
 | Repository | Actions variable | `PRODUCTION_URL` | `https://hongzhexie.com` |
-| Environment | Environment | `production` | Allow deployments from `main` only; do not add required reviewers, wait timers, or a manual approval rule |
+| Environment | Environment | `Cloudflare Production` | Allow deployments from `main` only; do not add required reviewers, wait timers, or a manual approval rule |
 | Production environment | Actions variable | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account containing project `dev` |
 | Production environment | Actions secret | `CLOUDFLARE_API_TOKEN` | Scoped only to **Account → Cloudflare Pages → Edit** |
 
@@ -39,7 +39,7 @@ Never put a Cloudflare token or account value in this document, source control, 
 Keep the current production site serving throughout this sequence:
 
 1. Create the repository variables `CLOUDFLARE_DEPLOY_ENABLED=false`, `CLOUDFLARE_PAGES_PROJECT=dev`, and `PRODUCTION_URL=https://hongzhexie.com`. A missing or false deploy switch also keeps deployment off.
-2. Create the single GitHub environment `production`, add its exact variable and secret, and restrict it to `main`. Do not configure required reviewers, a wait timer, or another manual approval requirement.
+2. Create the single GitHub environment `Cloudflare Production`, add its exact variable and secret, and restrict it to `main`. Do not configure required reviewers, a wait timer, or another manual approval requirement.
 3. Merge the CI/CD workflows while the kill switch remains false. Confirm the `main` push passes `CI` and produces `pages-build-<commit-sha>`; the deployment workflow should show its preflight and deploy jobs as skipped.
 4. In Cloudflare, open **Workers & Pages → dev → Settings → Builds & deployments**. Disable automatic production-branch deployments and set preview-branch deployments to **None**. Keep the disabled Git connection attached during burn-in; do not delete the Pages project, its custom domain, or prior deployments.
 5. Confirm a GitHub push no longer creates a Cloudflare-native Git build or preview. Direct uploads from Wrangler must remain enabled; those are what the GitHub workflows use.
@@ -87,4 +87,4 @@ After that decision is recorded:
 2. Only then delete the legacy GitHub environment named `github-pages` and any Pages-only deployment configuration. Do not remove either while it is still serving or needed for fallback.
 3. In **Repository Settings → Webhooks**, identify the webhook that belongs specifically to this repository's old AWS Amplify integration by its endpoint and recent deliveries. Disable it first, observe that GitHub Actions/Cloudflare delivery remains healthy, and then delete only that repository-specific Amplify webhook. Do not change organization-wide or unrelated AWS webhooks.
 
-Keep the Cloudflare Pages project, custom-domain/DNS configuration, deployment history, and `production` environment in place for normal operation and rollback.
+Keep the Cloudflare Pages project, custom-domain/DNS configuration, deployment history, and `Cloudflare Production` environment in place for normal operation and rollback.

@@ -28,9 +28,9 @@ GitHub does not need a Cloudflare API token for this delivery path. Do not add C
 | Build command | `npm run build` |
 | Build output directory | `build` |
 | Build system | Version 3 |
-| Production build variable | `NODE_VERSION=24.18.1` |
+| Node version file | `pages/.nvmrc`: `24.18.1` |
 
-The configured output matches `pages/vite.config.mjs`. The prebuild script verifies shared content and the one-page resume. The Node version matches `pages/package.json` and the GitHub CI runtime. Keep the repository root available during builds because shared assets live in `assets/` alongside `pages/`.
+The configured output matches `pages/vite.config.mjs`. The prebuild script verifies shared content and the one-page resume. The Node version file is inside the configured build root so Cloudflare detects it; it matches the repository-root `.nvmrc`, `pages/package.json`, and the GitHub CI runtime. Do not rely on `package.json` engines to select the Cloudflare runtime. Keep the repository root available during builds because shared assets live in `assets/` alongside `pages/`.
 
 ## GitHub configuration
 

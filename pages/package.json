@@ -27,7 +27,7 @@
     "jest-environment-jsdom": "^30.5.2",
     "jest-watch-typeahead": "^3.0.1",
     "vite": "^8.3.4",
-    "wrangler": "4.149.0"
+    "wrangler": "4.155.0"
   },
   "scripts": {
     "start": "vite",
@@ -60,8 +60,8 @@
     ]
   },
   "allowScripts": {
-    "esbuild@0.28.1": true,
-    "workerd@1.20260903.1": true,
+    "esbuild@0.28.2": true,
+    "workerd@1.20261023.1": true,
     "fsevents@2.3.3": true
   }
 }

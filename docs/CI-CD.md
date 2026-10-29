@@ -36,9 +36,21 @@ The configured output matches `pages/vite.config.mjs`. The prebuild script verif
 
 Keep the existing `main` ruleset, required `CI` status, resolved review discussions, CodeQL, and fixed action commit references. Keep force pushes and branch deletion blocked. No Cloudflare token is required in GitHub for native Git deployment.
 
-The old token-based deployment and rollback workflows are archived in `docs/legacy-workflows/`; GitHub Actions does not execute workflows in that directory. Keep the legacy `CLOUDFLARE_DEPLOY_ENABLED` variable false while it remains in repository settings so an older workflow cannot be accidentally re-armed. The remaining project URL variables and `Cloudflare Production` environment are reference configuration, not an alternative deployment controller.
+The old token-based deployment and rollback workflows are archived in `docs/legacy-workflows/`; GitHub Actions does not execute workflows in that directory. Keep the legacy `CLOUDFLARE_DEPLOY_ENABLED` variable false while it remains in repository settings so an older workflow cannot be accidentally re-armed. The remaining project URL variables are reference configuration. The `Cloudflare Production` GitHub environment displays verified publication records through the status reporter below.
 
 GitHub CI artifacts and coverage are retained for 14 days; SBOMs are retained for 30 days. CI's artifact metadata describes that CI build and is not the release marker for Cloudflare's independently built output.
+
+## GitHub deployment status sync
+
+`Sync Cloudflare deployment status` writes real Cloudflare App results to the **Cloudflare Production** environment in GitHub Deployments. It does not build, upload, deploy, or require a Cloudflare token. Its only write permission is `deployments: write`; GitHub's short-lived `GITHUB_TOKEN` also reads check runs and repository metadata.
+
+The reporter runs after this repository's `CI` completes on `main`, including unsuccessful CI runs so an actual Cloudflare publication is reported truthfully. It also accepts completed official-App check events where GitHub delivers them. GitHub can suppress check events associated with Actions, so those events are not the only trigger. The reporter waits up to ten minutes for Cloudflare's result; if the check never completes, the sync fails visibly without manufacturing a successful record.
+
+Before writing a record it re-fetches and validates the official App ID and slug, repository ID, check suite, `main` source branch, commit ancestry, project log URL, and the matching immutable Pages URL. The deployment record uses the actual checked commit SHA, not the reporter workflow's SHA. **View deployment** opens that version's immutable Pages URL; **View logs** opens its Cloudflare build log. The public production domain remains `https://hongzhexie.com`.
+
+Success, failure, cancellation, and timeout results retain their actual outcomes. Skipped, neutral, preview, and unfinished checks never become successful publications. Repeated syncs reuse the same publication record. A later successful publication marks older successes inactive; late-arriving historical results cannot reactivate an older version, and a failed attempt does not deactivate the last successful release. The original Cloudflare completion time, check ID, deployment ID, and production URL are retained in the record payload.
+
+To reconcile a missed result, run **Sync Cloudflare deployment status** manually from branch `main`. Leave `commit_sha` blank for current `main`, or supply a full SHA already merged into `main` that has a genuine production Cloudflare check. This reads existing evidence and does not redeploy anything. Manually rolling back in the Cloudflare dashboard may not update an App check; the reporter cannot infer an unreported rollback without a new official check result.
 
 ## Verify a release
 

@@ -1,0 +1,60 @@
+name: Sync Cloudflare deployment status
+
+on:
+  check_run:
+    types: [completed]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Optional full main commit SHA to reconcile; defaults to current main
+        required: false
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: cloudflare-production-status
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Record verified Cloudflare result
+    if: >-
+      github.repository == 'MacroXie04/MacroXie04' &&
+      ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+       (github.event_name == 'workflow_run' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        github.event.workflow_run.head_branch == 'main' &&
+        (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch')) ||
+       (github.event_name == 'check_run' &&
+        github.event.check_run.app.id == 85455 &&
+        github.event.check_run.name == 'Cloudflare Pages'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      checks: read
+      contents: read
+      deployments: write
+    steps:
+      # Always execute trusted default-branch code, never code from the check's ref.
+      # Deliberately omit job.environment: the API records the actual published SHA.
+      - name: Checkout status reporter from main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.18.1
+
+      - name: Sync official App result to GitHub Deployments
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SYNC_COMMIT_SHA: ${{ inputs.commit_sha }}
+        run: node .github/scripts/sync-cloudflare-status.mjs
